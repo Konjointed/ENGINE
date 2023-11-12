@@ -4,6 +4,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
+
+#include "Mesh.h"
+#include "Camera.h"
+
 SDL_Window* window;
 SDL_GLContext glContext;
 
@@ -55,9 +61,14 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 }
 
 int Run() {
+	Camera camera;
+	Mesh cube = Mesh::GenerateCube();
 	bool quit = false;
 	SDL_Event event;
 	while (!quit) {
+		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 projection = camera.GetProjectionMatrix();
+
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 			case SDL_QUIT:
@@ -65,7 +76,15 @@ int Run() {
 				break;
 			}
 		}
+
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		camera.Update();
+
+		SDL_GL_SwapWindow(window);
 	}
+
 	return 0;
 }
 

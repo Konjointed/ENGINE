@@ -133,10 +133,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Mesh.cpp" />
+    <ClCompile Include="Source\VertexArray.cpp" />
+    <ClCompile Include="Source\VertexBuffer.cpp" />
     <ClCompile Include="ThirdParty\glad\glad.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Camera.h" />
+    <ClInclude Include="Source\Mesh.h" />
+    <ClInclude Include="Source\VertexArray.h" />
+    <ClInclude Include="Source\VertexBuffer.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />
     <ClInclude Include="ThirdParty\glad\khrplatform.h" />
   </ItemGroup>
