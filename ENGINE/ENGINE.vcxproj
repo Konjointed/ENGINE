@@ -175,6 +175,8 @@
   <ItemGroup>
     <None Include="Resources\Shaders\Default.frag" />
     <None Include="Resources\Shaders\Default.vert" />
+    <None Include="Resources\Shaders\Grayscale.frag" />
+    <None Include="Resources\Shaders\Grayscale.vert" />
     <None Include="Resources\Shaders\Texture.frag" />
     <None Include="Resources\Shaders\Texture.vert" />
   </ItemGroup>

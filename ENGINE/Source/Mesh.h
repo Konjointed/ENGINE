@@ -22,9 +22,9 @@ public:
 
 	const glm::mat4& GetModelMatrix() const;
 
-	//void SetPosition(const glm::vec3& position);
-	//void SetRotation(const glm::vec3& rotation);
-	//void SetScale(const glm::vec3& scale);
+	void SetPosition(const glm::vec3& position);
+	void SetRotation(const glm::vec3& rotation);
+	void SetScale(const glm::vec3& scale);
 private:
 	VAO* vao;
 	VBO* vbo;

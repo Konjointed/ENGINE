@@ -93,6 +93,7 @@ int Run() {
 	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
 	Shader textureShader("Resources/Shaders/Texture.vert", "Resources/Shaders/Texture.frag");
 	
+	/*
 	int mapWidth = 100;
 	int mapHeight = 100;
 	float mapScale = 25.0f;
@@ -104,9 +105,19 @@ int Run() {
 	int seed = 0;
 	float offsetX = 0.0f, offsetY = 0.0f;
 
-	std::vector<std::vector<float>> noiseMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale, seed, octaves, persistance, lacunarity, {offsetX, offsetY});
-	Texture texture(noiseMap);
-	Mesh plane = Mesh::GeneratePlane();
+	d::vector<std::vector<float>> heightMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale, seed, octaves, persistance, lacunarity, {offsetX, offsetY});
+	//Texture noiseMap(heightMap);
+	Mesh terrain = Mesh::GenerateTerrain(heightMap, 0.2f);
+	*/
+
+	Texture brickTexture("Resources/Textures/brickwall.jpg");
+	Texture woodTexture("Resources/Textures/wood.png");
+
+	Mesh cubeMesh = Mesh::GenerateCube();
+	cubeMesh.SetScale({ 0.2f, 0.2f, 0.2f });
+	cubeMesh.SetPosition({ 0.0f, 1.0f, 0.0f });
+
+	Mesh planMesh = Mesh::GeneratePlane();
 
 	Camera camera;
 
@@ -156,6 +167,7 @@ int Run() {
 		ImGui::NewFrame();
 		//ImGui::ShowDemoWindow();
 
+		/*
 		ImGui::Begin("Noise Controls");
 		bool parametersChanged = ImGui::SliderInt("Width", &mapWidth, 1, 200) ||
 			ImGui::SliderInt("Height", &mapHeight, 1, 200) ||
@@ -169,9 +181,10 @@ int Run() {
 		ImGui::End();
 
 		if (parametersChanged) {
-			std::vector<std::vector<float>> noiseMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale, seed, octaves, persistance, lacunarity, { offsetX, offsetY });
-			texture.Update(noiseMap);
+			std::vector<std::vector<float>> heightMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale, seed, octaves, persistance, lacunarity, { offsetX, offsetY });
+			noiseMap.Update(heightMap);
 		}
+		*/
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -183,15 +196,25 @@ int Run() {
 		// Render
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 projection = camera.GetProjectionMatrix();
-		glm::mat4 model = plane.GetModelMatrix();
+		glm::mat4 planeModel = planMesh.GetModelMatrix();
+		glm::mat4 cubeModel = cubeMesh.GetModelMatrix();
 
 		textureShader.use();
 		textureShader.setMat4("projection", projection);
 		textureShader.setMat4("view", view);
-		textureShader.setMat4("model", model);
+		textureShader.setMat4("model", planeModel);
 
-		texture.Bind();
-		plane.Draw();
+		woodTexture.Bind();
+		planMesh.Draw();
+		Texture::Unbind();
+
+		textureShader.use();
+		textureShader.setMat4("projection", projection);
+		textureShader.setMat4("view", view);
+		textureShader.setMat4("model", cubeModel);
+
+		brickTexture.Bind();
+		cubeMesh.Draw();
 		Texture::Unbind();
 
 		// Render ImGui

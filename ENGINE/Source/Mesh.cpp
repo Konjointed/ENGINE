@@ -49,15 +49,43 @@ Mesh::~Mesh() {
 
 Mesh Mesh::GenerateCube() {
     std::vector<float> vertices = {
-        // Positions         
-        -0.5f, -0.5f, -0.5f, // 0. left bottom back
-         0.5f, -0.5f, -0.5f, // 1. right bottom back
-        -0.5f,  0.5f, -0.5f, // 2. left top back
-         0.5f,  0.5f, -0.5f, // 3. right top back
-        -0.5f, -0.5f,  0.5f, // 4. left bottom front
-         0.5f, -0.5f,  0.5f, // 5. right bottom front
-        -0.5f,  0.5f,  0.5f, // 6. left top front
-         0.5f,  0.5f,  0.5f  // 7. right top front
+        // Positions        // Texture Coords
+
+        // Front face (4, 5, 6, 7)
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // 4. left bottom front
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // 5. right bottom front
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, // 6. left top front
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // 7. right top front
+
+         // Back face (0, 1, 2, 3)
+         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // 0. left bottom back
+          0.5f, -0.5f, -0.5f,  1.0f, 0.0f, // 1. right bottom back
+         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // 2. left top back
+          0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // 3. right top back
+
+          // Left face (8, 9, 10, 11)
+          -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // 8. left bottom back
+          -0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // 9. left bottom front
+          -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // 10. left top back
+          -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // 11. left top front
+
+          // Right face (12, 13, 14, 15)
+           0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // 12. right bottom back
+           0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // 13. right bottom front
+           0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // 14. right top back
+           0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // 15. right top front
+
+           // Top face (16, 17, 18, 19)
+           -0.5f,  0.5f, -0.5f,  0.0f, 0.0f, // 16. left top back
+            0.5f,  0.5f, -0.5f,  1.0f, 0.0f, // 17. right top back
+           -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, // 18. left top front
+            0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // 19. right top front
+
+            // Bottom face (20, 21, 22, 23)
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // 20. left bottom back
+             0.5f, -0.5f, -0.5f,  1.0f, 0.0f, // 21. right bottom back
+            -0.5f, -0.5f,  0.5f,  0.0f, 1.0f, // 22. left bottom front
+             0.5f, -0.5f,  0.5f,  1.0f, 1.0f, // 23. right bottom front
     };
 
     std::vector<unsigned int> indices = {
@@ -66,24 +94,24 @@ Mesh Mesh::GenerateCube() {
         5, 7, 6,
 
         // Back face
-        0, 2, 1,
-        1, 2, 3,
+        8, 10, 9,
+        9, 10, 11,
 
         // Left face
-        0, 4, 2,
-        2, 4, 6,
+        12, 14, 13,
+        13, 14, 15,
 
         // Right face
-        1, 3, 5,
-        3, 7, 5,
+        16, 18, 17,
+        17, 18, 19,
 
         // Top face
-        2, 6, 3,
-        3, 6, 7,
+        20, 22, 21,
+        21, 22, 23,
 
         // Bottom face
-        0, 1, 4,
-        1, 5, 4
+        0, 1, 2,
+        1, 3, 2
     };
 
     return Mesh(vertices, indices);
@@ -105,6 +133,18 @@ Mesh Mesh::GeneratePlane() {
     };
 
     return Mesh(vertices, indices);
+}
+
+void Mesh::SetPosition(const glm::vec3& newPosition) {
+    position = newPosition;
+}
+
+void Mesh::SetRotation(const glm::vec3& newRotation) {
+    rotation = newRotation;
+}
+
+void Mesh::SetScale(const glm::vec3& newScale) {
+    scale = newScale;
 }
 
 const glm::mat4& Mesh::GetModelMatrix() const {

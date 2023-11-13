@@ -30,6 +30,9 @@ public:
         float maxNoiseHeight = std::numeric_limits<float>::lowest();
         float minNoiseHeight = std::numeric_limits<float>::max();
 
+        float halfWidth = mapWidth / 2.0f;
+        float halfHeight = mapHeight / 2.0f;
+
         for (int y = 0; y < mapHeight; y++) {
             for (int x = 0; x < mapWidth; x++) {
 
@@ -38,8 +41,8 @@ public:
                 float noiseHeight = 0;
 
                 for (int i = 0; i < octaves; i++) {
-                    float sampleX = x / scale * frequency + octaveOffsets[i].x;
-                    float sampleY = y / scale * frequency + octaveOffsets[i].y;
+                    float sampleX = (x - halfWidth) / scale * frequency + octaveOffsets[i].x;
+                    float sampleY = (y - halfHeight) / scale * frequency + octaveOffsets[i].y;
 
                     // glm::perlin returns values in the range of [-1, 1]
                     float perlinValue = glm::perlin(glm::vec2(sampleX, sampleY)) * 2 - 1;
