@@ -7,6 +7,8 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+#include <Shader.h>
+
 #include "Mesh.h"
 #include "Camera.h"
 
@@ -61,14 +63,13 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 }
 
 int Run() {
-	Camera camera;
+	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
 	Mesh cube = Mesh::GenerateCube();
+	Camera camera;
+
 	bool quit = false;
 	SDL_Event event;
 	while (!quit) {
-		glm::mat4 view = camera.GetViewMatrix();
-		glm::mat4 projection = camera.GetProjectionMatrix();
-
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 			case SDL_QUIT:
@@ -78,9 +79,23 @@ int Run() {
 		}
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
 
+		// Update
 		camera.Update();
+
+		// Render
+		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 projection = camera.GetProjectionMatrix();
+
+		defaultShader.use();
+		defaultShader.setMat4("projection", projection);
+		std::cout << projection << "\n";
+		defaultShader.setMat4("view", view);
+		defaultShader.setMat4("model", cube.GetModelMatrix());
+
+		cube.Draw();
 
 		SDL_GL_SwapWindow(window);
 	}
