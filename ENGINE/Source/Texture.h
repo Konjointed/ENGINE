@@ -7,7 +7,6 @@
 
 class Texture {
 public:
-    // Constructor
     Texture(const std::string& path) {
         // Load the image
         int width, height, nrChannels;
@@ -38,16 +37,15 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    Texture(int width, int height) {
-        // Generate Perlin noise data
-        std::vector<unsigned char> data(width * height * 3); // 3 for RGB
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
-                float noise = glm::perlin(glm::vec2(x, y) * 0.1f) * 0.5f + 0.5f; // Adjust scale and bias
-                unsigned char value = static_cast<unsigned char>(noise * 255.0f);
-                data[(y * width + x) * 3 + 0] = value; // R
-                data[(y * width + x) * 3 + 1] = value; // G
-                data[(y * width + x) * 3 + 2] = value; // B
+    Texture(const std::vector<std::vector<float>>& noiseMap) {
+        int width = noiseMap.size();
+        int height = noiseMap[0].size();
+
+        // Convert the noise map to an array of unsigned char (grayscale values)
+        std::vector<unsigned char> pixels;
+        for (const auto& row : noiseMap) {
+            for (float value : row) {
+                pixels.push_back(static_cast<unsigned char>(value * 255));
             }
         }
 
@@ -62,14 +60,13 @@ public:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         // Upload the texture to the GPU
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data.data());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, pixels.data());
         glGenerateMipmap(GL_TEXTURE_2D);
 
         // Unbind the texture
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    // Destructor
     ~Texture() {
         glDeleteTextures(1, &textureID);
     }

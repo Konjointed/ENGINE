@@ -14,10 +14,24 @@
 
 #include "Mesh.h"
 #include "Texture.h"
+#include "Noise.h"
 #include "Camera.h"
 
 SDL_Window* window;
 SDL_GLContext glContext;
+
+std::vector<std::vector<float>> GenerateHeightMap(int width, int height, float scale, float maxHeight) {
+	std::vector<std::vector<float>> heightMap(height, std::vector<float>(width));
+
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			float noise = glm::perlin(glm::vec2(x, y) * scale) * 0.5f + 0.5f; // Adjust scale and bias
+			heightMap[y][x] = noise * maxHeight;
+		}
+	}
+
+	return heightMap;
+}
 
 bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fullscreen) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -69,9 +83,15 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 int Run() {
 	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
 	Shader textureShader("Resources/Shaders/Texture.vert", "Resources/Shaders/Texture.frag");
-	//Texture texture("Resources/Textures/wood.png");
-	Texture texture(512, 512);
+	
+	int mapWidth = 100;
+	int mapHeight = 100;
+	float mapScale = 25.0f; // zoom in or out
+
+	std::vector<std::vector<float>> noiseMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale);
+	Texture texture(noiseMap);
 	Mesh plane = Mesh::GeneratePlane();
+
 	Camera camera;
 
 	int lastFrameTime = 0;
