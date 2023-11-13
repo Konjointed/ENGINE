@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDL2/SDL_events.h>
 #include <glm/ext/matrix_transform.hpp>
 
 class Camera {
@@ -9,7 +10,10 @@ public:
 
 	glm::mat4 GetViewMatrix();
 	glm::mat4 GetProjectionMatrix();
-	void Update();
+
+	void ProcessKeyboard(float deltaTime);
+	void ProcessMouseMovement(float xoffset, float yoffset);
+	void Update(float deltaTime);
 private:
 	float fov = 45.0f;
 	float aspectRatio = static_cast<float>(1280) / 720;
@@ -24,4 +28,9 @@ private:
 
 	float yaw;
 	float pitch;
+
+	float movementSpeed = 2.5f;
+	float mouseSensitivity = 0.1f;
+	bool firstMouse = true;
+	float lastX, lastY;
 };

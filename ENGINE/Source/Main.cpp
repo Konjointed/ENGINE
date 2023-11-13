@@ -77,11 +77,39 @@ int Run() {
 	Mesh cube = Mesh::GenerateCube();
 	Camera camera;
 
+	int lastFrameTime = 0;
+	bool rightMouseButtonPressed = false;
 	bool quit = false;
 	SDL_Event event;
 	while (!quit) {
+		int currentTime = SDL_GetTicks();
+		float deltaTime = (currentTime - lastFrameTime) / 1000.0f;
+		lastFrameTime = currentTime;
+		//std::cout << deltaTime << "\n";
+
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
+			//case SDL_KEYDOWN:
+				//break;
+			case SDL_MOUSEBUTTONDOWN:
+				if (event.button.button == SDL_BUTTON_RIGHT) {
+					rightMouseButtonPressed = true;
+					SDL_SetRelativeMouseMode(SDL_TRUE); 
+				}
+				break;
+			case SDL_MOUSEBUTTONUP:
+				if (event.button.button == SDL_BUTTON_RIGHT) {
+					rightMouseButtonPressed = false;
+					SDL_SetRelativeMouseMode(SDL_FALSE);
+				}
+				break;
+			//case SDL_MOUSEWHEEL:
+				//break;
+			case SDL_MOUSEMOTION:
+				if (rightMouseButtonPressed) {
+					camera.ProcessMouseMovement(static_cast<float>(event.motion.xrel), static_cast<float>(event.motion.yrel));
+				}
+				break;
 			case SDL_QUIT:
 				quit = true;
 				break;
@@ -93,23 +121,12 @@ int Run() {
 		glEnable(GL_DEPTH_TEST);
 
 		// Update
-		camera.Update();
+		camera.Update(deltaTime);
 
 		// Render
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 projection = camera.GetProjectionMatrix();
 		glm::mat4 model = cube.GetModelMatrix();
-
-		/*
-		std::cout << "View Matrix:" << std::endl;
-		PrintMatrix(view);
-
-		std::cout << "Projection Matrix:" << std::endl;
-		PrintMatrix(projection);
-
-		std::cout << "Model Matrix:" << std::endl;
-		PrintMatrix(model);
-		*/
 
 		defaultShader.use();
 		defaultShader.setMat4("projection", projection);
