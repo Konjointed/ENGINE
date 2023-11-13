@@ -69,7 +69,8 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 int Run() {
 	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
 	Shader textureShader("Resources/Shaders/Texture.vert", "Resources/Shaders/Texture.frag");
-	Texture texture("Resources/Textures/wood.png");
+	//Texture texture("Resources/Textures/wood.png");
+	Texture texture(512, 512);
 	Mesh plane = Mesh::GeneratePlane();
 	Camera camera;
 
