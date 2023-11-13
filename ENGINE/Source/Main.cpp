@@ -15,6 +15,16 @@
 SDL_Window* window;
 SDL_GLContext glContext;
 
+void PrintMatrix(const glm::mat4& mat) {
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			std::cout << mat[j][i] << " "; // Note: mat[column][row]
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+}
+
 bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fullscreen) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		std::cout << "SDL error on initialization: " << SDL_GetError() << "\n";
@@ -88,12 +98,23 @@ int Run() {
 		// Render
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 projection = camera.GetProjectionMatrix();
+		glm::mat4 model = cube.GetModelMatrix();
+
+		/*
+		std::cout << "View Matrix:" << std::endl;
+		PrintMatrix(view);
+
+		std::cout << "Projection Matrix:" << std::endl;
+		PrintMatrix(projection);
+
+		std::cout << "Model Matrix:" << std::endl;
+		PrintMatrix(model);
+		*/
 
 		defaultShader.use();
 		defaultShader.setMat4("projection", projection);
-		std::cout << projection << "\n";
 		defaultShader.setMat4("view", view);
-		defaultShader.setMat4("model", cube.GetModelMatrix());
+		defaultShader.setMat4("model", model);
 
 		cube.Draw();
 

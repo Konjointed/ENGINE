@@ -23,7 +23,7 @@ Mesh::Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& 
     ebo = new EBO(indices.data(), indices.size() * sizeof(unsigned int));
 
     // Assuming the stride (gap between vertices) is 8 floats (3 for position, 2 for texture, 3 for normal)
-    GLsizei stride = 8 * sizeof(float);
+    GLsizei stride = 3 * sizeof(float);
 
     // Set the vertex attribute pointers
     // Position attribute
