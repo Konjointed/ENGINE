@@ -71,6 +71,29 @@ public:
         glDeleteTextures(1, &textureID);
     }
 
+    void Update(const std::vector<std::vector<float>>& noiseMap) {
+        int width = noiseMap.size();
+        int height = noiseMap[0].size();
+
+        // Convert the noise map to an array of unsigned char (grayscale values)
+        std::vector<unsigned char> pixels;
+        for (const auto& row : noiseMap) {
+            for (float value : row) {
+                pixels.push_back(static_cast<unsigned char>(value * 255));
+            }
+        }
+
+        // Bind the existing texture
+        glBindTexture(GL_TEXTURE_2D, textureID);
+
+        // Update the texture with new data
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, pixels.data());
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        // Unbind the texture
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
     // Bind the texture
     void Bind() const {
         glBindTexture(GL_TEXTURE_2D, textureID);

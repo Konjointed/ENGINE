@@ -7,6 +7,10 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_sdl2.h>
+#include <imgui/imgui_impl_opengl3.h>
+
 #include <Shader.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -20,17 +24,20 @@
 SDL_Window* window;
 SDL_GLContext glContext;
 
-std::vector<std::vector<float>> GenerateHeightMap(int width, int height, float scale, float maxHeight) {
-	std::vector<std::vector<float>> heightMap(height, std::vector<float>(width));
+bool ImGuiInit() {
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
 
-	for (int y = 0; y < height; ++y) {
-		for (int x = 0; x < width; ++x) {
-			float noise = glm::perlin(glm::vec2(x, y) * scale) * 0.5f + 0.5f; // Adjust scale and bias
-			heightMap[y][x] = noise * maxHeight;
-		}
-	}
+	// Setup Platform/Renderer backends
+	ImGui_ImplSDL2_InitForOpenGL(window, glContext);
+	ImGui_ImplOpenGL3_Init();
 
-	return heightMap;
+	return true;
 }
 
 bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fullscreen) {
@@ -77,6 +84,8 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 		return false;
 	}
 	
+	ImGuiInit();
+
 	return true;
 }
 
@@ -86,9 +95,16 @@ int Run() {
 	
 	int mapWidth = 100;
 	int mapHeight = 100;
-	float mapScale = 25.0f; // zoom in or out
+	float mapScale = 25.0f;
 
-	std::vector<std::vector<float>> noiseMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale);
+	int octaves = 4;
+	float persistance = 0.5f;
+	float lacunarity = 2.0f;
+
+	int seed = 0;
+	float offsetX = 0.0f, offsetY = 0.0f;
+
+	std::vector<std::vector<float>> noiseMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale, seed, octaves, persistance, lacunarity, {offsetX, offsetY});
 	Texture texture(noiseMap);
 	Mesh plane = Mesh::GeneratePlane();
 
@@ -105,6 +121,8 @@ int Run() {
 		//std::cout << deltaTime << "\n";
 
 		while (SDL_PollEvent(&event)) {
+			ImGui_ImplSDL2_ProcessEvent(&event);
+
 			switch (event.type) {
 			//case SDL_KEYDOWN:
 				//break;
@@ -133,6 +151,28 @@ int Run() {
 			}
 		}
 
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+		//ImGui::ShowDemoWindow();
+
+		ImGui::Begin("Noise Controls");
+		bool parametersChanged = ImGui::SliderInt("Width", &mapWidth, 1, 200) ||
+			ImGui::SliderInt("Height", &mapHeight, 1, 200) ||
+			ImGui::SliderFloat("Scale", &mapScale, 0.1f, 100.0f) ||
+			ImGui::SliderInt("Octaves", &octaves, 1, 8) ||
+			ImGui::SliderFloat("Persistence", &persistance, 0.0f, 1.0f) ||
+			ImGui::SliderFloat("Lacunarity", &lacunarity, 0.0f, 4.0f) ||
+			ImGui::InputInt("Seed", &seed) ||
+			ImGui::SliderFloat("Offset X", &offsetX, -100.0f, 100.0f) ||
+			ImGui::SliderFloat("Offset Y", &offsetY, -100.0f, 100.0f);
+		ImGui::End();
+
+		if (parametersChanged) {
+			std::vector<std::vector<float>> noiseMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale, seed, octaves, persistance, lacunarity, { offsetX, offsetY });
+			texture.Update(noiseMap);
+		}
+
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
@@ -154,8 +194,18 @@ int Run() {
 		plane.Draw();
 		Texture::Unbind();
 
+		// Render ImGui
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		// Swap buffers
 		SDL_GL_SwapWindow(window);
 	}
+
+	// Shutdown
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
 
 	return 0;
 }

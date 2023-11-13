@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>.\Bin</OutDir>
-    <IncludePath>D:\Github\ENGINE\ENGINE\ThirdParty;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Github\ENGINE\ENGINE\ThirdParty\SDL2;D:\Github\ENGINE\ENGINE\ThirdParty;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Github\ENGINE\ENGINE\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -142,6 +142,13 @@
     <ClCompile Include="Source\VertexArray.cpp" />
     <ClCompile Include="Source\VertexBuffer.cpp" />
     <ClCompile Include="ThirdParty\glad\glad.c" />
+    <ClCompile Include="ThirdParty\imgui\imgui.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_impl_sdl2.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Camera.h" />
@@ -153,6 +160,15 @@
     <ClInclude Include="Source\VertexBuffer.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />
     <ClInclude Include="ThirdParty\glad\khrplatform.h" />
+    <ClInclude Include="ThirdParty\imgui\imconfig.h" />
+    <ClInclude Include="ThirdParty\imgui\imgui.h" />
+    <ClInclude Include="ThirdParty\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="ThirdParty\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="ThirdParty\imgui\imgui_impl_sdl2.h" />
+    <ClInclude Include="ThirdParty\imgui\imgui_internal.h" />
+    <ClInclude Include="ThirdParty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="ThirdParty\imgui\imstb_textedit.h" />
+    <ClInclude Include="ThirdParty\imgui\imstb_truetype.h" />
     <ClInclude Include="ThirdParty\Shader.h" />
     <ClInclude Include="ThirdParty\stb_image.h" />
   </ItemGroup>
