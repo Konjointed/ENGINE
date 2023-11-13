@@ -89,6 +89,24 @@ Mesh Mesh::GenerateCube() {
     return Mesh(vertices, indices);
 }
 
+Mesh Mesh::GeneratePlane() {
+    std::vector<float> vertices = {
+        // Positions
+        -0.5f, 0.0f, -0.5f, // 0. left back
+         0.5f, 0.0f, -0.5f, // 1. right back
+        -0.5f, 0.0f,  0.5f, // 2. left front
+         0.5f, 0.0f,  0.5f  // 3. right front
+    };
+
+    std::vector<unsigned int> indices = {
+        // Two triangles forming the plane
+        0, 1, 2, // First triangle
+        1, 3, 2  // Second triangle
+    };
+
+    return Mesh(vertices, indices);
+}
+
 const glm::mat4& Mesh::GetModelMatrix() const {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);

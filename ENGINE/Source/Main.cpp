@@ -74,7 +74,7 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 
 int Run() {
 	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
-	Mesh cube = Mesh::GenerateCube();
+	Mesh cube = Mesh::GeneratePlane();
 	Camera camera;
 
 	int lastFrameTime = 0;

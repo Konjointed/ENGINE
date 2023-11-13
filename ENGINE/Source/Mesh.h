@@ -16,6 +16,7 @@ public:
 	~Mesh();
 
 	static Mesh GenerateCube();
+	static Mesh GeneratePlane();
 
 	void Draw();
 
