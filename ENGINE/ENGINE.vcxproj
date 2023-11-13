@@ -137,6 +137,7 @@
     <ClCompile Include="Source\ElementBuffer.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
+    <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\VertexArray.cpp" />
     <ClCompile Include="Source\VertexBuffer.cpp" />
     <ClCompile Include="ThirdParty\glad\glad.c" />
@@ -145,15 +146,22 @@
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\ElementBuffer.h" />
     <ClInclude Include="Source\Mesh.h" />
+    <ClInclude Include="Source\Texture.h" />
     <ClInclude Include="Source\VertexArray.h" />
     <ClInclude Include="Source\VertexBuffer.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />
     <ClInclude Include="ThirdParty\glad\khrplatform.h" />
     <ClInclude Include="ThirdParty\Shader.h" />
+    <ClInclude Include="ThirdParty\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Default.frag" />
     <None Include="Resources\Shaders\Default.vert" />
+    <None Include="Resources\Shaders\Texture.frag" />
+    <None Include="Resources\Shaders\Texture.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Textures\wood.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

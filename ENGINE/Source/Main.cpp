@@ -9,21 +9,15 @@
 
 #include <Shader.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 #include "Mesh.h"
+#include "Texture.h"
 #include "Camera.h"
 
 SDL_Window* window;
 SDL_GLContext glContext;
-
-void PrintMatrix(const glm::mat4& mat) {
-	for (int i = 0; i < 4; ++i) {
-		for (int j = 0; j < 4; ++j) {
-			std::cout << mat[j][i] << " "; // Note: mat[column][row]
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-}
 
 bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fullscreen) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -74,7 +68,9 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 
 int Run() {
 	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
-	Mesh cube = Mesh::GeneratePlane();
+	Shader textureShader("Resources/Shaders/Texture.vert", "Resources/Shaders/Texture.frag");
+	Texture texture("Resources/Textures/wood.png");
+	Mesh plane = Mesh::GeneratePlane();
 	Camera camera;
 
 	int lastFrameTime = 0;
@@ -126,14 +122,16 @@ int Run() {
 		// Render
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 projection = camera.GetProjectionMatrix();
-		glm::mat4 model = cube.GetModelMatrix();
+		glm::mat4 model = plane.GetModelMatrix();
 
-		defaultShader.use();
-		defaultShader.setMat4("projection", projection);
-		defaultShader.setMat4("view", view);
-		defaultShader.setMat4("model", model);
+		textureShader.use();
+		textureShader.setMat4("projection", projection);
+		textureShader.setMat4("view", view);
+		textureShader.setMat4("model", model);
 
-		cube.Draw();
+		texture.Bind();
+		plane.Draw();
+		Texture::Unbind();
 
 		SDL_GL_SwapWindow(window);
 	}

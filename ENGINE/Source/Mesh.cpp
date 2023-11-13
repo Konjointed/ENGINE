@@ -23,7 +23,7 @@ Mesh::Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& 
     ebo = new EBO(indices.data(), indices.size() * sizeof(unsigned int));
 
     // Assuming the stride (gap between vertices) is 8 floats (3 for position, 2 for texture, 3 for normal)
-    GLsizei stride = 3 * sizeof(float);
+    GLsizei stride = 5 * sizeof(float);
 
     // Set the vertex attribute pointers
     // Position attribute
@@ -31,8 +31,8 @@ Mesh::Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& 
     glEnableVertexAttribArray(0);
 
     // Texture coordinate attribute
-    //glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-    //glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // Normal attribute
     //glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
@@ -91,11 +91,11 @@ Mesh Mesh::GenerateCube() {
 
 Mesh Mesh::GeneratePlane() {
     std::vector<float> vertices = {
-        // Positions
-        -0.5f, 0.0f, -0.5f, // 0. left back
-         0.5f, 0.0f, -0.5f, // 1. right back
-        -0.5f, 0.0f,  0.5f, // 2. left front
-         0.5f, 0.0f,  0.5f  // 3. right front
+        // Positions         // Texture Coords
+        -0.5f, 0.0f, -0.5f,   0.0f, 0.0f, // 0. left back
+         0.5f, 0.0f, -0.5f,   1.0f, 0.0f, // 1. right back
+        -0.5f, 0.0f,  0.5f,   0.0f, 1.0f, // 2. left front
+         0.5f, 0.0f,  0.5f,   1.0f, 1.0f  // 3. right front
     };
 
     std::vector<unsigned int> indices = {
