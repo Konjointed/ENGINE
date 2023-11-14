@@ -206,6 +206,8 @@ int Run() {
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 projection = camera.GetProjectionMatrix();
 
+		glm::vec3 lightDir = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
+
 		// Cube
 		lightingShader.use();
 		lightingShader.setVec3("light.position", camera.GetPosition());
