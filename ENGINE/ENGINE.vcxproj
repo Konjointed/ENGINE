@@ -181,6 +181,8 @@
     <None Include="Resources\Shaders\Color.vert" />
     <None Include="Resources\Shaders\BasicLighting.frag" />
     <None Include="Resources\Shaders\BasicLighting.vert" />
+    <None Include="Resources\Shaders\DebugQuadDepth.frag" />
+    <None Include="Resources\Shaders\DebugQuadDepth.vert" />
     <None Include="Resources\Shaders\FramebufferScreen.frag" />
     <None Include="Resources\Shaders\FramebufferScreen.vert" />
     <None Include="Resources\Shaders\Grayscale.frag" />

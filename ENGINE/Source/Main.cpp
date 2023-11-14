@@ -88,60 +88,51 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 	return true;
 }
 
+void RenderScene(Mesh& mesh, Mesh& mesh2, const Texture& texture, const Shader& shader) {
+	glm::mat4 model = mesh.GetModelMatrix();
+	shader.setMat4("model", model);
+	texture.Bind(0);
+	mesh.Draw();
+
+	model = mesh2.GetModelMatrix();
+	shader.setMat4("model", model);
+	mesh2.Draw();
+}
 
 int Run() {
 	int SCREEN_WIDTH = 1280;
 	int SCREEN_HEIGHT = 720;
-	int SHADOW_WIDTH = 1024;
-	int SHADOW_HEIGHT = 1024;
+	int SHADOW_WIDTH = 2048;
+	int SHADOW_HEIGHT = 2048;
 
 	glEnable(GL_DEPTH_TEST);
 
 	// Build and compile shaders
-	//Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
-	//Shader colorShader("Resources/Shaders/Color.vert", "Resources/Shaders/Color.frag");
-	//Shader textureShader("Resources/Shaders/Texture.vert", "Resources/Shaders/Texture.frag");
-	//Shader lightingShader("Resources/Shaders/BasicLighting.vert", "Resources/Shaders/BasicLighting.frag");
-	//Shader lightingShader("Resources/Shaders/LightingMap.vert", "Resources/Shaders/LightingMap.frag");
-	//Shader lightingShader("Resources/Shaders/LightCasters.vert", "Resources/Shaders/LightCasters.frag");
-	//Shader screenShader("Resources/Shaders/FramebufferScreen.vert", "Resources/Shaders/FramebufferScreen.frag");
 	Shader shader("Resources/Shaders/ShadowMapping.vert", "Resources/Shaders/ShadowMapping.frag");
 	Shader simpleDepthShader("Resources/Shaders/ShadowMappingDepth.vert", "Resources/Shaders/ShadowMappingDepth.frag");
-
-	/*
-	Mesh lamp = Mesh::GenerateCube();
-	lamp.SetScale({ 0.2f, 0.2f, 0.2f });
-	lamp.SetPosition({ 1.2f, 2.0f, 2.0f });
+	Shader debugDepthQuad("Resources/Shaders/DebugQuadDepth.vert", "Resources/Shaders/DebugQuadDepth.frag");
 
 	Mesh cube = Mesh::GenerateCube();
-	cube.SetScale({ 1.0f, 1.0f, 1.0f });
-	cube.SetPosition({ 0.0f, 1.0f, 0.0f });
-	*/
+	cube.SetScale({ 0.5f, 0.5f, 0.5f });
+	cube.SetPosition({ 4.0f, 2.0f, 0.0f });
 
 	Mesh plane = Mesh::GeneratePlane();
-	plane.SetScale({ 50.0f, 50.0f, 50.0f });
+	plane.SetPosition({ 0.0f, -1.0f, 0.0f });
+	plane.SetScale({ 100.0f, 100.0f, 100.0f });
 
-	//Mesh quad = Mesh::GenerateQuad();
+	Mesh quad = Mesh::GenerateQuad();
 
 	// Load textures
-	//Texture brickTexture("Resources/Textures/brickwall.jpg");
 	Texture woodTexture("Resources/Textures/wood.png");
-	//Texture containerDiffuseTexture("Resources/Textures/container.png");
-	//Texture containerSpecularTexture("Resources/Textures/container_specular.png");
 
 	// Shader configuration
 	shader.use();
 	shader.setInt("diffuseTexture", 0);
 	shader.setInt("shadowMap", 1);
 
-	//screenShader.use();
-	//screenShader.setInt("screenTexture", 0);
+	debugDepthQuad.use();
+	debugDepthQuad.setInt("depthMap", 0);
 
-	//lightingShader.use();
-	//lightingShader.setInt("material.diffuse", 0);
-	//lightingShader.setInt("material.specular", 1);
-
-	//FBO framebuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 	FBO depthMapFramebuffer(SHADOW_WIDTH, SHADOW_HEIGHT, true);
 
 	Camera camera;
@@ -180,12 +171,12 @@ int Run() {
 			ImGui_ImplSDL2_ProcessEvent(&event);
 
 			switch (event.type) {
-			//case SDL_KEYDOWN:
-				//break;
+				//case SDL_KEYDOWN:
+					//break;
 			case SDL_MOUSEBUTTONDOWN:
 				if (event.button.button == SDL_BUTTON_RIGHT) {
 					rightMouseButtonPressed = true;
-					SDL_SetRelativeMouseMode(SDL_TRUE); 
+					SDL_SetRelativeMouseMode(SDL_TRUE);
 				}
 				break;
 			case SDL_MOUSEBUTTONUP:
@@ -194,8 +185,8 @@ int Run() {
 					SDL_SetRelativeMouseMode(SDL_FALSE);
 				}
 				break;
-			//case SDL_MOUSEWHEEL:
-				//break;
+				//case SDL_MOUSEWHEEL:
+					//break;
 			case SDL_MOUSEMOTION:
 				if (rightMouseButtonPressed) {
 					camera.ProcessMouseMovement(static_cast<float>(event.motion.xrel), static_cast<float>(event.motion.yrel));
@@ -243,8 +234,10 @@ int Run() {
 		// 1. Render depth of scene to texture (from light's perspetive)
 		glm::mat4 lightProjection, lightView;
 		glm::mat4 lightSpaceMatrix;
-		float near_plane = 1.0f, far_plane = 7.5f;
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		float near_plane = 1.0f, far_plane = 25.0f;
+		//lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane);
+		float orthoSize = 10.0f;
+		lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
 		lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 		lightSpaceMatrix = lightProjection * lightView;
 		// Render scene from light's point of view
@@ -253,13 +246,8 @@ int Run() {
 
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		depthMapFramebuffer.Bind();
-			glClear(GL_DEPTH_BUFFER_BIT);
-			// RENDER SCENE
-			glm::mat4 planeModel = plane.GetModelMatrix();
-			simpleDepthShader.setMat4("model", planeModel);
-			woodTexture.Bind(0);
-			plane.Draw();
-			Texture::Unbind();
+		glClear(GL_DEPTH_BUFFER_BIT);
+		RenderScene(plane, cube, woodTexture, simpleDepthShader);
 		depthMapFramebuffer.UnBind();
 
 		// Reset viewport
@@ -276,63 +264,15 @@ int Run() {
 		shader.setVec3("viewPos", camera.GetPosition());
 		shader.setVec3("lightPos", lightPos);
 		shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		// RENDER SCENE
-		simpleDepthShader.setMat4("model", planeModel);
-		woodTexture.Bind(0);
-		// Bind depth map texture
-		plane.Draw();
+		depthMapFramebuffer.GetDepthTexture().Bind(1);
+		RenderScene(plane, cube, woodTexture, shader);
 
-		/*
-		// First pass
-		glViewport(0, 0, 1024, 1024);
-		depthMapFramebuffer.Bind();
-			glClear(GL_DEPTH_BUFFER_BIT);
-		depthMapFramebuffer.UnBind();
-
-		glViewport(0, 0, 1280, 720);
-
-
-		// Cube
-		lightingShader.use();
-		lightingShader.setVec3("light.direction", lightDir);
-		lightingShader.setVec3("viewPos", camera.GetPosition());
-		// light properties
-		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-		lightingShader.setVec3("light.diffuse", 0.8f, 0.8f, 0.8f);
-		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		// material properties
-		lightingShader.setFloat("material.shininess", 32.0f);
-		lightingShader.setMat4("projection", projection);
-		lightingShader.setMat4("view", view);
-		glm::mat4 cubeModel = cube.GetModelMatrix();
-		lightingShader.setMat4("model", cubeModel);
-		containerDiffuseTexture.Bind(0);
-		containerSpecularTexture.Bind(1);
-		cube.Draw();
-		Texture::Unbind(0);
-		Texture::Unbind(1);
-
-		textureShader.use();
-		textureShader.setVec2("textureScale", 50.0f, 50.0f);
-		textureShader.setMat4("projection", projection);
-		textureShader.setMat4("view", view);
-		glm::mat4 planeModel = plane.GetModelMatrix();
-		textureShader.setMat4("model", planeModel);
-		woodTexture.Bind(0);
-		plane.Draw();
-
-		Texture::Unbind();
-
-		// Second pass
-		framebuffer.UnBind();
-		glDisable(GL_DEPTH_TEST);
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		screenShader.use(); // post processing shader goes here
-		glBindTexture(GL_TEXTURE_2D, framebuffer.texture);
-		quad.Draw();
-		*/
+		// Render depth map to quad for visual debugging
+		debugDepthQuad.use();
+		debugDepthQuad.setFloat("near_plane", near_plane);
+		debugDepthQuad.setFloat("far_plane", far_plane);
+		depthMapFramebuffer.GetDepthTexture().Bind();
+		//quad.Draw();
 
 		// Render ImGui
 		ImGui::Render();

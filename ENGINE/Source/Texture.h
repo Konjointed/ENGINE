@@ -8,9 +8,11 @@
 
 class Texture {
 public:
+    Texture() {}
     Texture(const std::string& path);
     Texture(const std::vector<std::vector<float>>& noiseMap);
     Texture(int width, int height);
+    Texture(int width, int height, GLenum format, GLenum internalFormat, GLenum type);
     ~Texture();
 
     void Update(const std::vector<std::vector<float>>& noiseMap);

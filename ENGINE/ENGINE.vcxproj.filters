@@ -159,6 +159,8 @@
     <None Include="Resources\Shaders\ShadowMappingDepth.vert" />
     <None Include="Resources\Shaders\ShadowMapping.frag" />
     <None Include="Resources\Shaders\ShadowMapping.vert" />
+    <None Include="Resources\Shaders\DebugQuadDepth.vert" />
+    <None Include="Resources\Shaders\DebugQuadDepth.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">
