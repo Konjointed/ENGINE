@@ -137,12 +137,20 @@
     <None Include="Resources\Shaders\Default.frag" />
     <None Include="Resources\Shaders\Color.vert" />
     <None Include="Resources\Shaders\Color.frag" />
+    <None Include="Resources\Shaders\LightingMap.vert" />
+    <None Include="Resources\Shaders\LightingMap.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Resources\Textures\brickwall.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\Textures\container.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\Textures\container_specular.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -181,11 +181,15 @@
     <None Include="Resources\Shaders\Grayscale.vert" />
     <None Include="Resources\Shaders\Default.frag" />
     <None Include="Resources\Shaders\Default.vert" />
+    <None Include="Resources\Shaders\LightingMap.frag" />
+    <None Include="Resources\Shaders\LightingMap.vert" />
     <None Include="Resources\Shaders\Texture.frag" />
     <None Include="Resources\Shaders\Texture.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\brickwall.jpg" />
+    <Image Include="Resources\Textures\container.png" />
+    <Image Include="Resources\Textures\container_specular.png" />
     <Image Include="Resources\Textures\wood.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

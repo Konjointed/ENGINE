@@ -13,8 +13,8 @@ public:
     ~Texture();
 
     void Update(const std::vector<std::vector<float>>& noiseMap);
-    void Bind() const;
-    static void Unbind();
+    void Bind(unsigned int unit = 0) const;
+    static void Unbind(unsigned int unit = 0);
 
 private:
     unsigned int textureID;

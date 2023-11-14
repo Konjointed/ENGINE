@@ -92,10 +92,17 @@ int Run() {
 	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
 	Shader colorShader("Resources/Shaders/Color.vert", "Resources/Shaders/Color.frag");
 	Shader textureShader("Resources/Shaders/Texture.vert", "Resources/Shaders/Texture.frag");
-	Shader lightingShader("Resources/Shaders/BasicLighting.vert", "Resources/Shaders/BasicLighting.frag");
+	//Shader lightingShader("Resources/Shaders/BasicLighting.vert", "Resources/Shaders/BasicLighting.frag");
+	Shader lightingShader("Resources/Shaders/LightingMap.vert", "Resources/Shaders/LightingMap.frag");
 
 	Texture brickTexture("Resources/Textures/brickwall.jpg");
 	Texture woodTexture("Resources/Textures/wood.png");
+	Texture containerDiffuseTexture("Resources/Textures/container.png");
+	Texture containerSpecularTexture("Resources/Textures/container_specular.png");
+
+	lightingShader.use();
+	lightingShader.setInt("material.diffuse", 0);
+	lightingShader.setInt("material.specular", 1);
 
 	Mesh lamp = Mesh::GenerateCube();
 	lamp.SetScale({ 0.2f, 0.2f, 0.2f });
@@ -200,17 +207,29 @@ int Run() {
 
 		// Cube
 		lightingShader.use();
-		lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-		lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		lightingShader.setVec3("lightPos", lamp.GetPosition());
+		lightingShader.setVec3("light.position", lamp.GetPosition());
 		lightingShader.setVec3("viewPos", camera.GetPosition());
+
+		// light properties
+		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+		lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+		// material properties
+		lightingShader.setFloat("material.shininess", 64.0f);
+
 		lightingShader.setMat4("projection", projection);
 		lightingShader.setMat4("view", view);
 		glm::mat4 cubeModel = cube.GetModelMatrix();
 		lightingShader.setMat4("model", cubeModel);
-		brickTexture.Bind();
+
+		containerDiffuseTexture.Bind(0);
+		containerSpecularTexture.Bind(1);
+
 		cube.Draw();
-		Texture::Unbind();
+
+		Texture::Unbind(0);
+		Texture::Unbind(1);
 
 		// Lamp
 		defaultShader.use();
