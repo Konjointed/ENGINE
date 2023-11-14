@@ -23,7 +23,7 @@ Mesh::Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& 
     ebo = new EBO(indices.data(), indices.size() * sizeof(unsigned int));
 
     // Assuming the stride (gap between vertices) is 8 floats (3 for position, 2 for texture, 3 for normal)
-    GLsizei stride = 5 * sizeof(float);
+    GLsizei stride = 8 * sizeof(float);
 
     // Set the vertex attribute pointers
     // Position attribute
@@ -35,8 +35,8 @@ Mesh::Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& 
     glEnableVertexAttribArray(1);
 
     // Normal attribute
-    //glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
-    //glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     vao->Unbind(); // Unbind the VAO to prevent accidental modifications.
 }
@@ -49,69 +49,63 @@ Mesh::~Mesh() {
 
 Mesh Mesh::GenerateCube() {
     std::vector<float> vertices = {
-        // Positions        // Texture Coords
+        // Positions        // Texture Coords // Normals
 
-        // Front face (4, 5, 6, 7)
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // 4. left bottom front
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // 5. right bottom front
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, // 6. left top front
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // 7. right top front
+        // Front face (positive Z)
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,  0.0f, 0.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f,
 
-         // Back face (0, 1, 2, 3)
-         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // 0. left bottom back
-          0.5f, -0.5f, -0.5f,  1.0f, 0.0f, // 1. right bottom back
-         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // 2. left top back
-          0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // 3. right top back
+        // Back face (negative Z)
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f, 0.0f, -1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f,
 
-          // Left face (8, 9, 10, 11)
-          -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // 8. left bottom back
-          -0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // 9. left bottom front
-          -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // 10. left top back
-          -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // 11. left top front
+        // Left face (negative X)
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  -1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  -1.0f, 0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  -1.0f, 0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  -1.0f, 0.0f, 0.0f,
 
-          // Right face (12, 13, 14, 15)
-           0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // 12. right bottom back
-           0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // 13. right bottom front
-           0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // 14. right top back
-           0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // 15. right top front
+        // Right face (positive X)
+        0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f,
 
-           // Top face (16, 17, 18, 19)
-           -0.5f,  0.5f, -0.5f,  0.0f, 0.0f, // 16. left top back
-            0.5f,  0.5f, -0.5f,  1.0f, 0.0f, // 17. right top back
-           -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, // 18. left top front
-            0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // 19. right top front
+        // Top face (positive Y)
+        -0.5f,  0.5f, -0.5f,  0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f, 1.0f, 0.0f,
 
-            // Bottom face (20, 21, 22, 23)
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // 20. left bottom back
-             0.5f, -0.5f, -0.5f,  1.0f, 0.0f, // 21. right bottom back
-            -0.5f, -0.5f,  0.5f,  0.0f, 1.0f, // 22. left bottom front
-             0.5f, -0.5f,  0.5f,  1.0f, 1.0f, // 23. right bottom front
+        // Bottom face (negative Y)
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f, -1.0f, 0.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,  0.0f, -1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 1.0f,  0.0f, -1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 1.0f,  0.0f, -1.0f, 0.0f,
     };
 
     std::vector<unsigned int> indices = {
         // Front face
-        4, 5, 6,
-        5, 7, 6,
+        0, 1, 2, 1, 3, 2,
 
         // Back face
-        8, 10, 9,
-        9, 10, 11,
+        4, 6, 5, 6, 7, 5,
 
         // Left face
-        12, 14, 13,
-        13, 14, 15,
+        8, 10, 9, 10, 11, 9,
 
         // Right face
-        16, 18, 17,
-        17, 18, 19,
+        12, 13, 14, 13, 15, 14,
 
         // Top face
-        20, 22, 21,
-        21, 22, 23,
+        16, 17, 18, 17, 19, 18,
 
         // Bottom face
-        0, 1, 2,
-        1, 3, 2
+        20, 22, 21, 22, 23, 21
     };
 
     return Mesh(vertices, indices);
@@ -119,11 +113,11 @@ Mesh Mesh::GenerateCube() {
 
 Mesh Mesh::GeneratePlane() {
     std::vector<float> vertices = {
-        // Positions         // Texture Coords
-        -0.5f, 0.0f, -0.5f,   0.0f, 0.0f, // 0. left back
-         0.5f, 0.0f, -0.5f,   1.0f, 0.0f, // 1. right back
-        -0.5f, 0.0f,  0.5f,   0.0f, 1.0f, // 2. left front
-         0.5f, 0.0f,  0.5f,   1.0f, 1.0f  // 3. right front
+        // Positions         // Texture Coords // Normals
+        -0.5f, 0.0f, -0.5f,   0.0f, 0.0f,    0.0f, 1.0f, 0.0f, // 0. left back
+         0.5f, 0.0f, -0.5f,   1.0f, 0.0f,    0.0f, 1.0f, 0.0f, // 1. right back
+        -0.5f, 0.0f,  0.5f,   0.0f, 1.0f,    0.0f, 1.0f, 0.0f, // 2. left front
+         0.5f, 0.0f,  0.5f,   1.0f, 1.0f,    0.0f, 1.0f, 0.0f  // 3. right front
     };
 
     std::vector<unsigned int> indices = {
@@ -133,18 +127,6 @@ Mesh Mesh::GeneratePlane() {
     };
 
     return Mesh(vertices, indices);
-}
-
-void Mesh::SetPosition(const glm::vec3& newPosition) {
-    position = newPosition;
-}
-
-void Mesh::SetRotation(const glm::vec3& newRotation) {
-    rotation = newRotation;
-}
-
-void Mesh::SetScale(const glm::vec3& newScale) {
-    scale = newScale;
 }
 
 const glm::mat4& Mesh::GetModelMatrix() const {
@@ -161,4 +143,20 @@ void Mesh::Draw() {
     vao->Bind();
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
     vao->Unbind();
+}
+
+glm::vec3 Mesh::GetPosition() {
+    return position;
+}
+
+void Mesh::SetPosition(const glm::vec3& newPosition) {
+    position = newPosition;
+}
+
+void Mesh::SetRotation(const glm::vec3& newRotation) {
+    rotation = newRotation;
+}
+
+void Mesh::SetScale(const glm::vec3& newScale) {
+    scale = newScale;
 }

@@ -173,14 +173,19 @@
     <ClInclude Include="ThirdParty\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shaders\Default.frag" />
-    <None Include="Resources\Shaders\Default.vert" />
+    <None Include="Resources\Shaders\Color.frag" />
+    <None Include="Resources\Shaders\Color.vert" />
+    <None Include="Resources\Shaders\BasicLighting.frag" />
+    <None Include="Resources\Shaders\BasicLighting.vert" />
     <None Include="Resources\Shaders\Grayscale.frag" />
     <None Include="Resources\Shaders\Grayscale.vert" />
+    <None Include="Resources\Shaders\Default.frag" />
+    <None Include="Resources\Shaders\Default.vert" />
     <None Include="Resources\Shaders\Texture.frag" />
     <None Include="Resources\Shaders\Texture.vert" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Resources\Textures\brickwall.jpg" />
     <Image Include="Resources\Textures\wood.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -13,9 +13,6 @@
 
 #include <Shader.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
 #include "Mesh.h"
 #include "Texture.h"
 #include "Noise.h"
@@ -90,9 +87,26 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 }
 
 int Run() {
+	Camera camera;
+
 	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
+	Shader colorShader("Resources/Shaders/Color.vert", "Resources/Shaders/Color.frag");
 	Shader textureShader("Resources/Shaders/Texture.vert", "Resources/Shaders/Texture.frag");
-	
+	Shader lightingShader("Resources/Shaders/BasicLighting.vert", "Resources/Shaders/BasicLighting.frag");
+
+	Texture brickTexture("Resources/Textures/brickwall.jpg");
+	Texture woodTexture("Resources/Textures/wood.png");
+
+	Mesh lamp = Mesh::GenerateCube();
+	lamp.SetScale({ 0.2f, 0.2f, 0.2f });
+	lamp.SetPosition({ 1.2f, 2.0f, 2.0f });
+
+	Mesh cube = Mesh::GenerateCube();
+	cube.SetScale({ 1.0f, 1.0f, 1.0f });
+	cube.SetPosition({ 0.0f, 1.0f, 0.0f });
+
+	Mesh plane = Mesh::GeneratePlane();
+
 	/*
 	int mapWidth = 100;
 	int mapHeight = 100;
@@ -109,17 +123,6 @@ int Run() {
 	//Texture noiseMap(heightMap);
 	Mesh terrain = Mesh::GenerateTerrain(heightMap, 0.2f);
 	*/
-
-	Texture brickTexture("Resources/Textures/brickwall.jpg");
-	Texture woodTexture("Resources/Textures/wood.png");
-
-	Mesh cubeMesh = Mesh::GenerateCube();
-	cubeMesh.SetScale({ 0.2f, 0.2f, 0.2f });
-	cubeMesh.SetPosition({ 0.0f, 1.0f, 0.0f });
-
-	Mesh planMesh = Mesh::GeneratePlane();
-
-	Camera camera;
 
 	int lastFrameTime = 0;
 	bool rightMouseButtonPressed = false;
@@ -186,36 +189,36 @@ int Run() {
 		}
 		*/
 
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_DEPTH_TEST);
-
-		// Update
 		camera.Update(deltaTime);
 
-		// Render
+		glEnable(GL_DEPTH_TEST);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 projection = camera.GetProjectionMatrix();
-		glm::mat4 planeModel = planMesh.GetModelMatrix();
-		glm::mat4 cubeModel = cubeMesh.GetModelMatrix();
 
-		textureShader.use();
-		textureShader.setMat4("projection", projection);
-		textureShader.setMat4("view", view);
-		textureShader.setMat4("model", planeModel);
-
-		woodTexture.Bind();
-		planMesh.Draw();
-		Texture::Unbind();
-
-		textureShader.use();
-		textureShader.setMat4("projection", projection);
-		textureShader.setMat4("view", view);
-		textureShader.setMat4("model", cubeModel);
-
+		// Cube
+		lightingShader.use();
+		lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+		lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+		lightingShader.setVec3("lightPos", lamp.GetPosition());
+		lightingShader.setVec3("viewPos", camera.GetPosition());
+		lightingShader.setMat4("projection", projection);
+		lightingShader.setMat4("view", view);
+		glm::mat4 cubeModel = cube.GetModelMatrix();
+		lightingShader.setMat4("model", cubeModel);
 		brickTexture.Bind();
-		cubeMesh.Draw();
+		cube.Draw();
 		Texture::Unbind();
+
+		// Lamp
+		defaultShader.use();
+		defaultShader.setMat4("projection", projection);
+		defaultShader.setMat4("view", view);
+		glm::mat4 lampModel = lamp.GetModelMatrix();
+		defaultShader.setMat4("model", lampModel);
+		lamp.Draw();
 
 		// Render ImGui
 		ImGui::Render();

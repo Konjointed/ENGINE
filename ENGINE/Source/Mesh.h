@@ -9,6 +9,8 @@
 class VAO;
 class VBO;
 class EBO;
+class Shader;
+class Texture;
 
 class Mesh {
 public:
@@ -22,6 +24,7 @@ public:
 
 	const glm::mat4& GetModelMatrix() const;
 
+	glm::vec3 GetPosition();
 	void SetPosition(const glm::vec3& position);
 	void SetRotation(const glm::vec3& rotation);
 	void SetScale(const glm::vec3& scale);

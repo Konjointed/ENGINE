@@ -127,15 +127,22 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shaders\Default.vert" />
-    <None Include="Resources\Shaders\Default.frag" />
+    <None Include="Resources\Shaders\BasicLighting.vert" />
+    <None Include="Resources\Shaders\BasicLighting.frag" />
     <None Include="Resources\Shaders\Texture.vert" />
     <None Include="Resources\Shaders\Texture.frag" />
     <None Include="Resources\Shaders\Grayscale.frag" />
     <None Include="Resources\Shaders\Grayscale.vert" />
+    <None Include="Resources\Shaders\Default.vert" />
+    <None Include="Resources\Shaders\Default.frag" />
+    <None Include="Resources\Shaders\Color.vert" />
+    <None Include="Resources\Shaders\Color.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\Textures\brickwall.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

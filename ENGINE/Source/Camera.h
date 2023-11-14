@@ -14,6 +14,7 @@ public:
 	void ProcessKeyboard(float deltaTime);
 	void ProcessMouseMovement(float xoffset, float yoffset);
 	void Update(float deltaTime);
+	glm::vec3 GetPosition();
 private:
 	float fov = 45.0f;
 	float aspectRatio = static_cast<float>(1280) / 720;
