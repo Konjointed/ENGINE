@@ -63,6 +63,12 @@
     <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\FrameBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RenderBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThirdParty\glad\khrplatform.h">
@@ -125,6 +131,12 @@
     <ClInclude Include="ThirdParty\imgui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\FrameBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RenderBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\BasicLighting.vert" />
@@ -141,6 +153,8 @@
     <None Include="Resources\Shaders\LightingMap.frag" />
     <None Include="Resources\Shaders\LightCasters.vert" />
     <None Include="Resources\Shaders\LightCasters.frag" />
+    <None Include="Resources\Shaders\FramebufferScreen.frag" />
+    <None Include="Resources\Shaders\FramebufferScreen.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">

@@ -14,11 +14,12 @@ class Texture;
 
 class Mesh {
 public:
-	Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
+	Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices, int layout);
 	~Mesh();
 
 	static Mesh GenerateCube();
 	static Mesh GeneratePlane();
+	static Mesh GenerateQuad();
 
 	void Draw();
 

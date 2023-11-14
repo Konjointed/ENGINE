@@ -135,9 +135,11 @@
   <ItemGroup>
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\ElementBuffer.cpp" />
+    <ClCompile Include="Source\FrameBuffer.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\Noise.cpp" />
+    <ClCompile Include="Source\RenderBuffer.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\VertexArray.cpp" />
     <ClCompile Include="Source\VertexBuffer.cpp" />
@@ -153,8 +155,10 @@
   <ItemGroup>
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\ElementBuffer.h" />
+    <ClInclude Include="Source\FrameBuffer.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\Noise.h" />
+    <ClInclude Include="Source\RenderBuffer.h" />
     <ClInclude Include="Source\Texture.h" />
     <ClInclude Include="Source\VertexArray.h" />
     <ClInclude Include="Source\VertexBuffer.h" />
@@ -177,6 +181,8 @@
     <None Include="Resources\Shaders\Color.vert" />
     <None Include="Resources\Shaders\BasicLighting.frag" />
     <None Include="Resources\Shaders\BasicLighting.vert" />
+    <None Include="Resources\Shaders\FramebufferScreen.frag" />
+    <None Include="Resources\Shaders\FramebufferScreen.vert" />
     <None Include="Resources\Shaders\Grayscale.frag" />
     <None Include="Resources\Shaders\Grayscale.vert" />
     <None Include="Resources\Shaders\Default.frag" />

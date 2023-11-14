@@ -17,6 +17,8 @@
 #include "Texture.h"
 #include "Noise.h"
 #include "Camera.h"
+#include "FrameBuffer.h"
+#include "RenderBuffer.h"
 
 SDL_Window* window;
 SDL_GLContext glContext;
@@ -80,30 +82,23 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 		SDL_Quit();
 		return false;
 	}
-	
+
 	ImGuiInit();
 
 	return true;
 }
 
 int Run() {
-	Camera camera;
+	glEnable(GL_DEPTH_TEST);
 
+	// Build and compile shaders
 	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
 	Shader colorShader("Resources/Shaders/Color.vert", "Resources/Shaders/Color.frag");
 	Shader textureShader("Resources/Shaders/Texture.vert", "Resources/Shaders/Texture.frag");
 	//Shader lightingShader("Resources/Shaders/BasicLighting.vert", "Resources/Shaders/BasicLighting.frag");
 	//Shader lightingShader("Resources/Shaders/LightingMap.vert", "Resources/Shaders/LightingMap.frag");
 	Shader lightingShader("Resources/Shaders/LightCasters.vert", "Resources/Shaders/LightCasters.frag");
-
-	Texture brickTexture("Resources/Textures/brickwall.jpg");
-	Texture woodTexture("Resources/Textures/wood.png");
-	Texture containerDiffuseTexture("Resources/Textures/container.png");
-	Texture containerSpecularTexture("Resources/Textures/container_specular.png");
-
-	lightingShader.use();
-	lightingShader.setInt("material.diffuse", 0);
-	lightingShader.setInt("material.specular", 1);
+	Shader screenShader("Resources/Shaders/FramebufferScreen.vert", "Resources/Shaders/FramebufferScreen.frag");
 
 	Mesh lamp = Mesh::GenerateCube();
 	lamp.SetScale({ 0.2f, 0.2f, 0.2f });
@@ -114,6 +109,25 @@ int Run() {
 	cube.SetPosition({ 0.0f, 1.0f, 0.0f });
 
 	Mesh plane = Mesh::GeneratePlane();
+	Mesh quad = Mesh::GenerateQuad();
+
+	// Load textures
+	Texture brickTexture("Resources/Textures/brickwall.jpg");
+	Texture woodTexture("Resources/Textures/wood.png");
+	Texture containerDiffuseTexture("Resources/Textures/container.png");
+	Texture containerSpecularTexture("Resources/Textures/container_specular.png");
+
+	screenShader.use();
+	screenShader.setInt("screenTexture", 0);
+
+	// Shader configuration
+	lightingShader.use();
+	lightingShader.setInt("material.diffuse", 0);
+	lightingShader.setInt("material.specular", 1);
+
+	FBO framebuffer(1280, 720);
+
+	Camera camera;
 
 	/*
 	int mapWidth = 100;
@@ -132,11 +146,15 @@ int Run() {
 	Mesh terrain = Mesh::GenerateTerrain(heightMap, 0.2f);
 	*/
 
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	int lastFrameTime = 0;
 	bool rightMouseButtonPressed = false;
 	bool quit = false;
 	SDL_Event event;
 	while (!quit) {
+		//glViewport(0, 0, 1280, 720);
+
 		int currentTime = SDL_GetTicks();
 		float deltaTime = (currentTime - lastFrameTime) / 1000.0f;
 		lastFrameTime = currentTime;
@@ -199,29 +217,24 @@ int Run() {
 
 		camera.Update(deltaTime);
 
+		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 projection = camera.GetProjectionMatrix();
+		glm::vec3 lightDir = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
+
+		// First pass
+		framebuffer.Bind();
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 view = camera.GetViewMatrix();
-		glm::mat4 projection = camera.GetProjectionMatrix();
-
-		glm::vec3 lightDir = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
-
 		// Cube
 		lightingShader.use();
-		lightingShader.setVec3("light.position", camera.GetPosition());
-		lightingShader.setVec3("light.direction", camera.GetFront());
-		lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-		lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+		lightingShader.setVec3("light.direction", lightDir);
 		lightingShader.setVec3("viewPos", camera.GetPosition());
 		// light properties
 		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
 		lightingShader.setVec3("light.diffuse", 0.8f, 0.8f, 0.8f);
 		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		lightingShader.setFloat("light.constant", 1.0f);
-		lightingShader.setFloat("light.linear", 0.09f);
-		lightingShader.setFloat("light.quadratic", 0.032f);
 		// material properties
 		lightingShader.setFloat("material.shininess", 32.0f);
 		lightingShader.setMat4("projection", projection);
@@ -233,6 +246,7 @@ int Run() {
 		cube.Draw();
 		Texture::Unbind(0);
 		Texture::Unbind(1);
+		Texture::Unbind();
 
 		// Lamp
 		/*
@@ -243,6 +257,16 @@ int Run() {
 		defaultShader.setMat4("model", lampModel);
 		lamp.Draw();
 		*/
+
+		// Second pass
+		framebuffer.UnBind();
+		glDisable(GL_DEPTH_TEST);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		screenShader.use();
+		glBindTexture(GL_TEXTURE_2D, framebuffer.textureColorbuffer);
+		quad.Draw();
 
 		// Render ImGui
 		ImGui::Render();

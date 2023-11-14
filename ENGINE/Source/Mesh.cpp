@@ -6,7 +6,7 @@
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
 
-Mesh::Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices) :
+Mesh::Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices, int layout) :
     indexCount(indices.size()),
     position(0.0f, 0.0f, 0.0f),
     rotation(0.0f, 0.0f, 0.0f), 
@@ -22,21 +22,44 @@ Mesh::Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& 
     // Create the EBO and upload the index data
     ebo = new EBO(indices.data(), indices.size() * sizeof(unsigned int));
 
-    // Assuming the stride (gap between vertices) is 8 floats (3 for position, 2 for texture, 3 for normal)
-    GLsizei stride = 8 * sizeof(float);
+    // Determine stride (gap between vertices)
+    GLsizei stride;
+    switch (layout) {
+    case 0: // Position and Texture
+        stride = 4 * sizeof(float); // 2 for position, 2 for texture
+        // Set attribute pointers for position and texture
+        break;
+    case 1: // Position, Texture, and Normals
+        stride = 8 * sizeof(float); // 3 for position, 2 for texture, 3 for normal
+        // Set attribute pointers for position, texture, and normal
+        break;
+    }
 
     // Set the vertex attribute pointers
-    // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-    glEnableVertexAttribArray(0);
+    if (layout == 0) {
+        // Set up attribute pointers for position and texture
+        // Position attribute
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        glEnableVertexAttribArray(0);
 
-    // Texture coordinate attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+        // Texture coordinate attribute
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(2 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+    }
+    else if (layout == 1) {
+        // Set up attribute pointers for position, texture, and normal
+        // Position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        glEnableVertexAttribArray(0);
 
-    // Normal attribute
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+        // Texture coordinate attribute
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        // Normal attribute
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+    }
 
     vao->Unbind(); // Unbind the VAO to prevent accidental modifications.
 }
@@ -108,7 +131,7 @@ Mesh Mesh::GenerateCube() {
         20, 22, 21, 22, 23, 21
     };
 
-    return Mesh(vertices, indices);
+    return Mesh(vertices, indices, 1);
 }
 
 Mesh Mesh::GeneratePlane() {
@@ -126,7 +149,24 @@ Mesh Mesh::GeneratePlane() {
         1, 3, 2  // Second triangle
     };
 
-    return Mesh(vertices, indices);
+    return Mesh(vertices, indices, 1);
+}
+
+Mesh Mesh::GenerateQuad() {
+    std::vector<float> vertices = {
+        // positions   // texCoords
+        -1.0f,  1.0f,  0.0f, 1.0f, // Top-left
+        -1.0f, -1.0f,  0.0f, 0.0f, // Bottom-left
+         1.0f, -1.0f,  1.0f, 0.0f, // Bottom-right
+         1.0f,  1.0f,  1.0f, 1.0f  // Top-right
+    };
+
+    std::vector<unsigned int> indices = {
+        0, 1, 2, // First triangle (top-left, bottom-left, bottom-right)
+        0, 2, 3  // Second triangle (top-left, bottom-right, top-right)
+    };
+
+    return Mesh(vertices, indices, 0);
 }
 
 const glm::mat4& Mesh::GetModelMatrix() const {
