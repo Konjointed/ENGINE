@@ -139,6 +139,8 @@
     <None Include="Resources\Shaders\Color.frag" />
     <None Include="Resources\Shaders\LightingMap.vert" />
     <None Include="Resources\Shaders\LightingMap.frag" />
+    <None Include="Resources\Shaders\LightCasters.vert" />
+    <None Include="Resources\Shaders\LightCasters.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">

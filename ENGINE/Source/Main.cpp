@@ -93,7 +93,8 @@ int Run() {
 	Shader colorShader("Resources/Shaders/Color.vert", "Resources/Shaders/Color.frag");
 	Shader textureShader("Resources/Shaders/Texture.vert", "Resources/Shaders/Texture.frag");
 	//Shader lightingShader("Resources/Shaders/BasicLighting.vert", "Resources/Shaders/BasicLighting.frag");
-	Shader lightingShader("Resources/Shaders/LightingMap.vert", "Resources/Shaders/LightingMap.frag");
+	//Shader lightingShader("Resources/Shaders/LightingMap.vert", "Resources/Shaders/LightingMap.frag");
+	Shader lightingShader("Resources/Shaders/LightCasters.vert", "Resources/Shaders/LightCasters.frag");
 
 	Texture brickTexture("Resources/Textures/brickwall.jpg");
 	Texture woodTexture("Resources/Textures/wood.png");
@@ -207,37 +208,39 @@ int Run() {
 
 		// Cube
 		lightingShader.use();
-		lightingShader.setVec3("light.position", lamp.GetPosition());
+		lightingShader.setVec3("light.position", camera.GetPosition());
+		lightingShader.setVec3("light.direction", camera.GetFront());
+		lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+		lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
 		lightingShader.setVec3("viewPos", camera.GetPosition());
-
 		// light properties
 		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-		lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+		lightingShader.setVec3("light.diffuse", 0.8f, 0.8f, 0.8f);
 		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
+		lightingShader.setFloat("light.constant", 1.0f);
+		lightingShader.setFloat("light.linear", 0.09f);
+		lightingShader.setFloat("light.quadratic", 0.032f);
 		// material properties
-		lightingShader.setFloat("material.shininess", 64.0f);
-
+		lightingShader.setFloat("material.shininess", 32.0f);
 		lightingShader.setMat4("projection", projection);
 		lightingShader.setMat4("view", view);
 		glm::mat4 cubeModel = cube.GetModelMatrix();
 		lightingShader.setMat4("model", cubeModel);
-
 		containerDiffuseTexture.Bind(0);
 		containerSpecularTexture.Bind(1);
-
 		cube.Draw();
-
 		Texture::Unbind(0);
 		Texture::Unbind(1);
 
 		// Lamp
+		/*
 		defaultShader.use();
 		defaultShader.setMat4("projection", projection);
 		defaultShader.setMat4("view", view);
 		glm::mat4 lampModel = lamp.GetModelMatrix();
 		defaultShader.setMat4("model", lampModel);
 		lamp.Draw();
+		*/
 
 		// Render ImGui
 		ImGui::Render();

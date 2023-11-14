@@ -181,6 +181,8 @@
     <None Include="Resources\Shaders\Grayscale.vert" />
     <None Include="Resources\Shaders\Default.frag" />
     <None Include="Resources\Shaders\Default.vert" />
+    <None Include="Resources\Shaders\LightCasters.frag" />
+    <None Include="Resources\Shaders\LightCasters.vert" />
     <None Include="Resources\Shaders\LightingMap.frag" />
     <None Include="Resources\Shaders\LightingMap.vert" />
     <None Include="Resources\Shaders\Texture.frag" />

@@ -72,3 +72,7 @@ void Camera::Update(float deltaTime) {
 glm::vec3 Camera::GetPosition() {
     return position;
 }
+
+glm::vec3 Camera::GetFront() {
+    return front;
+}
