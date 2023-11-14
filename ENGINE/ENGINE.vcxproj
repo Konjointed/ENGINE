@@ -191,6 +191,10 @@
     <None Include="Resources\Shaders\LightCasters.vert" />
     <None Include="Resources\Shaders\LightingMap.frag" />
     <None Include="Resources\Shaders\LightingMap.vert" />
+    <None Include="Resources\Shaders\ShadowMapping.frag" />
+    <None Include="Resources\Shaders\ShadowMapping.vert" />
+    <None Include="Resources\Shaders\ShadowMappingDepth.frag" />
+    <None Include="Resources\Shaders\ShadowMappingDepth.vert" />
     <None Include="Resources\Shaders\Texture.frag" />
     <None Include="Resources\Shaders\Texture.vert" />
   </ItemGroup>

@@ -76,6 +76,27 @@ Texture::Texture(const std::vector<std::vector<float>>& noiseMap) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+Texture::Texture(int width, int height) {
+    // Generate the texture
+    glGenTextures(1, &this->textureID);
+    glBindTexture(GL_TEXTURE_2D, this->textureID);
+
+    // Set texture parameters for a depth texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    // Allocate the depth texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+        width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+    // Unbind the texture
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 Texture::~Texture() {
     glDeleteTextures(1, &textureID);
 }
@@ -111,4 +132,8 @@ void Texture::Bind(unsigned int unit) const {
 void Texture::Unbind(unsigned int unit) {
     glActiveTexture(GL_TEXTURE0 + unit); 
     glBindTexture(GL_TEXTURE_2D, 0);    
+}
+
+unsigned int Texture::GetID() {
+    return textureID;
 }

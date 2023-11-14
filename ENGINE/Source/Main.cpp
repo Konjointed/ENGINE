@@ -88,18 +88,27 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 	return true;
 }
 
+
 int Run() {
+	int SCREEN_WIDTH = 1280;
+	int SCREEN_HEIGHT = 720;
+	int SHADOW_WIDTH = 1024;
+	int SHADOW_HEIGHT = 1024;
+
 	glEnable(GL_DEPTH_TEST);
 
 	// Build and compile shaders
-	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
-	Shader colorShader("Resources/Shaders/Color.vert", "Resources/Shaders/Color.frag");
-	Shader textureShader("Resources/Shaders/Texture.vert", "Resources/Shaders/Texture.frag");
+	//Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
+	//Shader colorShader("Resources/Shaders/Color.vert", "Resources/Shaders/Color.frag");
+	//Shader textureShader("Resources/Shaders/Texture.vert", "Resources/Shaders/Texture.frag");
 	//Shader lightingShader("Resources/Shaders/BasicLighting.vert", "Resources/Shaders/BasicLighting.frag");
 	//Shader lightingShader("Resources/Shaders/LightingMap.vert", "Resources/Shaders/LightingMap.frag");
-	Shader lightingShader("Resources/Shaders/LightCasters.vert", "Resources/Shaders/LightCasters.frag");
-	Shader screenShader("Resources/Shaders/FramebufferScreen.vert", "Resources/Shaders/FramebufferScreen.frag");
+	//Shader lightingShader("Resources/Shaders/LightCasters.vert", "Resources/Shaders/LightCasters.frag");
+	//Shader screenShader("Resources/Shaders/FramebufferScreen.vert", "Resources/Shaders/FramebufferScreen.frag");
+	Shader shader("Resources/Shaders/ShadowMapping.vert", "Resources/Shaders/ShadowMapping.frag");
+	Shader simpleDepthShader("Resources/Shaders/ShadowMappingDepth.vert", "Resources/Shaders/ShadowMappingDepth.frag");
 
+	/*
 	Mesh lamp = Mesh::GenerateCube();
 	lamp.SetScale({ 0.2f, 0.2f, 0.2f });
 	lamp.SetPosition({ 1.2f, 2.0f, 2.0f });
@@ -107,25 +116,33 @@ int Run() {
 	Mesh cube = Mesh::GenerateCube();
 	cube.SetScale({ 1.0f, 1.0f, 1.0f });
 	cube.SetPosition({ 0.0f, 1.0f, 0.0f });
+	*/
 
 	Mesh plane = Mesh::GeneratePlane();
-	Mesh quad = Mesh::GenerateQuad();
+	plane.SetScale({ 50.0f, 50.0f, 50.0f });
+
+	//Mesh quad = Mesh::GenerateQuad();
 
 	// Load textures
-	Texture brickTexture("Resources/Textures/brickwall.jpg");
+	//Texture brickTexture("Resources/Textures/brickwall.jpg");
 	Texture woodTexture("Resources/Textures/wood.png");
-	Texture containerDiffuseTexture("Resources/Textures/container.png");
-	Texture containerSpecularTexture("Resources/Textures/container_specular.png");
-
-	screenShader.use();
-	screenShader.setInt("screenTexture", 0);
+	//Texture containerDiffuseTexture("Resources/Textures/container.png");
+	//Texture containerSpecularTexture("Resources/Textures/container_specular.png");
 
 	// Shader configuration
-	lightingShader.use();
-	lightingShader.setInt("material.diffuse", 0);
-	lightingShader.setInt("material.specular", 1);
+	shader.use();
+	shader.setInt("diffuseTexture", 0);
+	shader.setInt("shadowMap", 1);
 
-	FBO framebuffer(1280, 720);
+	//screenShader.use();
+	//screenShader.setInt("screenTexture", 0);
+
+	//lightingShader.use();
+	//lightingShader.setInt("material.diffuse", 0);
+	//lightingShader.setInt("material.specular", 1);
+
+	//FBO framebuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+	FBO depthMapFramebuffer(SHADOW_WIDTH, SHADOW_HEIGHT, true);
 
 	Camera camera;
 
@@ -148,13 +165,12 @@ int Run() {
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	glm::vec3 lightPos(-2.0f, 4.0f, -1.0f);
 	int lastFrameTime = 0;
 	bool rightMouseButtonPressed = false;
 	bool quit = false;
 	SDL_Event event;
 	while (!quit) {
-		//glViewport(0, 0, 1280, 720);
-
 		int currentTime = SDL_GetTicks();
 		float deltaTime = (currentTime - lastFrameTime) / 1000.0f;
 		lastFrameTime = currentTime;
@@ -215,17 +231,66 @@ int Run() {
 		}
 		*/
 
-		camera.Update(deltaTime);
-
-		glm::mat4 view = camera.GetViewMatrix();
-		glm::mat4 projection = camera.GetProjectionMatrix();
 		glm::vec3 lightDir = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
 
-		// First pass
-		framebuffer.Bind();
-		glEnable(GL_DEPTH_TEST);
+		// UPDATE
+		camera.Update(deltaTime);
+
+		// RENDER
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// 1. Render depth of scene to texture (from light's perspetive)
+		glm::mat4 lightProjection, lightView;
+		glm::mat4 lightSpaceMatrix;
+		float near_plane = 1.0f, far_plane = 7.5f;
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		lightSpaceMatrix = lightProjection * lightView;
+		// Render scene from light's point of view
+		simpleDepthShader.use();
+		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		depthMapFramebuffer.Bind();
+			glClear(GL_DEPTH_BUFFER_BIT);
+			// RENDER SCENE
+			glm::mat4 planeModel = plane.GetModelMatrix();
+			simpleDepthShader.setMat4("model", planeModel);
+			woodTexture.Bind(0);
+			plane.Draw();
+			Texture::Unbind();
+		depthMapFramebuffer.UnBind();
+
+		// Reset viewport
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// 2. Render scene as normal using the generated depth/shadow map
+		shader.use();
+		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 projection = camera.GetProjectionMatrix();
+		shader.setMat4("projection", projection);
+		shader.setMat4("view", view);
+		// set light uniforms
+		shader.setVec3("viewPos", camera.GetPosition());
+		shader.setVec3("lightPos", lightPos);
+		shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		// RENDER SCENE
+		simpleDepthShader.setMat4("model", planeModel);
+		woodTexture.Bind(0);
+		// Bind depth map texture
+		plane.Draw();
+
+		/*
+		// First pass
+		glViewport(0, 0, 1024, 1024);
+		depthMapFramebuffer.Bind();
+			glClear(GL_DEPTH_BUFFER_BIT);
+		depthMapFramebuffer.UnBind();
+
+		glViewport(0, 0, 1280, 720);
+
 
 		// Cube
 		lightingShader.use();
@@ -246,17 +311,17 @@ int Run() {
 		cube.Draw();
 		Texture::Unbind(0);
 		Texture::Unbind(1);
-		Texture::Unbind();
 
-		// Lamp
-		/*
-		defaultShader.use();
-		defaultShader.setMat4("projection", projection);
-		defaultShader.setMat4("view", view);
-		glm::mat4 lampModel = lamp.GetModelMatrix();
-		defaultShader.setMat4("model", lampModel);
-		lamp.Draw();
-		*/
+		textureShader.use();
+		textureShader.setVec2("textureScale", 50.0f, 50.0f);
+		textureShader.setMat4("projection", projection);
+		textureShader.setMat4("view", view);
+		glm::mat4 planeModel = plane.GetModelMatrix();
+		textureShader.setMat4("model", planeModel);
+		woodTexture.Bind(0);
+		plane.Draw();
+
+		Texture::Unbind();
 
 		// Second pass
 		framebuffer.UnBind();
@@ -264,9 +329,10 @@ int Run() {
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		screenShader.use();
-		glBindTexture(GL_TEXTURE_2D, framebuffer.textureColorbuffer);
+		screenShader.use(); // post processing shader goes here
+		glBindTexture(GL_TEXTURE_2D, framebuffer.texture);
 		quad.Draw();
+		*/
 
 		// Render ImGui
 		ImGui::Render();

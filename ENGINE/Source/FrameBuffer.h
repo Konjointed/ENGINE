@@ -2,9 +2,9 @@
 
 class FBO {
 public:
-    unsigned int textureColorbuffer;
+    unsigned int texture;
 
-    FBO(int width, int height);
+    FBO(int width, int height, bool depthMap = false);
     ~FBO();
 
     void Bind();
