@@ -1,5 +1,7 @@
 #include "Mesh.h"
 
+#include <iostream>
+
 #include <glad/glad.h>
 
 #include "VertexArray.h"
@@ -65,6 +67,7 @@ Mesh::Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& 
 }
 
 Mesh::~Mesh() {
+    std::cout << "Mesh destroyed\n";
     delete vbo;
     delete ebo;
     delete vao;
@@ -169,6 +172,36 @@ Mesh Mesh::GenerateQuad() {
     return Mesh(vertices, indices, 0);
 }
 
+Mesh Mesh::GenerateArrow() {
+    // Arrow shaft vertices
+    std::vector<float> vertices = {
+        // Positions         // Texture Coords // Normals
+        // Shaft (line) - not actually used in lighting, but you can use this if needed
+        0.0f, 0.0f, 0.0f,     0.0f, 0.0f,     0.0f, 0.0f, 1.0f, // Shaft start
+        0.0f, 0.0f, 1.0f,     1.0f, 0.0f,     0.0f, 0.0f, 1.0f, // Shaft end
+
+        // Arrowhead (pyramid)
+        0.0f, 0.0f, 1.0f,     0.5f, 0.0f,     0.0f, 0.0f, 1.0f, // Top of the pyramid, and end of the shaft
+        -0.1f, 0.1f, 0.8f,    0.0f, 1.0f,     -1.0f, 1.0f, 0.0f, // Bottom left of the pyramid
+        0.1f, 0.1f, 0.8f,     1.0f, 1.0f,     1.0f, 1.0f, 0.0f,  // Bottom right of the pyramid
+        -0.1f, -0.1f, 0.8f,   0.0f, 1.0f,     -1.0f, -1.0f, 0.0f,// Top left of the pyramid
+        0.1f, -0.1f, 0.8f,    1.0f, 1.0f,     1.0f, -1.0f, 0.0f  // Top right of the pyramid
+    };
+
+    std::vector<unsigned int> indices = {
+        // Line indices (shaft)
+        0, 1, // This will only be visible if you draw GL_LINES
+
+        // Pyramid indices (arrowhead)
+        2, 3, 4, // Front face
+        2, 4, 5, // Right face
+        2, 5, 6, // Back face
+        2, 6, 3  // Left face
+    };
+
+    return Mesh(vertices, indices, 1);
+}
+
 const glm::mat4& Mesh::GetModelMatrix() const {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
@@ -179,9 +212,9 @@ const glm::mat4& Mesh::GetModelMatrix() const {
     return model;
 }
 
-void Mesh::Draw() {
+void Mesh::Draw(GLenum mode) {
     vao->Bind();
-    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+    glDrawElements(mode, indexCount, GL_UNSIGNED_INT, 0);
     vao->Unbind();
 }
 

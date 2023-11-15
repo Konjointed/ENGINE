@@ -1,5 +1,7 @@
 #include "VertexArray.h"
 
+#include <iostream>
+
 #include <glad/glad.h>
 
 VAO::VAO() {
@@ -7,6 +9,7 @@ VAO::VAO() {
 }
 
 VAO::~VAO() {
+    std::cout << "VAO destroyed\n";
     glDeleteVertexArrays(1, &this->vao);
 }
 

@@ -20,7 +20,7 @@ private:
 	float fov = 45.0f;
 	float aspectRatio = static_cast<float>(1280) / 720;
 	float nearPlane = 0.1f;
-	float farPlane = 100.0f;
+	float farPlane = 1000.0f;
 
 	glm::vec3 position;
 	glm::vec3 front;
@@ -31,7 +31,7 @@ private:
 	float yaw;
 	float pitch;
 
-	float movementSpeed = 2.5f;
+	float movementSpeed = 100.5f;
 	float mouseSensitivity = 0.1f;
 	bool firstMouse = true;
 	float lastX, lastY;

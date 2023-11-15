@@ -23,6 +23,8 @@
 SDL_Window* window;
 SDL_GLContext glContext;
 
+std::vector<Mesh*> objects;
+
 bool ImGuiInit() {
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -88,39 +90,72 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 	return true;
 }
 
-void RenderScene(Mesh& mesh, Mesh& mesh2, const Texture& texture, const Shader& shader) {
-	glm::mat4 model = mesh.GetModelMatrix();
-	shader.setMat4("model", model);
-	texture.Bind(0);
-	mesh.Draw();
-
-	model = mesh2.GetModelMatrix();
-	shader.setMat4("model", model);
-	mesh2.Draw();
+void RenderScene(Texture& texture, const Shader& shader) {
+	for (Mesh* obj : objects) {
+		glm::mat4 model = obj->GetModelMatrix();
+		shader.setMat4("model", model);
+		//texture.Bind(0);
+		obj->Draw();
+	}
 }
 
 int Run() {
-	int SCREEN_WIDTH = 1280;
-	int SCREEN_HEIGHT = 720;
-	int SHADOW_WIDTH = 2048;
-	int SHADOW_HEIGHT = 2048;
-
 	glEnable(GL_DEPTH_TEST);
 
+	int SCREEN_WIDTH = 1280;
+	int SCREEN_HEIGHT = 720;
+	int SHADOW_WIDTH = 1024;
+	int SHADOW_HEIGHT = 1024;
+
+	Camera camera;
+
 	// Build and compile shaders
+	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
 	Shader shader("Resources/Shaders/ShadowMapping.vert", "Resources/Shaders/ShadowMapping.frag");
 	Shader simpleDepthShader("Resources/Shaders/ShadowMappingDepth.vert", "Resources/Shaders/ShadowMappingDepth.frag");
 	Shader debugDepthQuad("Resources/Shaders/DebugQuadDepth.vert", "Resources/Shaders/DebugQuadDepth.frag");
 
-	Mesh cube = Mesh::GenerateCube();
-	cube.SetScale({ 0.5f, 0.5f, 0.5f });
-	cube.SetPosition({ 4.0f, 2.0f, 0.0f });
+	Mesh* cube = new Mesh(Mesh::GenerateCube());
+	cube->SetScale({ 10.0f, 10.0f, 10.0f });
+	cube->SetPosition({ 20.0f, 10.0f, 30.0f });
+	objects.push_back(cube);
 
-	Mesh plane = Mesh::GeneratePlane();
-	plane.SetPosition({ 0.0f, -1.0f, 0.0f });
-	plane.SetScale({ 100.0f, 100.0f, 100.0f });
+	Mesh* cube11 = new Mesh(Mesh::GenerateCube());
+	cube11->SetScale({ 10.0f, 10.0f, 10.0f });
+	cube11->SetPosition({ 5.0f, 5.0f, 30.0f });
+	objects.push_back(cube11);
+
+	Mesh* cube1 = new Mesh(Mesh::GenerateCube());
+	cube1->SetScale({ 8.0f, 12.0f, 6.0f }); 
+	cube1->SetPosition({ -15.0f, 20.0f, 40.0f });
+	cube1->SetRotation({ 30.0f, 0.0f, 45.0f });
+	objects.push_back(cube1);
+
+	Mesh* cube2 = new Mesh(Mesh::GenerateCube());
+	cube2->SetScale({ 15.0f, 10.0f, 10.0f });
+	cube2->SetPosition({ 35.0f, -10.0f, -20.0f });
+	cube2->SetRotation({ 0.0f, 45.0f, 0.0f });
+	objects.push_back(cube2);
+
+	Mesh* cube3 = new Mesh(Mesh::GenerateCube());
+	cube3->SetScale({ 6.0f, 6.0f, 12.0f });
+	cube3->SetPosition({ -25.0f, 30.0f, 15.0f });
+	cube3->SetRotation({ 20.0f, 20.0f, 60.0f });
+	objects.push_back(cube3);
+
+	Mesh* cube4 = new Mesh(Mesh::GenerateCube());
+	cube4->SetScale({ 9.0f, 15.0f, 9.0f });
+	cube4->SetPosition({ 10.0f, -20.0f, 50.0f });
+	cube4->SetRotation({ 45.0f, 30.0f, 10.0f });
+	objects.push_back(cube4);
+
+	Mesh* plane = new Mesh(Mesh::GeneratePlane());
+	plane->SetPosition({ 0.0f, -50.0f, 0.0f });
+	plane->SetScale({ 500.0f, 1.0f, 500.0f });
+	objects.push_back(plane);
 
 	Mesh quad = Mesh::GenerateQuad();
+	Mesh arrowMesh = Mesh::GenerateArrow();
 
 	// Load textures
 	Texture woodTexture("Resources/Textures/wood.png");
@@ -134,8 +169,6 @@ int Run() {
 	debugDepthQuad.setInt("depthMap", 0);
 
 	FBO depthMapFramebuffer(SHADOW_WIDTH, SHADOW_HEIGHT, true);
-
-	Camera camera;
 
 	/*
 	int mapWidth = 100;
@@ -156,7 +189,11 @@ int Run() {
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	glm::vec3 lightPos(-2.0f, 4.0f, -1.0f);
+	glm::vec3 lightPos(80.0f, 51.0f, -77.0f);
+	glm::vec3 lightDir = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
+	float near_plane = -177.0f, far_plane = 479.0f;
+	float orthoSize = 369.0f;
+
 	int lastFrameTime = 0;
 	bool rightMouseButtonPressed = false;
 	bool quit = false;
@@ -222,10 +259,24 @@ int Run() {
 		}
 		*/
 
-		glm::vec3 lightDir = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
+		ImGui::Begin("Light Controls"); // Begin a new window named "Light Controls"
+		ImGui::DragFloat3("Light Position", &lightPos.x, 0.1f); 
+		ImGui::DragFloat3("Light Direction", &lightDir.x, 0.1f); 
+		ImGui::DragFloat("Near Plane", &near_plane, 0.1f, 0.0f, 0.0f, "%.2f"); // Slider for near plane
+		ImGui::DragFloat("Far Plane", &far_plane, 0.1f, 0.0f, 0.0f, "%.2f"); // Slider for far plane
+		ImGui::DragFloat("Ortho Size", &orthoSize, 0.1f, 0.0f, 0.0f, "%.2f"); // Slider for orthographic size
+		ImGui::End(); // End the window
+
 
 		// UPDATE
 		camera.Update(deltaTime);
+
+		// change light position over time
+		/*
+		lightPos.x = sin(SDL_GetTicks()) * 3.0f;
+		lightPos.z = cos(SDL_GetTicks()) * 2.0f;
+		lightPos.y = 5.0 + cos(SDL_GetTicks()) * 1.0f;
+		*/
 
 		// RENDER
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -234,9 +285,8 @@ int Run() {
 		// 1. Render depth of scene to texture (from light's perspetive)
 		glm::mat4 lightProjection, lightView;
 		glm::mat4 lightSpaceMatrix;
-		float near_plane = 1.0f, far_plane = 25.0f;
+		//float near_plane = 0.5f, far_plane = 500.0f;
 		//lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane);
-		float orthoSize = 10.0f;
 		lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
 		lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 		lightSpaceMatrix = lightProjection * lightView;
@@ -247,7 +297,9 @@ int Run() {
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		depthMapFramebuffer.Bind();
 		glClear(GL_DEPTH_BUFFER_BIT);
-		RenderScene(plane, cube, woodTexture, simpleDepthShader);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, woodTexture.GetID());
+		RenderScene(woodTexture, simpleDepthShader);
 		depthMapFramebuffer.UnBind();
 
 		// Reset viewport
@@ -264,15 +316,19 @@ int Run() {
 		shader.setVec3("viewPos", camera.GetPosition());
 		shader.setVec3("lightPos", lightPos);
 		shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		depthMapFramebuffer.GetDepthTexture().Bind(1);
-		RenderScene(plane, cube, woodTexture, shader);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, woodTexture.GetID());
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, depthMapFramebuffer.GetDepthTexture().GetID());
+		RenderScene(woodTexture, shader);
 
 		// Render depth map to quad for visual debugging
 		debugDepthQuad.use();
 		debugDepthQuad.setFloat("near_plane", near_plane);
 		debugDepthQuad.setFloat("far_plane", far_plane);
-		depthMapFramebuffer.GetDepthTexture().Bind();
-		//quad.Draw();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, depthMapFramebuffer.GetDepthTexture().GetID());
+		quad.Draw();
 
 		// Render ImGui
 		ImGui::Render();
@@ -286,6 +342,10 @@ int Run() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
+
+	for (Mesh* obj : objects) {
+		delete obj;
+	}
 
 	return 0;
 }

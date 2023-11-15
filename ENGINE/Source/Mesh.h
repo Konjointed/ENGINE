@@ -5,6 +5,7 @@
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <glad/glad.h>
 
 class VAO;
 class VBO;
@@ -20,8 +21,9 @@ public:
 	static Mesh GenerateCube();
 	static Mesh GeneratePlane();
 	static Mesh GenerateQuad();
+	static Mesh GenerateArrow();
 
-	void Draw();
+	void Draw(GLenum mode = GL_TRIANGLES);
 
 	const glm::mat4& GetModelMatrix() const;
 
