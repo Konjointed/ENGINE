@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
@@ -11,7 +12,19 @@ class VAO;
 class VBO;
 class EBO;
 class Shader;
-class Texture;
+
+enum TEXTURE_TYPE {
+	DIFFUSE,
+	SPECULAR,
+	NORMAL,
+	HEIGHT
+};
+
+struct Texture {
+	int ID;
+	TEXTURE_TYPE type;
+	std::string path;
+};
 
 class Mesh {
 public:
@@ -23,11 +36,13 @@ public:
 	static Mesh GenerateQuad();
 	static Mesh GenerateArrow();
 
-	void Draw(GLenum mode = GL_TRIANGLES);
+	void Draw(Shader& shader);
+
+	void AddTexture(Texture* texture);
 
 	const glm::mat4& GetModelMatrix() const;
-
 	glm::vec3 GetPosition();
+
 	void SetPosition(const glm::vec3& position);
 	void SetRotation(const glm::vec3& rotation);
 	void SetScale(const glm::vec3& scale);
@@ -36,6 +51,8 @@ private:
 	VBO* vbo;
 	EBO* ebo;
 	unsigned int indexCount;
+
+	std::vector<Texture> textures;
 
 	glm::vec3 position;
 	glm::vec3 rotation;

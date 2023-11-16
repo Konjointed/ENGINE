@@ -1,9 +1,8 @@
 #include "Texture.h"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-Texture::Texture(const std::string& path) {
+TextureOLD::TextureOLD(const std::string& path) {
     // Load the image
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true); // This line is added if your texture coordinates are flipped vertically.
@@ -46,7 +45,7 @@ Texture::Texture(const std::string& path) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Texture::Texture(const std::vector<std::vector<float>>& noiseMap) {
+TextureOLD::TextureOLD(const std::vector<std::vector<float>>& noiseMap) {
     int width = noiseMap.size();
     int height = noiseMap[0].size();
 
@@ -76,7 +75,7 @@ Texture::Texture(const std::vector<std::vector<float>>& noiseMap) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Texture::Texture(int width, int height) {
+TextureOLD::TextureOLD(int width, int height) {
     // Generate the texture
     glGenTextures(1, &this->textureID);
     glBindTexture(GL_TEXTURE_2D, this->textureID);
@@ -96,7 +95,7 @@ Texture::Texture(int width, int height) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Texture::Texture(int width, int height, GLenum format, GLenum internalFormat, GLenum type) {
+TextureOLD::TextureOLD(int width, int height, GLenum format, GLenum internalFormat, GLenum type) {
     // Generate the texture
     glGenTextures(1, &this->textureID);
     glBindTexture(GL_TEXTURE_2D, this->textureID);
@@ -114,12 +113,12 @@ Texture::Texture(int width, int height, GLenum format, GLenum internalFormat, GL
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Texture::~Texture() {
+TextureOLD::~TextureOLD() {
     //std::cout << "Texture Destroyed\n";
     glDeleteTextures(1, &textureID);
 }
 
-void Texture::Update(const std::vector<std::vector<float>>& noiseMap) {
+void TextureOLD::Update(const std::vector<std::vector<float>>& noiseMap) {
     int width = noiseMap.size();
     int height = noiseMap[0].size();
 
@@ -142,16 +141,16 @@ void Texture::Update(const std::vector<std::vector<float>>& noiseMap) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Texture::Bind(unsigned int unit) const {
+void TextureOLD::Bind(unsigned int unit) const {
     glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
-void Texture::Unbind(unsigned int unit) {
+void TextureOLD::Unbind(unsigned int unit) {
     glActiveTexture(GL_TEXTURE0 + unit); 
     glBindTexture(GL_TEXTURE_2D, 0);    
 }
 
-unsigned int Texture::GetID() {
+unsigned int TextureOLD::GetID() {
     return textureID;
 }

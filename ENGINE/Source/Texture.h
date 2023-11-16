@@ -6,14 +6,14 @@
 #include <glad/glad.h>
 #include <glm/gtc/noise.hpp>
 
-class Texture {
+class TextureOLD {
 public:
-    Texture() {}
-    Texture(const std::string& path);
-    Texture(const std::vector<std::vector<float>>& noiseMap);
-    Texture(int width, int height);
-    Texture(int width, int height, GLenum format, GLenum internalFormat, GLenum type);
-    ~Texture();
+    TextureOLD() {}
+    TextureOLD(const std::string& path);
+    TextureOLD(const std::vector<std::vector<float>>& noiseMap);
+    TextureOLD(int width, int height);
+    TextureOLD(int width, int height, GLenum format, GLenum internalFormat, GLenum type);
+    ~TextureOLD();
 
     void Update(const std::vector<std::vector<float>>& noiseMap);
     void Bind(unsigned int unit = 0) const;

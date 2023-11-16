@@ -9,11 +9,11 @@ public:
 
     void Bind();
     void UnBind();
-    Texture& GetColorTexture();
-    Texture& GetDepthTexture();
+    TextureOLD& GetColorTexture();
+    TextureOLD& GetDepthTexture();
 private:
     unsigned int fbo;
     unsigned int rbo;
-    Texture* colorTexture;
-    Texture* depthTexture;
+    TextureOLD* colorTexture;
+    TextureOLD* depthTexture;
 };

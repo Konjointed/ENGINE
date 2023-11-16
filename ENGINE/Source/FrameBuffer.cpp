@@ -11,7 +11,7 @@ FBO::FBO(int width, int height, bool depthMap) {
 
     if (depthMap) {
         // Create depth texture for shadow mapping using Texture class
-        this->depthTexture = new Texture(width, height); // Assuming Texture class handles depth textures
+        this->depthTexture = new TextureOLD(width, height); // Assuming Texture class handles depth textures
         glBindTexture(GL_TEXTURE_2D, this->depthTexture->GetID());
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthTexture->GetID(), 0);
         glDrawBuffer(GL_NONE);
@@ -19,7 +19,7 @@ FBO::FBO(int width, int height, bool depthMap) {
     }
     else {
         // Create color texture using Texture class
-        this->colorTexture = new Texture(width, height, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE);
+        this->colorTexture = new TextureOLD(width, height, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE);
         glBindTexture(GL_TEXTURE_2D, this->colorTexture->GetID());
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->colorTexture->GetID(), 0);
 
@@ -51,6 +51,6 @@ void FBO::UnBind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-Texture& FBO::GetColorTexture() { return *colorTexture; }
+TextureOLD& FBO::GetColorTexture() { return *colorTexture; }
 
-Texture& FBO::GetDepthTexture() { return *depthTexture; }
+TextureOLD& FBO::GetDepthTexture() { return *depthTexture; }

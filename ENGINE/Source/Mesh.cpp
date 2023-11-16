@@ -4,6 +4,8 @@
 
 #include <glad/glad.h>
 
+#include <Shader.h>
+
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
@@ -202,6 +204,27 @@ Mesh Mesh::GenerateArrow() {
     return Mesh(vertices, indices, 1);
 }
 
+void Mesh::Draw(Shader& shader) {
+    glm::mat4 model = GetModelMatrix();
+    shader.setMat4("model", model);
+
+    // Bind Textures
+    for (int i = 0; i < textures.size(); i++) {
+        glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit
+        shader.setInt("diffuseTexture", 0);
+        glBindTexture(GL_TEXTURE_2D, textures[i].ID); // Bind the texture
+    }
+
+    // Draw Mesh
+    vao->Bind();
+    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+    vao->Unbind();
+}
+
+void Mesh::AddTexture(Texture* texture) {
+    textures.push_back(*texture);
+}
+
 const glm::mat4& Mesh::GetModelMatrix() const {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
@@ -210,12 +233,6 @@ const glm::mat4& Mesh::GetModelMatrix() const {
     model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
     model = glm::scale(model, scale);
     return model;
-}
-
-void Mesh::Draw(GLenum mode) {
-    vao->Bind();
-    glDrawElements(mode, indexCount, GL_UNSIGNED_INT, 0);
-    vao->Unbind();
 }
 
 glm::vec3 Mesh::GetPosition() {

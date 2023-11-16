@@ -19,6 +19,7 @@
 #include "Camera.h"
 #include "FrameBuffer.h"
 #include "RenderBuffer.h"
+#include "ResourceManager.h"
 
 SDL_Window* window;
 SDL_GLContext glContext;
@@ -90,12 +91,9 @@ bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fulls
 	return true;
 }
 
-void RenderScene(Texture& texture, const Shader& shader) {
+void RenderScene(Shader& shader) {
 	for (Mesh* obj : objects) {
-		glm::mat4 model = obj->GetModelMatrix();
-		shader.setMat4("model", model);
-		//texture.Bind(0);
-		obj->Draw();
+		obj->Draw(shader);
 	}
 }
 
@@ -110,65 +108,83 @@ int Run() {
 	Camera camera;
 
 	// Build and compile shaders
+	Shader grayscaleShader("Resources/Shaders/Grayscale.vert", "Resources/Shaders/Grayscale.frag");
 	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
 	Shader shader("Resources/Shaders/ShadowMapping.vert", "Resources/Shaders/ShadowMapping.frag");
 	Shader simpleDepthShader("Resources/Shaders/ShadowMappingDepth.vert", "Resources/Shaders/ShadowMappingDepth.frag");
 	Shader debugDepthQuad("Resources/Shaders/DebugQuadDepth.vert", "Resources/Shaders/DebugQuadDepth.frag");
+	Shader skyboxShader("Resources/Shaders/Skybox.vert", "Resources/Shaders/Skybox.frag");
 
+	// Load textures
+	std::vector<std::string> faces{
+	"Resources/Textures/skybox/right.jpg",
+	"Resources/Textures/skybox/left.jpg",
+	"Resources/Textures/skybox/top.jpg",
+	"Resources/Textures/skybox/bottom.jpg",
+	"Resources/Textures/skybox/front.jpg",
+	"Resources/Textures/skybox/back.jpg",
+	};
+	Texture* cubemapTexture = ResourceManager::LoadCubemap(faces);
+	Texture* woodTexture = ResourceManager::LoadTextureFromFile("Resources/Textures/wood.png");
+	Texture* brickTexture = ResourceManager::LoadTextureFromFile("Resources/Textures/brickwall.jpg");
+
+	// Create some meshes for the scene
 	Mesh* cube = new Mesh(Mesh::GenerateCube());
+	cube->AddTexture(woodTexture);
 	cube->SetScale({ 10.0f, 10.0f, 10.0f });
 	cube->SetPosition({ 20.0f, 10.0f, 30.0f });
 	objects.push_back(cube);
 
-	Mesh* cube11 = new Mesh(Mesh::GenerateCube());
-	cube11->SetScale({ 10.0f, 10.0f, 10.0f });
-	cube11->SetPosition({ 5.0f, 5.0f, 30.0f });
-	objects.push_back(cube11);
-
 	Mesh* cube1 = new Mesh(Mesh::GenerateCube());
+	cube1->AddTexture(brickTexture);
 	cube1->SetScale({ 8.0f, 12.0f, 6.0f }); 
 	cube1->SetPosition({ -15.0f, 20.0f, 40.0f });
 	cube1->SetRotation({ 30.0f, 0.0f, 45.0f });
 	objects.push_back(cube1);
 
 	Mesh* cube2 = new Mesh(Mesh::GenerateCube());
+	cube2->AddTexture(brickTexture);
 	cube2->SetScale({ 15.0f, 10.0f, 10.0f });
 	cube2->SetPosition({ 35.0f, -10.0f, -20.0f });
 	cube2->SetRotation({ 0.0f, 45.0f, 0.0f });
 	objects.push_back(cube2);
 
 	Mesh* cube3 = new Mesh(Mesh::GenerateCube());
+	cube3->AddTexture(brickTexture);
 	cube3->SetScale({ 6.0f, 6.0f, 12.0f });
 	cube3->SetPosition({ -25.0f, 30.0f, 15.0f });
 	cube3->SetRotation({ 20.0f, 20.0f, 60.0f });
 	objects.push_back(cube3);
 
 	Mesh* cube4 = new Mesh(Mesh::GenerateCube());
+	cube4->AddTexture(brickTexture);
 	cube4->SetScale({ 9.0f, 15.0f, 9.0f });
 	cube4->SetPosition({ 10.0f, -20.0f, 50.0f });
 	cube4->SetRotation({ 45.0f, 30.0f, 10.0f });
 	objects.push_back(cube4);
 
 	Mesh* plane = new Mesh(Mesh::GeneratePlane());
+	plane->AddTexture(woodTexture);
 	plane->SetPosition({ 0.0f, -50.0f, 0.0f });
 	plane->SetScale({ 500.0f, 1.0f, 500.0f });
 	objects.push_back(plane);
 
-	Mesh quad = Mesh::GenerateQuad();
-	Mesh arrowMesh = Mesh::GenerateArrow();
+	Mesh* skybox = new Mesh(Mesh::GenerateCube());
+	skybox->AddTexture(cubemapTexture);
 
-	// Load textures
-	Texture woodTexture("Resources/Textures/wood.png");
+	Mesh quad = Mesh::GenerateQuad();
+	//Mesh arrowMesh = Mesh::GenerateArrow();
 
 	// Shader configuration
 	shader.use();
 	shader.setInt("diffuseTexture", 0);
 	shader.setInt("shadowMap", 1);
 
-	debugDepthQuad.use();
-	debugDepthQuad.setInt("depthMap", 0);
+	//debugDepthQuad.use();
+	//debugDepthQuad.setInt("depthMap", 0);
 
-	FBO depthMapFramebuffer(SHADOW_WIDTH, SHADOW_HEIGHT, true);
+	FBO depthMapFBO(SHADOW_WIDTH, SHADOW_HEIGHT, true);
+	FBO postProcessingFBO(SCREEN_WIDTH, SCREEN_HEIGHT, false);
 
 	/*
 	int mapWidth = 100;
@@ -262,8 +278,8 @@ int Run() {
 		*/
 
 		ImGui::Begin("Light Controls"); // Begin a new window named "Light Controls"
-		ImGui::DragFloat3("Light Position", &lightPos.x, 0.1f); 
-		ImGui::DragFloat3("Light Direction", &lightDir.x, 0.1f); 
+		ImGui::DragFloat3("Light Position", &lightPos.x, 0.1f);
+		ImGui::DragFloat3("Light Direction", &lightDir.x, 0.1f);
 		ImGui::DragFloat("Near Plane", &near_plane, 0.1f, 0.0f, 0.0f, "%.2f"); // Slider for near plane
 		ImGui::DragFloat("Far Plane", &far_plane, 0.1f, 0.0f, 0.0f, "%.2f"); // Slider for far plane
 		ImGui::DragFloat("Ortho Size", &orthoSize, 0.1f, 0.0f, 0.0f, "%.2f"); // Slider for orthographic size
@@ -284,9 +300,9 @@ int Run() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// 1. Render depth of scene to texture (from light's perspetive)
-		glm::mat4 lightProjection, lightView;
+		glm::mat4 lightProjection;
+		glm::mat4 lightView;
 		glm::mat4 lightSpaceMatrix;
-		//float near_plane = 0.5f, far_plane = 500.0f;
 		//lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane);
 		lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
 		lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
@@ -296,12 +312,12 @@ int Run() {
 		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		depthMapFramebuffer.Bind();
+		depthMapFBO.Bind();
 		glClear(GL_DEPTH_BUFFER_BIT);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, woodTexture.GetID());
-		RenderScene(woodTexture, simpleDepthShader);
-		depthMapFramebuffer.UnBind();
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, depthMapFBO.GetDepthTexture().GetID());
+		RenderScene(simpleDepthShader);
+		depthMapFBO.UnBind();
 
 		// Reset viewport
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -317,19 +333,29 @@ int Run() {
 		shader.setVec3("viewPos", camera.GetPosition());
 		shader.setVec3("lightPos", lightPos);
 		shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, woodTexture.GetID());
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, depthMapFramebuffer.GetDepthTexture().GetID());
-		RenderScene(woodTexture, shader);
+		glBindTexture(GL_TEXTURE_2D, depthMapFBO.GetDepthTexture().GetID());
+		RenderScene(shader);
+
+		// Skybox
+		glDepthFunc(GL_LEQUAL);
+		skyboxShader.use();
+		view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+		skyboxShader.setMat4("view", view);
+		skyboxShader.setMat4("projection", projection);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture->ID);
+		skybox->Draw(shader);
+		glDepthFunc(GL_LESS);
 
 		// Render depth map to quad for visual debugging
 		debugDepthQuad.use();
 		debugDepthQuad.setFloat("near_plane", near_plane);
 		debugDepthQuad.setFloat("far_plane", far_plane);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, depthMapFramebuffer.GetDepthTexture().GetID());
-		//quad.Draw();
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, depthMapFBO.GetDepthTexture().GetID());
+		//quad.Draw(debugDepthQuad);
+
 
 		// Render ImGui
 		ImGui::Render();

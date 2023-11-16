@@ -69,6 +69,12 @@
     <ClCompile Include="Source\RenderBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\ResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\stb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThirdParty\glad\khrplatform.h">
@@ -137,6 +143,9 @@
     <ClInclude Include="Source\RenderBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\ResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\BasicLighting.vert" />
@@ -161,6 +170,8 @@
     <None Include="Resources\Shaders\ShadowMapping.vert" />
     <None Include="Resources\Shaders\DebugQuadDepth.vert" />
     <None Include="Resources\Shaders\DebugQuadDepth.frag" />
+    <None Include="Resources\Shaders\Skybox.vert" />
+    <None Include="Resources\Shaders\Skybox.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">
