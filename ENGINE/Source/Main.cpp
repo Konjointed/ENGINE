@@ -173,26 +173,28 @@ int Run() {
 	/*
 	int mapWidth = 100;
 	int mapHeight = 100;
+	float mapScale = 25.0f; // zoom in or out
 	float mapScale = 25.0f;
 
 	int octaves = 4;
 	float persistance = 0.5f;
 	float lacunarity = 2.0f;
 
+	std::vector<std::vector<float>> noiseMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale);
 	int seed = 0;
 	float offsetX = 0.0f, offsetY = 0.0f;
 
-	d::vector<std::vector<float>> heightMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale, seed, octaves, persistance, lacunarity, {offsetX, offsetY});
-	//Texture noiseMap(heightMap);
-	Mesh terrain = Mesh::GenerateTerrain(heightMap, 0.2f);
+	std::vector<std::vector<float>> noiseMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale, seed, octaves, persistance, lacunarity, { offsetX, offsetY });
+	Texture texture(noiseMap);
+	Mesh plane = Mesh::GeneratePlane();
 	*/
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	glm::vec3 lightPos(80.0f, 51.0f, -77.0f);
+	glm::vec3 lightPos(80.0f, 500.0f, -77.0f);
 	glm::vec3 lightDir = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
-	float near_plane = -177.0f, far_plane = 479.0f;
-	float orthoSize = 369.0f;
+	float near_plane = -1000.0f, far_plane = 1000.0f;
+	float orthoSize = 100.0f;
 
 	int lastFrameTime = 0;
 	bool rightMouseButtonPressed = false;
@@ -267,7 +269,6 @@ int Run() {
 		ImGui::DragFloat("Ortho Size", &orthoSize, 0.1f, 0.0f, 0.0f, "%.2f"); // Slider for orthographic size
 		ImGui::End(); // End the window
 
-
 		// UPDATE
 		camera.Update(deltaTime);
 
@@ -328,7 +329,7 @@ int Run() {
 		debugDepthQuad.setFloat("far_plane", far_plane);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, depthMapFramebuffer.GetDepthTexture().GetID());
-		quad.Draw();
+		//quad.Draw();
 
 		// Render ImGui
 		ImGui::Render();
