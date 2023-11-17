@@ -142,7 +142,6 @@
     <ClCompile Include="Source\RenderBuffer.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\stb.cpp" />
-    <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\VertexArray.cpp" />
     <ClCompile Include="Source\VertexBuffer.cpp" />
     <ClCompile Include="ThirdParty\glad\glad.c" />
@@ -162,7 +161,6 @@
     <ClInclude Include="Source\Noise.h" />
     <ClInclude Include="Source\RenderBuffer.h" />
     <ClInclude Include="Source\ResourceManager.h" />
-    <ClInclude Include="Source\Texture.h" />
     <ClInclude Include="Source\VertexArray.h" />
     <ClInclude Include="Source\VertexBuffer.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />

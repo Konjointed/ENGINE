@@ -1,13 +1,16 @@
 #pragma once
 
+#include <glad/glad.h>
+
 class RBO {
 public:
-	RBO(int width, int height);
-	~RBO();
+    RBO(int width, int height);
+    ~RBO();
 
-	unsigned int GetRBO();
-	void Bind();
-	void UnBind();
+    void Bind();
+    void Unbind();
+    GLuint GetID() const;
+
 private:
-	unsigned int rbo;
+    GLuint rbo;
 };

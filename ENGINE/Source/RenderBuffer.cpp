@@ -5,28 +5,23 @@
 #include <glad/glad.h>
 
 RBO::RBO(int width, int height) {
-    glGenRenderbuffers(1, &this->rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, this->rbo);
-
-    // Allocate storage for the renderbuffer
-   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-
-    // You can unbind the renderbuffer here as a good practice
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
 }
 
 RBO::~RBO() {
-    glDeleteRenderbuffers(1, &this->rbo);
-}
-
-unsigned int RBO::GetRBO() {
-    return this->rbo;
+    glDeleteRenderbuffers(1, &rbo);
 }
 
 void RBO::Bind() {
-	glBindRenderbuffer(GL_RENDERBUFFER, this->rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 }
 
-void RBO::UnBind() {
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+void RBO::Unbind() {
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+}
+
+GLuint RBO::GetID() const {
+    return rbo;
 }

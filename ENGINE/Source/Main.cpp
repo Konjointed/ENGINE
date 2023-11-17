@@ -14,7 +14,6 @@
 #include <Shader.h>
 
 #include "Mesh.h"
-#include "Texture.h"
 #include "Noise.h"
 #include "Camera.h"
 #include "FrameBuffer.h"
@@ -109,6 +108,7 @@ int Run() {
 
 	// Build and compile shaders
 	Shader grayscaleShader("Resources/Shaders/Grayscale.vert", "Resources/Shaders/Grayscale.frag");
+	Shader screenShader("Resources/Shaders/FramebufferScreen.vert", "Resources/Shaders/FramebufferScreen.frag");
 	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
 	Shader shader("Resources/Shaders/ShadowMapping.vert", "Resources/Shaders/ShadowMapping.frag");
 	Shader simpleDepthShader("Resources/Shaders/ShadowMappingDepth.vert", "Resources/Shaders/ShadowMappingDepth.frag");
@@ -176,6 +176,9 @@ int Run() {
 	//Mesh arrowMesh = Mesh::GenerateArrow();
 
 	// Shader configuration
+	screenShader.use();
+	screenShader.setInt("screenTexture", 0);
+
 	shader.use();
 	shader.setInt("diffuseTexture", 0);
 	shader.setInt("shadowMap", 1);
@@ -183,8 +186,13 @@ int Run() {
 	//debugDepthQuad.use();
 	//debugDepthQuad.setInt("depthMap", 0);
 
-	FBO depthMapFBO(SHADOW_WIDTH, SHADOW_HEIGHT, true);
-	FBO postProcessingFBO(SCREEN_WIDTH, SCREEN_HEIGHT, false);
+	FBO postProcessFBO(SCREEN_WIDTH, SCREEN_HEIGHT);
+	postProcessFBO.AddColorTexture();
+	postProcessFBO.Finalize();
+
+	FBO depthMapFBO(SHADOW_WIDTH, SHADOW_HEIGHT);
+	depthMapFBO.AddDepthTexture();
+	depthMapFBO.Finalize();
 
 	/*
 	int mapWidth = 100;
@@ -310,14 +318,11 @@ int Run() {
 		// Render scene from light's point of view
 		simpleDepthShader.use();
 		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		depthMapFBO.Bind();
 		glClear(GL_DEPTH_BUFFER_BIT);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, depthMapFBO.GetDepthTexture().GetID());
 		RenderScene(simpleDepthShader);
-		depthMapFBO.UnBind();
+		depthMapFBO.Unbind();
 
 		// Reset viewport
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -333,8 +338,7 @@ int Run() {
 		shader.setVec3("viewPos", camera.GetPosition());
 		shader.setVec3("lightPos", lightPos);
 		shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, depthMapFBO.GetDepthTexture().GetID());
+		depthMapFBO.BindTexture(1);
 		RenderScene(shader);
 
 		// Skybox
@@ -349,11 +353,11 @@ int Run() {
 		glDepthFunc(GL_LESS);
 
 		// Render depth map to quad for visual debugging
-		debugDepthQuad.use();
-		debugDepthQuad.setFloat("near_plane", near_plane);
-		debugDepthQuad.setFloat("far_plane", far_plane);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, depthMapFBO.GetDepthTexture().GetID());
+		//debugDepthQuad.use();
+		//debugDepthQuad.setFloat("near_plane", near_plane);
+		//debugDepthQuad.setFloat("far_plane", far_plane);
+		//glActiveTexture(GL_TEXTURE1);
+		//glBindTexture(GL_TEXTURE_2D, depthMapFBO.GetDepthTexture().GetID());
 		//quad.Draw(debugDepthQuad);
 
 
