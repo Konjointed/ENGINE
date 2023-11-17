@@ -154,6 +154,7 @@
     <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Resources\Shaders\Shaders.vert" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\ElementBuffer.h" />
     <ClInclude Include="Source\FrameBuffer.h" />
@@ -194,6 +195,7 @@
     <None Include="Resources\Shaders\LightCasters.vert" />
     <None Include="Resources\Shaders\LightingMap.frag" />
     <None Include="Resources\Shaders\LightingMap.vert" />
+    <None Include="Resources\Shaders\Shaders.frag" />
     <None Include="Resources\Shaders\ShadowMapping.frag" />
     <None Include="Resources\Shaders\ShadowMapping.vert" />
     <None Include="Resources\Shaders\ShadowMappingDepth.frag" />

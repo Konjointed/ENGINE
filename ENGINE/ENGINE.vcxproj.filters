@@ -140,6 +140,9 @@
     <ClInclude Include="Source\ResourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Resources\Shaders\Shaders.vert">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\BasicLighting.vert" />
@@ -166,6 +169,7 @@
     <None Include="Resources\Shaders\DebugQuadDepth.frag" />
     <None Include="Resources\Shaders\Skybox.vert" />
     <None Include="Resources\Shaders\Skybox.frag" />
+    <None Include="Resources\Shaders\Shaders.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">

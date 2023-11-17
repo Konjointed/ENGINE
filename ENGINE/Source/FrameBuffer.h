@@ -4,15 +4,27 @@
 
 class FBO {
 public:
+    unsigned int depthTextureID = 0;
+    unsigned int colorTextureID = 0;
+
     FBO(int width, int height) : width(width), height(height) {
         glGenFramebuffers(1, &fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    }
+
+    void AddDepthStencilRenderbuffer() {
+        glGenRenderbuffers(1, &rbo);
+        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
     }
 
     void AddDepthTexture() {
         // Create depth texture
         glGenTextures(1, &depthTextureID);
         glBindTexture(GL_TEXTURE_2D, depthTextureID);
+
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -70,7 +82,6 @@ public:
 
 private:
     unsigned int fbo;
-    unsigned int depthTextureID = 0;
-    unsigned int colorTextureID = 0;
+    unsigned int rbo;
     int width, height;
 };

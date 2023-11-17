@@ -96,6 +96,10 @@ void RenderScene(Shader& shader) {
 	}
 }
 
+void Update() {}
+
+void Render() {}
+
 int Run() {
 	glEnable(GL_DEPTH_TEST);
 
@@ -107,111 +111,78 @@ int Run() {
 	Camera camera;
 
 	// Build and compile shaders
-	Shader grayscaleShader("Resources/Shaders/Grayscale.vert", "Resources/Shaders/Grayscale.frag");
+	Shader shader("Resources/Shaders/Shaders.vert", "Resources/Shaders/Shaders.frag");
 	Shader screenShader("Resources/Shaders/FramebufferScreen.vert", "Resources/Shaders/FramebufferScreen.frag");
-	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
-	Shader shader("Resources/Shaders/ShadowMapping.vert", "Resources/Shaders/ShadowMapping.frag");
+	Shader grayScaleShader("Resources/Shaders/Grayscale.vert", "Resources/Shaders/Grayscale.frag");
+	Shader shadowMapShader("Resources/Shaders/ShadowMapping.vert", "Resources/Shaders/ShadowMapping.frag");
 	Shader simpleDepthShader("Resources/Shaders/ShadowMappingDepth.vert", "Resources/Shaders/ShadowMappingDepth.frag");
 	Shader debugDepthQuad("Resources/Shaders/DebugQuadDepth.vert", "Resources/Shaders/DebugQuadDepth.frag");
-	Shader skyboxShader("Resources/Shaders/Skybox.vert", "Resources/Shaders/Skybox.frag");
 
 	// Load textures
-	std::vector<std::string> faces{
-	"Resources/Textures/skybox/right.jpg",
-	"Resources/Textures/skybox/left.jpg",
-	"Resources/Textures/skybox/top.jpg",
-	"Resources/Textures/skybox/bottom.jpg",
-	"Resources/Textures/skybox/front.jpg",
-	"Resources/Textures/skybox/back.jpg",
-	};
-	Texture* cubemapTexture = ResourceManager::LoadCubemap(faces);
-	Texture* woodTexture = ResourceManager::LoadTextureFromFile("Resources/Textures/wood.png");
-	Texture* brickTexture = ResourceManager::LoadTextureFromFile("Resources/Textures/brickwall.jpg");
+	Texture* floorTexture = ResourceManager::LoadTextureFromFile("Resources/Textures/wood.png");
+	Texture* cubeTexture = ResourceManager::LoadTextureFromFile("Resources/Textures/brickwall.jpg");
 
-	// Create some meshes for the scene
+	// shader configuration
+	shadowMapShader.use();
+	shadowMapShader.setInt("diffuseTexture", 0);
+	shadowMapShader.setInt("shadowMap", 1);
+
+	debugDepthQuad.use();
+	debugDepthQuad.setInt("depthMap", 0);
+
+	screenShader.use();
+	screenShader.setInt("screenTexture", 0);
+
 	Mesh* cube = new Mesh(Mesh::GenerateCube());
-	cube->AddTexture(woodTexture);
+	cube->AddTexture(cubeTexture);
 	cube->SetScale({ 10.0f, 10.0f, 10.0f });
 	cube->SetPosition({ 20.0f, 10.0f, 30.0f });
 	objects.push_back(cube);
 
 	Mesh* cube1 = new Mesh(Mesh::GenerateCube());
-	cube1->AddTexture(brickTexture);
-	cube1->SetScale({ 8.0f, 12.0f, 6.0f }); 
+	cube1->AddTexture(cubeTexture);
+	cube1->SetScale({ 8.0f, 12.0f, 6.0f });
 	cube1->SetPosition({ -15.0f, 20.0f, 40.0f });
 	cube1->SetRotation({ 30.0f, 0.0f, 45.0f });
 	objects.push_back(cube1);
 
 	Mesh* cube2 = new Mesh(Mesh::GenerateCube());
-	cube2->AddTexture(brickTexture);
+	cube2->AddTexture(cubeTexture);
 	cube2->SetScale({ 15.0f, 10.0f, 10.0f });
 	cube2->SetPosition({ 35.0f, -10.0f, -20.0f });
 	cube2->SetRotation({ 0.0f, 45.0f, 0.0f });
 	objects.push_back(cube2);
 
 	Mesh* cube3 = new Mesh(Mesh::GenerateCube());
-	cube3->AddTexture(brickTexture);
+	cube3->AddTexture(cubeTexture);
 	cube3->SetScale({ 6.0f, 6.0f, 12.0f });
 	cube3->SetPosition({ -25.0f, 30.0f, 15.0f });
 	cube3->SetRotation({ 20.0f, 20.0f, 60.0f });
 	objects.push_back(cube3);
 
 	Mesh* cube4 = new Mesh(Mesh::GenerateCube());
-	cube4->AddTexture(brickTexture);
+	cube4->AddTexture(cubeTexture);
 	cube4->SetScale({ 9.0f, 15.0f, 9.0f });
 	cube4->SetPosition({ 10.0f, -20.0f, 50.0f });
 	cube4->SetRotation({ 45.0f, 30.0f, 10.0f });
 	objects.push_back(cube4);
 
 	Mesh* plane = new Mesh(Mesh::GeneratePlane());
-	plane->AddTexture(woodTexture);
+	plane->AddTexture(floorTexture);
 	plane->SetPosition({ 0.0f, -50.0f, 0.0f });
 	plane->SetScale({ 500.0f, 1.0f, 500.0f });
 	objects.push_back(plane);
 
-	Mesh* skybox = new Mesh(Mesh::GenerateCube());
-	skybox->AddTexture(cubemapTexture);
-
 	Mesh quad = Mesh::GenerateQuad();
-	//Mesh arrowMesh = Mesh::GenerateArrow();
 
-	// Shader configuration
-	screenShader.use();
-	screenShader.setInt("screenTexture", 0);
-
-	shader.use();
-	shader.setInt("diffuseTexture", 0);
-	shader.setInt("shadowMap", 1);
-
-	//debugDepthQuad.use();
-	//debugDepthQuad.setInt("depthMap", 0);
-
-	FBO postProcessFBO(SCREEN_WIDTH, SCREEN_HEIGHT);
-	postProcessFBO.AddColorTexture();
-	postProcessFBO.Finalize();
+	FBO framebuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+	framebuffer.AddColorTexture();
+	framebuffer.AddDepthStencilRenderbuffer();
+	framebuffer.Finalize();
 
 	FBO depthMapFBO(SHADOW_WIDTH, SHADOW_HEIGHT);
 	depthMapFBO.AddDepthTexture();
 	depthMapFBO.Finalize();
-
-	/*
-	int mapWidth = 100;
-	int mapHeight = 100;
-	float mapScale = 25.0f; // zoom in or out
-	float mapScale = 25.0f;
-
-	int octaves = 4;
-	float persistance = 0.5f;
-	float lacunarity = 2.0f;
-
-	std::vector<std::vector<float>> noiseMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale);
-	int seed = 0;
-	float offsetX = 0.0f, offsetY = 0.0f;
-
-	std::vector<std::vector<float>> noiseMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale, seed, octaves, persistance, lacunarity, { offsetX, offsetY });
-	Texture texture(noiseMap);
-	Mesh plane = Mesh::GeneratePlane();
-	*/
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -224,12 +195,13 @@ int Run() {
 	bool rightMouseButtonPressed = false;
 	bool quit = false;
 	SDL_Event event;
+	// MAIN LOOP
 	while (!quit) {
 		int currentTime = SDL_GetTicks();
 		float deltaTime = (currentTime - lastFrameTime) / 1000.0f;
 		lastFrameTime = currentTime;
-		//std::cout << deltaTime << "\n";
 
+		// EVENTS
 		while (SDL_PollEvent(&event)) {
 			ImGui_ImplSDL2_ProcessEvent(&event);
 
@@ -266,25 +238,6 @@ int Run() {
 		ImGui::NewFrame();
 		//ImGui::ShowDemoWindow();
 
-		/*
-		ImGui::Begin("Noise Controls");
-		bool parametersChanged = ImGui::SliderInt("Width", &mapWidth, 1, 200) ||
-			ImGui::SliderInt("Height", &mapHeight, 1, 200) ||
-			ImGui::SliderFloat("Scale", &mapScale, 0.1f, 100.0f) ||
-			ImGui::SliderInt("Octaves", &octaves, 1, 8) ||
-			ImGui::SliderFloat("Persistence", &persistance, 0.0f, 1.0f) ||
-			ImGui::SliderFloat("Lacunarity", &lacunarity, 0.0f, 4.0f) ||
-			ImGui::InputInt("Seed", &seed) ||
-			ImGui::SliderFloat("Offset X", &offsetX, -100.0f, 100.0f) ||
-			ImGui::SliderFloat("Offset Y", &offsetY, -100.0f, 100.0f);
-		ImGui::End();
-
-		if (parametersChanged) {
-			std::vector<std::vector<float>> heightMap = Noise::GenerateNoiseMap(mapWidth, mapHeight, mapScale, seed, octaves, persistance, lacunarity, { offsetX, offsetY });
-			noiseMap.Update(heightMap);
-		}
-		*/
-
 		ImGui::Begin("Light Controls"); // Begin a new window named "Light Controls"
 		ImGui::DragFloat3("Light Position", &lightPos.x, 0.1f);
 		ImGui::DragFloat3("Light Direction", &lightDir.x, 0.1f);
@@ -296,70 +249,60 @@ int Run() {
 		// UPDATE
 		camera.Update(deltaTime);
 
-		// change light position over time
-		/*
-		lightPos.x = sin(SDL_GetTicks()) * 3.0f;
-		lightPos.z = cos(SDL_GetTicks()) * 2.0f;
-		lightPos.y = 5.0 + cos(SDL_GetTicks()) * 1.0f;
-		*/
-
 		// RENDER
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 projection = camera.GetProjectionMatrix();
+
 		// 1. Render depth of scene to texture (from light's perspetive)
-		glm::mat4 lightProjection;
-		glm::mat4 lightView;
-		glm::mat4 lightSpaceMatrix;
-		//lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane);
-		lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
-		lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-		lightSpaceMatrix = lightProjection * lightView;
+		glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
+		glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 		// Render scene from light's point of view
 		simpleDepthShader.use();
 		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		// First Pass - Shadow Depth Map
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		depthMapFBO.Bind();
 		glClear(GL_DEPTH_BUFFER_BIT);
-		RenderScene(simpleDepthShader);
+		RenderScene(simpleDepthShader); // RenderSceneDepth() uses simpleDepthShader
 		depthMapFBO.Unbind();
 
 		// Reset viewport
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// 2. Render scene as normal using the generated depth/shadow map
-		shader.use();
-		glm::mat4 view = camera.GetViewMatrix();
-		glm::mat4 projection = camera.GetProjectionMatrix();
-		shader.setMat4("projection", projection);
-		shader.setMat4("view", view);
-		// set light uniforms
-		shader.setVec3("viewPos", camera.GetPosition());
-		shader.setVec3("lightPos", lightPos);
-		shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		depthMapFBO.BindTexture(1);
-		RenderScene(shader);
+		// Second Pass - Render Scene with Shadows into the Framebuffer
+		framebuffer.Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Skybox
-		glDepthFunc(GL_LEQUAL);
-		skyboxShader.use();
-		view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
-		skyboxShader.setMat4("view", view);
-		skyboxShader.setMat4("projection", projection);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture->ID);
-		skybox->Draw(shader);
-		glDepthFunc(GL_LESS);
+		shadowMapShader.use();
+		shadowMapShader.setMat4("projection", projection);
+		shadowMapShader.setMat4("view", view);
+		shadowMapShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		depthMapFBO.BindTexture(1); // Use depth map for shadows
+		RenderScene(shadowMapShader); // RenderScene() uses shadowMapShader
 
-		// Render depth map to quad for visual debugging
-		//debugDepthQuad.use();
-		//debugDepthQuad.setFloat("near_plane", near_plane);
-		//debugDepthQuad.setFloat("far_plane", far_plane);
-		//glActiveTexture(GL_TEXTURE1);
-		//glBindTexture(GL_TEXTURE_2D, depthMapFBO.GetDepthTexture().GetID());
-		//quad.Draw(debugDepthQuad);
+		framebuffer.Unbind();
 
+		// Third Pass - Post Processing (Grayscale Effect)
+		glClear(GL_COLOR_BUFFER_BIT);
+		glDisable(GL_DEPTH_TEST); // Disable depth test for screen-space quad
+
+		grayScaleShader.use();
+		framebuffer.BindTexture(0); // Use the texture from framebuffer
+		quad.Draw(grayScaleShader); // Draw fullscreen quad with grayscale effect
+
+		glEnable(GL_DEPTH_TEST); // Re-enable depth test if needed later
+
+		debugDepthQuad.use();
+		debugDepthQuad.setFloat("near_plane", near_plane);
+		debugDepthQuad.setFloat("far_plane", far_plane);
+		depthMapFBO.BindTexture(0);
+		//quad.Draw(shader);
 
 		// Render ImGui
 		ImGui::Render();

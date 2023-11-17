@@ -174,41 +174,11 @@ Mesh Mesh::GenerateQuad() {
     return Mesh(vertices, indices, 0);
 }
 
-Mesh Mesh::GenerateArrow() {
-    // Arrow shaft vertices
-    std::vector<float> vertices = {
-        // Positions         // Texture Coords // Normals
-        // Shaft (line) - not actually used in lighting, but you can use this if needed
-        0.0f, 0.0f, 0.0f,     0.0f, 0.0f,     0.0f, 0.0f, 1.0f, // Shaft start
-        0.0f, 0.0f, 1.0f,     1.0f, 0.0f,     0.0f, 0.0f, 1.0f, // Shaft end
-
-        // Arrowhead (pyramid)
-        0.0f, 0.0f, 1.0f,     0.5f, 0.0f,     0.0f, 0.0f, 1.0f, // Top of the pyramid, and end of the shaft
-        -0.1f, 0.1f, 0.8f,    0.0f, 1.0f,     -1.0f, 1.0f, 0.0f, // Bottom left of the pyramid
-        0.1f, 0.1f, 0.8f,     1.0f, 1.0f,     1.0f, 1.0f, 0.0f,  // Bottom right of the pyramid
-        -0.1f, -0.1f, 0.8f,   0.0f, 1.0f,     -1.0f, -1.0f, 0.0f,// Top left of the pyramid
-        0.1f, -0.1f, 0.8f,    1.0f, 1.0f,     1.0f, -1.0f, 0.0f  // Top right of the pyramid
-    };
-
-    std::vector<unsigned int> indices = {
-        // Line indices (shaft)
-        0, 1, // This will only be visible if you draw GL_LINES
-
-        // Pyramid indices (arrowhead)
-        2, 3, 4, // Front face
-        2, 4, 5, // Right face
-        2, 5, 6, // Back face
-        2, 6, 3  // Left face
-    };
-
-    return Mesh(vertices, indices, 1);
-}
-
 void Mesh::Draw(Shader& shader) {
     glm::mat4 model = GetModelMatrix();
     shader.setMat4("model", model);
 
-    // Bind Textures
+    // Bind Textures (only sets the diffuse texture if the shader has it)
     for (int i = 0; i < textures.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit
         shader.setInt("diffuseTexture", 0);
