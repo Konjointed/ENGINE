@@ -178,7 +178,7 @@ void Mesh::Draw(Shader& shader) {
     glm::mat4 model = GetModelMatrix();
     shader.setMat4("model", model);
 
-    // Bind Textures (only sets the diffuse texture if the shader has it)
+    // Bind Textures (only sets the diffuse texture atm)
     for (int i = 0; i < textures.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit
         shader.setInt("diffuseTexture", 0);

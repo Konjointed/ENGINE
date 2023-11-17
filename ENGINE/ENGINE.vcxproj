@@ -140,6 +140,7 @@
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\Noise.cpp" />
     <ClCompile Include="Source\RenderBuffer.cpp" />
+    <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\stb.cpp" />
     <ClCompile Include="Source\VertexArray.cpp" />
@@ -161,6 +162,9 @@
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\Noise.h" />
     <ClInclude Include="Source\RenderBuffer.h" />
+    <ClInclude Include="Source\Renderer.h" />
+    <ClInclude Include="Source\ShadowMapPass.h" />
+    <ClInclude Include="Source\RenderPipeline.h" />
     <ClInclude Include="Source\ResourceManager.h" />
     <ClInclude Include="Source\VertexArray.h" />
     <ClInclude Include="Source\VertexBuffer.h" />

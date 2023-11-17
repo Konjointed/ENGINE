@@ -250,59 +250,88 @@ int Run() {
 		camera.Update(deltaTime);
 
 		// RENDER
+		// Set clear color and clear the buffers
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 view = camera.GetViewMatrix();
-		glm::mat4 projection = camera.GetProjectionMatrix();
-
-		// 1. Render depth of scene to texture (from light's perspetive)
+		// -----------------------------
+		// First Pass: Shadow Depth Map
+		// -----------------------------
+		// Set up matrices for shadow mapping
 		glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
 		glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-		// Render scene from light's point of view
+
+		// Use shader for rendering depth map
 		simpleDepthShader.use();
 		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-		// First Pass - Shadow Depth Map
+		// Configure viewport to the size of the shadow map
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		depthMapFBO.Bind();
-		glClear(GL_DEPTH_BUFFER_BIT);
-		RenderScene(simpleDepthShader); // RenderSceneDepth() uses simpleDepthShader
+		depthMapFBO.Bind();  // Bind the framebuffer for depth map
+		glClear(GL_DEPTH_BUFFER_BIT); // Clear depth buffer
+
+		// Render the scene from light's perspective to create depth map
+		RenderScene(simpleDepthShader);
+
+		// Unbind the depth map framebuffer
 		depthMapFBO.Unbind();
 
-		// Reset viewport
+		// Reset viewport back to the original size
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Second Pass - Render Scene with Shadows into the Framebuffer
+		// --------------------------------------------
+		// Second Pass: Render Scene with Shadow Effect
+		// --------------------------------------------
+		// Bind the framebuffer for scene rendering
 		framebuffer.Bind();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear buffers
 
+		// Set up camera matrices
+		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 projection = camera.GetProjectionMatrix();
+
+		// Use shader for rendering scene with shadows
 		shadowMapShader.use();
 		shadowMapShader.setMat4("projection", projection);
 		shadowMapShader.setMat4("view", view);
 		shadowMapShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		depthMapFBO.BindTexture(1); // Use depth map for shadows
-		RenderScene(shadowMapShader); // RenderScene() uses shadowMapShader
 
+		// Bind the depth map texture for shadow calculation
+		depthMapFBO.BindTexture(1);
+
+		// Render the scene with shadows
+		RenderScene(shadowMapShader);
+
+		// Unbind the scene framebuffer
 		framebuffer.Unbind();
 
-		// Third Pass - Post Processing (Grayscale Effect)
+		// -------------------------------------
+		// Third Pass: Post-Processing Effect
+		// -------------------------------------
+		// Clear the color buffer
 		glClear(GL_COLOR_BUFFER_BIT);
-		glDisable(GL_DEPTH_TEST); // Disable depth test for screen-space quad
+		// Disable depth test for post-processing
+		glDisable(GL_DEPTH_TEST);
 
-		grayScaleShader.use();
-		framebuffer.BindTexture(0); // Use the texture from framebuffer
-		quad.Draw(grayScaleShader); // Draw fullscreen quad with grayscale effect
+		// Use shader for grayscale effect
+		screenShader.use();
+		// Bind the texture from scene framebuffer
+		framebuffer.BindTexture(0);
+		// Draw fullscreen quad with grayscale effect
+		quad.Draw(screenShader);
 
-		glEnable(GL_DEPTH_TEST); // Re-enable depth test if needed later
+		// Re-enable depth test for any further rendering
+		glEnable(GL_DEPTH_TEST);
 
+		// Optional: Debug depth quad rendering
 		debugDepthQuad.use();
 		debugDepthQuad.setFloat("near_plane", near_plane);
 		debugDepthQuad.setFloat("far_plane", far_plane);
 		depthMapFBO.BindTexture(0);
-		//quad.Draw(shader);
+		//quad.Draw(shader); // Uncomment to draw the depth quad for debugging
+
 
 		// Render ImGui
 		ImGui::Render();
