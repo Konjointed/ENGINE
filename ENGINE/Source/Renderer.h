@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 
+/*
 class RenderPipeline;
 
 class Renderer {
@@ -15,3 +16,4 @@ public:
 private:
 	std::vector<std::unique_ptr<RenderPipeline>> renderPipelines;
 };
+*/

@@ -19,6 +19,11 @@
 #include "FrameBuffer.h"
 #include "RenderBuffer.h"
 #include "ResourceManager.h"
+//#include "Renderer.h"
+#include "ShadowMapPass.h"
+#include "MainRenderPass.h"
+#include "PostProcessPass.h"
+#include "RenderPipeline.h"
 
 SDL_Window* window;
 SDL_GLContext glContext;
@@ -122,17 +127,6 @@ int Run() {
 	Texture* floorTexture = ResourceManager::LoadTextureFromFile("Resources/Textures/wood.png");
 	Texture* cubeTexture = ResourceManager::LoadTextureFromFile("Resources/Textures/brickwall.jpg");
 
-	// shader configuration
-	shadowMapShader.use();
-	shadowMapShader.setInt("diffuseTexture", 0);
-	shadowMapShader.setInt("shadowMap", 1);
-
-	debugDepthQuad.use();
-	debugDepthQuad.setInt("depthMap", 0);
-
-	screenShader.use();
-	screenShader.setInt("screenTexture", 0);
-
 	Mesh* cube = new Mesh(Mesh::GenerateCube());
 	cube->AddTexture(cubeTexture);
 	cube->SetScale({ 10.0f, 10.0f, 10.0f });
@@ -173,23 +167,32 @@ int Run() {
 	plane->SetScale({ 500.0f, 1.0f, 500.0f });
 	objects.push_back(plane);
 
-	Mesh quad = Mesh::GenerateQuad();
+	glm::vec3 lightPosition(80.0f, 500.0f, -77.0f);
+	glm::vec3 lightDirection = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
+	float nearPlane = -1000.0f;
+	float farPlane = 1000.0f;
+	float orthoSize = 100.0f;
 
-	FBO framebuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
-	framebuffer.AddColorTexture();
-	framebuffer.AddDepthStencilRenderbuffer();
-	framebuffer.Finalize();
+	glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
+	glm::mat4 lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
-	FBO depthMapFBO(SHADOW_WIDTH, SHADOW_HEIGHT);
-	depthMapFBO.AddDepthTexture();
-	depthMapFBO.Finalize();
+	ShadowMapPass shadowMapPass(&simpleDepthShader, lightSpaceMatrix);
+	MainRenderPass mainRenderPass(&shadowMapShader, shadowMapPass.GetDepthTexture(), lightSpaceMatrix, camera);
+	PostProcessPass postProcessPass(&grayScaleShader);
+
+	shadowMapPass.SetSceneObjects(objects);
+	mainRenderPass.SetSceneObjects(objects);
+
+	RenderPipeline renderPipeline;
+	renderPipeline.AddPass(&shadowMapPass);
+	renderPipeline.AddPass(&mainRenderPass);
+	renderPipeline.AddPass(&postProcessPass);
+
+	//Renderer renderer;
+	//renderer.SetPipeline(&renderPipeline);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	glm::vec3 lightPos(80.0f, 500.0f, -77.0f);
-	glm::vec3 lightDir = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
-	float near_plane = -1000.0f, far_plane = 1000.0f;
-	float orthoSize = 100.0f;
 
 	int lastFrameTime = 0;
 	bool rightMouseButtonPressed = false;
@@ -233,118 +236,17 @@ int Run() {
 			}
 		}
 
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplSDL2_NewFrame();
-		ImGui::NewFrame();
-		//ImGui::ShowDemoWindow();
-
-		ImGui::Begin("Light Controls"); // Begin a new window named "Light Controls"
-		ImGui::DragFloat3("Light Position", &lightPos.x, 0.1f);
-		ImGui::DragFloat3("Light Direction", &lightDir.x, 0.1f);
-		ImGui::DragFloat("Near Plane", &near_plane, 0.1f, 0.0f, 0.0f, "%.2f"); // Slider for near plane
-		ImGui::DragFloat("Far Plane", &far_plane, 0.1f, 0.0f, 0.0f, "%.2f"); // Slider for far plane
-		ImGui::DragFloat("Ortho Size", &orthoSize, 0.1f, 0.0f, 0.0f, "%.2f"); // Slider for orthographic size
-		ImGui::End(); // End the window
-
 		// UPDATE
 		camera.Update(deltaTime);
 
 		// RENDER
-		// Set clear color and clear the buffers
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		// -----------------------------
-		// First Pass: Shadow Depth Map
-		// -----------------------------
-		// Set up matrices for shadow mapping
-		glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
-		glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-
-		// Use shader for rendering depth map
-		simpleDepthShader.use();
-		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-		// Configure viewport to the size of the shadow map
-		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		depthMapFBO.Bind();  // Bind the framebuffer for depth map
-		glClear(GL_DEPTH_BUFFER_BIT); // Clear depth buffer
-
-		// Render the scene from light's perspective to create depth map
-		RenderScene(simpleDepthShader);
-
-		// Unbind the depth map framebuffer
-		depthMapFBO.Unbind();
-
-		// Reset viewport back to the original size
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		// --------------------------------------------
-		// Second Pass: Render Scene with Shadow Effect
-		// --------------------------------------------
-		// Bind the framebuffer for scene rendering
-		framebuffer.Bind();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear buffers
-
-		// Set up camera matrices
-		glm::mat4 view = camera.GetViewMatrix();
-		glm::mat4 projection = camera.GetProjectionMatrix();
-
-		// Use shader for rendering scene with shadows
-		shadowMapShader.use();
-		shadowMapShader.setMat4("projection", projection);
-		shadowMapShader.setMat4("view", view);
-		shadowMapShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-		// Bind the depth map texture for shadow calculation
-		depthMapFBO.BindTexture(1);
-
-		// Render the scene with shadows
-		RenderScene(shadowMapShader);
-
-		// Unbind the scene framebuffer
-		framebuffer.Unbind();
-
-		// -------------------------------------
-		// Third Pass: Post-Processing Effect
-		// -------------------------------------
-		// Clear the color buffer
-		glClear(GL_COLOR_BUFFER_BIT);
-		// Disable depth test for post-processing
-		glDisable(GL_DEPTH_TEST);
-
-		// Use shader for grayscale effect
-		screenShader.use();
-		// Bind the texture from scene framebuffer
-		framebuffer.BindTexture(0);
-		// Draw fullscreen quad with grayscale effect
-		quad.Draw(screenShader);
-
-		// Re-enable depth test for any further rendering
-		glEnable(GL_DEPTH_TEST);
-
-		// Optional: Debug depth quad rendering
-		debugDepthQuad.use();
-		debugDepthQuad.setFloat("near_plane", near_plane);
-		debugDepthQuad.setFloat("far_plane", far_plane);
-		depthMapFBO.BindTexture(0);
-		//quad.Draw(shader); // Uncomment to draw the depth quad for debugging
-
-
-		// Render ImGui
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		renderPipeline.Execute();
 
 		// Swap buffers
 		SDL_GL_SwapWindow(window);
 	}
-
-	// Shutdown
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplSDL2_Shutdown();
-	ImGui::DestroyContext();
 
 	for (Mesh* obj : objects) {
 		delete obj;

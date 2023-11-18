@@ -159,10 +159,13 @@
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\ElementBuffer.h" />
     <ClInclude Include="Source\FrameBuffer.h" />
+    <ClInclude Include="Source\MainRenderPass.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\Noise.h" />
+    <ClInclude Include="Source\PostProcessPass.h" />
     <ClInclude Include="Source\RenderBuffer.h" />
     <ClInclude Include="Source\Renderer.h" />
+    <ClInclude Include="Source\RenderPass.h" />
     <ClInclude Include="Source\ShadowMapPass.h" />
     <ClInclude Include="Source\RenderPipeline.h" />
     <ClInclude Include="Source\ResourceManager.h" />
