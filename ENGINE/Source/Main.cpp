@@ -179,7 +179,7 @@ int Run() {
 
 	ShadowMapPass shadowMapPass(&simpleDepthShader, lightSpaceMatrix);
 	MainRenderPass mainRenderPass(&shadowMapShader, shadowMapPass.GetDepthTexture(), lightSpaceMatrix, camera);
-	PostProcessPass postProcessPass(&screenShader);
+	PostProcessPass postProcessPass(&grayScaleShader, mainRenderPass.GetColorTexture());
 
 	shadowMapPass.SetSceneObjects(objects);
 	mainRenderPass.SetSceneObjects(objects);
@@ -188,7 +188,7 @@ int Run() {
 	RenderPipeline renderPipeline;
 	renderPipeline.AddPass(&shadowMapPass);
 	renderPipeline.AddPass(&mainRenderPass);
-	//renderPipeline.AddPass(&postProcessPass);
+	renderPipeline.AddPass(&postProcessPass);
 
 	//Renderer renderer;
 	//renderer.SetPipeline(&renderPipeline);
