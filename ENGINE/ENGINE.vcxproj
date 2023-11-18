@@ -137,11 +137,14 @@
     <ClCompile Include="Source\ElementBuffer.cpp" />
     <ClCompile Include="Source\FrameBuffer.cpp" />
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\MainRenderPass.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\Noise.cpp" />
+    <ClCompile Include="Source\PostProcessPass.cpp" />
     <ClCompile Include="Source\RenderBuffer.cpp" />
     <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
+    <ClCompile Include="Source\ShadowMapPass.cpp" />
     <ClCompile Include="Source\stb.cpp" />
     <ClCompile Include="Source\VertexArray.cpp" />
     <ClCompile Include="Source\VertexBuffer.cpp" />

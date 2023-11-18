@@ -101,10 +101,6 @@ void RenderScene(Shader& shader) {
 	}
 }
 
-void Update() {}
-
-void Render() {}
-
 int Run() {
 	glEnable(GL_DEPTH_TEST);
 

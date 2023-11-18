@@ -1,5 +1,9 @@
 #pragma once
 
+#include <vector>
+
+class Mesh;
+
 class RenderPass {
 public:
 	virtual ~RenderPass() {}
