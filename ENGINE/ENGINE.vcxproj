@@ -134,6 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Buffers.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Compile\stb.cpp" />
@@ -151,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\Buffers.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\IncludeGL.h" />
     <ClInclude Include="Source\Mesh.h" />
