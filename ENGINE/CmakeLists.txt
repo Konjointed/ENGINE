@@ -1,0 +1,19 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(MyEngine)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True) # What does this do?
+
+add_executable(MyEngine Main.cpp ENGINE/Compile/glad.c)
+
+# Include directories for header-only libraries
+include_directories("ENGINE/ThirdParty/glm")
+
+# Find packages (sets variables containing the paths to the library fiiles needed for linking)
+find_package(SDL2 REQUIRED) # SDL2_LIBRARIES
+find_package(OpenGL REQUIRED) # OPENGL_LIBRARIES
+find_package(Assimp REQUIRED) # ASSIMP_LIBRARIES
+
+# Link libraries
+target_link_libraries(MyEngine ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ${ASSIMP_LIBRARIES}) 

@@ -18,25 +18,10 @@
     <ClCompile Include="Source\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThirdParty\glad\glad.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\VertexArray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\VertexBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ElementBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Noise.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ThirdParty\imgui\imgui.cpp">
@@ -60,34 +45,19 @@
     <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\FrameBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\RenderBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ResourceManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\stb.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ShadowMapPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\MainRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\PostProcessPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Compile\stb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Compile\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,28 +68,16 @@
     <ClInclude Include="ThirdParty\glad\glad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\VertexBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\VertexArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ElementBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ThirdParty\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ThirdParty\stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Noise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ThirdParty\imgui\imconfig.h">
@@ -149,36 +107,6 @@
     <ClInclude Include="ThirdParty\imgui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\FrameBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\RenderBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ResourceManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Resources\Shaders\Shaders.vert">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\RenderPipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ShadowMapPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\MainRenderPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\RenderPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PostProcessPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -188,33 +116,13 @@
     <ClInclude Include="Source\Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shaders\BasicLighting.vert" />
-    <None Include="Resources\Shaders\BasicLighting.frag" />
-    <None Include="Resources\Shaders\Texture.vert" />
-    <None Include="Resources\Shaders\Texture.frag" />
-    <None Include="Resources\Shaders\Grayscale.frag" />
-    <None Include="Resources\Shaders\Grayscale.vert" />
     <None Include="Resources\Shaders\Default.vert" />
     <None Include="Resources\Shaders\Default.frag" />
-    <None Include="Resources\Shaders\Color.vert" />
-    <None Include="Resources\Shaders\Color.frag" />
-    <None Include="Resources\Shaders\LightingMap.vert" />
-    <None Include="Resources\Shaders\LightingMap.frag" />
-    <None Include="Resources\Shaders\LightCasters.vert" />
-    <None Include="Resources\Shaders\LightCasters.frag" />
-    <None Include="Resources\Shaders\FramebufferScreen.frag" />
-    <None Include="Resources\Shaders\FramebufferScreen.vert" />
-    <None Include="Resources\Shaders\ShadowMappingDepth.frag" />
-    <None Include="Resources\Shaders\ShadowMappingDepth.vert" />
-    <None Include="Resources\Shaders\ShadowMapping.frag" />
-    <None Include="Resources\Shaders\ShadowMapping.vert" />
-    <None Include="Resources\Shaders\DebugQuadDepth.vert" />
-    <None Include="Resources\Shaders\DebugQuadDepth.frag" />
-    <None Include="Resources\Shaders\Skybox.vert" />
-    <None Include="Resources\Shaders\Skybox.frag" />
-    <None Include="Resources\Shaders\Shaders.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">
@@ -229,5 +137,8 @@
     <Image Include="Resources\Textures\container_specular.png">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CmakeLists.txt" />
   </ItemGroup>
 </Project>
