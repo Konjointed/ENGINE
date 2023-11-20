@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WINDOW_H 
+#define WINDOW_H 
 
 #include <string>
 
@@ -14,21 +15,20 @@ struct WindowSettings {
 	WindowSettings() :
 		title("Engine"),
 		width(1280), height(720),
-		fullscreen(false),
+		fullscreen(true),
 		vsync(false)
 	{}
 };
 
 class Window {
 public:
-	Window();
-	bool Init(WindowSettings settings = WindowSettings());
-	void Update();
-	SDL_Window* GetWindow();
-	SDL_GLContext GetContext();
-	void SetVSync(bool enabled);
+	Window(int& success, WindowSettings settings = WindowSettings());
 	~Window();
+
+	void SwapBuffers();
 private:
 	SDL_Window* window;
 	SDL_GLContext glContext;
 };
+
+#endif 
