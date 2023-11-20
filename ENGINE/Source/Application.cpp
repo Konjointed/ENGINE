@@ -45,19 +45,21 @@ int Application::Run() {
 		PollEvents();
 
 		Update();
-			camera->Update(deltaTime);
+		// TEMPORAILY OUTSIDE OF UPDATE()
+		camera->Update(deltaTime);
 
 		Render();
-			glm::mat4 model = glm::mat4(1.0f);
-			glm::mat4 view = camera->GetViewMatrix();
-			glm::mat4 projection = camera->GetProjectionMatrix();
+		// TEMPORAILY OUTSIDE OF RENDER()
+		glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 view = camera->GetViewMatrix();
+		glm::mat4 projection = camera->GetProjectionMatrix();
 
-			shader.use();
-			shader.setMat4("view", view);
-			shader.setMat4("projection", projection);
-			shader.setMat4("model", model);
+		shader.use();
+		shader.setMat4("view", view);
+		shader.setMat4("projection", projection);
+		shader.setMat4("model", model);
 
-			mesh.Draw();
+		mesh.Draw();
 
 		window->SwapBuffers();
 	}
