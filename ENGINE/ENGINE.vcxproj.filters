@@ -125,6 +125,8 @@
     <None Include="Resources\Shaders\Default.frag" />
     <None Include="Resources\Shaders\Skybox.frag" />
     <None Include="Resources\Shaders\Skybox.vert" />
+    <None Include="Resources\Shaders\Screen.frag" />
+    <None Include="Resources\Shaders\Screen.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">
