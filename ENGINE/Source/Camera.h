@@ -31,7 +31,7 @@ private:
 	float yaw;
 	float pitch;
 
-	float movementSpeed = 100.5f;
+	float movementSpeed = 30.0f;
 	float mouseSensitivity = 0.1f;
 	bool firstMouse = true;
 	float lastX, lastY;

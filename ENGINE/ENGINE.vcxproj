@@ -135,10 +135,10 @@
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
-    <ClCompile Include="Source\Light.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Compile\stb.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
+    <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\Window.cpp" />
     <ClCompile Include="Compile\glad.c" />
     <ClCompile Include="ThirdParty\imgui\imgui.cpp" />
@@ -153,8 +153,8 @@
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\IncludeGL.h" />
-    <ClInclude Include="Source\Light.h" />
     <ClInclude Include="Source\Mesh.h" />
+    <ClInclude Include="Source\Texture.h" />
     <ClInclude Include="Source\Window.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />
     <ClInclude Include="ThirdParty\glad\khrplatform.h" />
@@ -179,6 +179,8 @@
   <ItemGroup>
     <None Include="Resources\Shaders\Default.frag" />
     <None Include="Resources\Shaders\Default.vert" />
+    <None Include="Resources\Shaders\Skybox.frag" />
+    <None Include="Resources\Shaders\Skybox.vert" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CmakeLists.txt" />
