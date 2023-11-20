@@ -1,4 +1,3 @@
-/*
 #include "Renderer.h"
 
 #include <glad/glad.h>
@@ -18,5 +17,3 @@ void Renderer::SetPipeline(RenderPipeline* pipeline) {
 }
 
 Renderer::~Renderer() {}
-*/
-

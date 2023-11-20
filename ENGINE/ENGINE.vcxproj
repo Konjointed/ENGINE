@@ -136,6 +136,7 @@
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\ElementBuffer.cpp" />
     <ClCompile Include="Source\FrameBuffer.cpp" />
+    <ClCompile Include="Source\Light.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\MainRenderPass.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
@@ -148,6 +149,7 @@
     <ClCompile Include="Source\stb.cpp" />
     <ClCompile Include="Source\VertexArray.cpp" />
     <ClCompile Include="Source\VertexBuffer.cpp" />
+    <ClCompile Include="Source\Window.cpp" />
     <ClCompile Include="ThirdParty\glad\glad.c" />
     <ClCompile Include="ThirdParty\imgui\imgui.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp" />
@@ -162,6 +164,8 @@
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\ElementBuffer.h" />
     <ClInclude Include="Source\FrameBuffer.h" />
+    <ClInclude Include="Source\IncludeGL.h" />
+    <ClInclude Include="Source\Light.h" />
     <ClInclude Include="Source\MainRenderPass.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\Noise.h" />
@@ -174,6 +178,7 @@
     <ClInclude Include="Source\ResourceManager.h" />
     <ClInclude Include="Source\VertexArray.h" />
     <ClInclude Include="Source\VertexBuffer.h" />
+    <ClInclude Include="Source\Window.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />
     <ClInclude Include="ThirdParty\glad\khrplatform.h" />
     <ClInclude Include="ThirdParty\imgui\imconfig.h" />

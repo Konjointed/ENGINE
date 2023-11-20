@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "RenderPass.h"
+
 class RenderPipeline {
 public:
 	void AddPass(RenderPass* pass) {

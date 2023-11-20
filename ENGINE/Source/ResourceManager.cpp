@@ -4,6 +4,7 @@
 
 #include <stb_image.h>
 
+#include "IncludeGL.h"
 #include "Mesh.h"
 
 Texture* ResourceManager::LoadTextureFromFile(const std::string path) {

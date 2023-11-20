@@ -1,99 +1,26 @@
 #include <iostream>
 
-#include <glad/glad.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
-
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_sdl2.h>
-#include <imgui/imgui_impl_opengl3.h>
-
 #include <Shader.h>
 
+#include "IncludeGL.h"
+#include "Window.h"
 #include "Mesh.h"
-#include "Noise.h"
+#include "Light.h"
+//#include "Noise.h"
 #include "Camera.h"
-#include "FrameBuffer.h"
-#include "RenderBuffer.h"
+//#include "FrameBuffer.h"
+//#include "RenderBuffer.h"
 #include "ResourceManager.h"
-//#include "Renderer.h"
+#include "Renderer.h"
 #include "ShadowMapPass.h"
 #include "MainRenderPass.h"
 #include "PostProcessPass.h"
 #include "RenderPipeline.h"
 
-SDL_Window* window;
-SDL_GLContext glContext;
-
 std::vector<Mesh*> objects;
-
-bool ImGuiInit() {
-	// Setup Dear ImGui context
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
-
-	// Setup Platform/Renderer backends
-	ImGui_ImplSDL2_InitForOpenGL(window, glContext);
-	ImGui_ImplOpenGL3_Init();
-
-	return true;
-}
-
-bool Init(const char* windowTitle, int windowWidth, int windowHeight, bool fullscreen) {
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-		std::cout << "SDL error on initialization: " << SDL_GetError() << "\n";
-		return false;
-	}
-
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-	// Create sdl window
-	const Uint32 windowFlags = (SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_RESIZABLE : 0));
-	window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowFlags);
-	if (!window) {
-		std::cout << "SDL error on create window: " << SDL_GetError() << "\n";
-		return false;
-	}
-
-	// Create opengl context
-	glContext = SDL_GL_CreateContext(window);
-	if (!glContext) {
-		std::cout << "SDL GL error on create context: " << SDL_GetError() << "\n";
-		SDL_DestroyWindow(window);
-		SDL_Quit();
-		return false;
-	}
-
-	/* Disable vsync
-	if (SDL_GL_SetSwapInterval(0) < 0) {
-		std::cerr << "Warning: Unable to set VSync! SDL Error: " << SDL_GetError() << std::endl;
-	}
-	*/
-
-	// Load opengl functions
-	if (!gladLoadGL()) {
-		std::cout << "GLAD Initialization Error\n";
-		SDL_GL_DeleteContext(glContext);
-		SDL_DestroyWindow(window);
-		SDL_Quit();
-		return false;
-	}
-
-	ImGuiInit();
-
-	return true;
-}
 
 void RenderScene(Shader& shader) {
 	for (Mesh* obj : objects) {
@@ -101,7 +28,7 @@ void RenderScene(Shader& shader) {
 	}
 }
 
-int Run() {
+int Run(Window window) {
 	glEnable(GL_DEPTH_TEST);
 
 	int SCREEN_WIDTH = 1280;
@@ -110,7 +37,9 @@ int Run() {
 	int SHADOW_HEIGHT = 1024;
 
 	Camera camera;
+	Light directionalLight;
 
+	// TO-DO: Add to ResourceManager
 	// Build and compile shaders
 	Shader shader("Resources/Shaders/Shaders.vert", "Resources/Shaders/Shaders.frag");
 	Shader screenShader("Resources/Shaders/FramebufferScreen.vert", "Resources/Shaders/FramebufferScreen.frag");
@@ -123,6 +52,7 @@ int Run() {
 	Texture* floorTexture = ResourceManager::LoadTextureFromFile("Resources/Textures/wood.png");
 	Texture* cubeTexture = ResourceManager::LoadTextureFromFile("Resources/Textures/brickwall.jpg");
 
+	// TODO: Make some sort of scene glass (scene graph?)
 	Mesh* cube = new Mesh(Mesh::GenerateCube());
 	cube->AddTexture(cubeTexture);
 	cube->SetScale({ 10.0f, 10.0f, 10.0f });
@@ -163,19 +93,12 @@ int Run() {
 	plane->SetScale({ 500.0f, 1.0f, 500.0f });
 	objects.push_back(plane);
 
-	glm::vec3 lightPosition(80.0f, 500.0f, -77.0f);
-	glm::vec3 lightDirection = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
-	float nearPlane = -1000.0f;
-	float farPlane = 1000.0f;
-	float orthoSize = 100.0f;
+	glm::mat4 lightSpaceMatrix = directionalLight.GetSpaceMatrix();
 
-	glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
-	glm::mat4 lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-
+	// Render pipeline stuff
 	ShadowMapPass shadowMapPass(&simpleDepthShader, lightSpaceMatrix);
 	MainRenderPass mainRenderPass(&shadowMapShader, shadowMapPass.GetDepthTexture(), lightSpaceMatrix, camera);
-	PostProcessPass postProcessPass(&grayScaleShader, mainRenderPass.GetColorTexture());
+	PostProcessPass postProcessPass(&screenShader, mainRenderPass.GetColorTexture());
 
 	shadowMapPass.SetSceneObjects(objects);
 	mainRenderPass.SetSceneObjects(objects);
@@ -186,8 +109,8 @@ int Run() {
 	renderPipeline.AddPass(&mainRenderPass);
 	renderPipeline.AddPass(&postProcessPass);
 
-	//Renderer renderer;
-	//renderer.SetPipeline(&renderPipeline);
+	Renderer renderer;
+	renderer.SetPipeline(&renderPipeline);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -203,8 +126,6 @@ int Run() {
 
 		// EVENTS
 		while (SDL_PollEvent(&event)) {
-			ImGui_ImplSDL2_ProcessEvent(&event);
-
 			switch (event.type) {
 				//case SDL_KEYDOWN:
 					//break;
@@ -237,12 +158,10 @@ int Run() {
 		camera.Update(deltaTime);
 
 		// RENDER
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		renderPipeline.Execute();
+		renderer.Render();
 
 		// Swap buffers
-		SDL_GL_SwapWindow(window);
+		SDL_GL_SwapWindow(window.GetWindow());
 	}
 
 	for (Mesh* obj : objects) {
@@ -253,8 +172,20 @@ int Run() {
 }
 
 int main(int argc, char* argv[]) {
-	if (!Init("Engine", 1280, 720, false))
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+		std::cout << "SDL error on initialization: " << SDL_GetError() << "\n";
+		return  -1;
+	}
+
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	Window window;
+	if (!window.Init())
 		return -1;
 
-	return Run();
+	return Run(window);
 }

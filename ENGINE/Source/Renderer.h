@@ -1,4 +1,3 @@
-/*
 #pragma once
 
 #include <vector>
@@ -18,4 +17,3 @@ private:
 	//std::vector<std::unique_ptr<RenderPipeline>> renderPipelines;
 	RenderPipeline* activePipeline;
 };
-*/

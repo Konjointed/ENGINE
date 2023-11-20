@@ -139,13 +139,13 @@ Mesh Mesh::GenerateCube() {
     return Mesh(vertices, indices, 1);
 }
 
-Mesh Mesh::GeneratePlane() {
+Mesh Mesh::GeneratePlane(float textureRepeat) {
     std::vector<float> vertices = {
-        // Positions         // Texture Coords // Normals
-        -0.5f, 0.0f, -0.5f,   0.0f, 0.0f,    0.0f, 1.0f, 0.0f, // 0. left back
-         0.5f, 0.0f, -0.5f,   1.0f, 0.0f,    0.0f, 1.0f, 0.0f, // 1. right back
-        -0.5f, 0.0f,  0.5f,   0.0f, 1.0f,    0.0f, 1.0f, 0.0f, // 2. left front
-         0.5f, 0.0f,  0.5f,   1.0f, 1.0f,    0.0f, 1.0f, 0.0f  // 3. right front
+        // Positions         // Texture Coords (repeated) // Normals
+        -0.5f, 0.0f, -0.5f,   0.0f, 0.0f,                 0.0f, 1.0f, 0.0f, // left back
+         0.5f, 0.0f, -0.5f,   textureRepeat, 0.0f,        0.0f, 1.0f, 0.0f, // right back
+        -0.5f, 0.0f,  0.5f,   0.0f, textureRepeat,        0.0f, 1.0f, 0.0f, // left front
+         0.5f, 0.0f,  0.5f,   textureRepeat, textureRepeat,0.0f, 1.0f, 0.0f  // right front
     };
 
     std::vector<unsigned int> indices = {
