@@ -1,7 +1,10 @@
 #ifndef APPLICATION_H 
 #define APPLICATION_H
 
-#include "Window.h"
+#include <vector>
+
+class Window;
+class Camera;
 
 class Application {
 public:
@@ -11,9 +14,14 @@ public:
 	bool Init();
 	int Run();
 	void Shutdown();
+
+	void PollEvents();
+	void Render();
+	void Update();
 private:
-	Window* window;
 	bool quit;
+	Window* window;
+	Camera* camera;
 };
 
 #endif 

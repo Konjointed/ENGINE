@@ -1,30 +1,26 @@
-#include "Mesh.h"
-
 #include <iostream>
-
-#include <glad/glad.h>
 
 #include <Shader.h>
 
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "ElementBuffer.h"
+#include "Mesh.h"
+#include "IncludeGL.h"
 
 Mesh::Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices, int layout) :
     indexCount(indices.size()),
     position(0.0f, 0.0f, 0.0f),
-    rotation(0.0f, 0.0f, 0.0f), 
-    scale(1.0f, 1.0f, 1.0f) 
+    rotation(0.0f, 0.0f, 0.0f),
+    scale(1.0f, 1.0f, 1.0f)
 {
-    // Create and bind the VAO
-    vao = new VAO();
-    vao->Bind();
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
 
-    // Create the VBO with the vertex data
-    vbo = new VBO(vertices);
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
 
-    // Create the EBO and upload the index data
-    ebo = new EBO(indices.data(), indices.size() * sizeof(unsigned int));
+    glGenBuffers(1, &ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
     // Determine stride (gap between vertices)
     GLsizei stride;
@@ -65,14 +61,43 @@ Mesh::Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& 
         glEnableVertexAttribArray(2);
     }
 
-    vao->Unbind(); // Unbind the VAO to prevent accidental modifications.
+    glBindVertexArray(0); // Unbind the VAO to prevent accidental modifications.
 }
 
 Mesh::~Mesh() {
     std::cout << "Mesh destroyed\n";
-    delete vbo;
-    delete ebo;
-    delete vao;
+}
+
+void Mesh::Draw() {
+    glBindVertexArray(vao); 
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexCount), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0); 
+}
+
+const glm::mat4& Mesh::GetModelMatrix() const {
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, position);
+    model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::scale(model, scale);
+    return model;
+}
+
+glm::vec3 Mesh::GetPosition() {
+    return position;
+}
+
+void Mesh::SetPosition(const glm::vec3& newPosition) {
+    position = newPosition;
+}
+
+void Mesh::SetRotation(const glm::vec3& newRotation) {
+    rotation = newRotation;
+}
+
+void Mesh::SetScale(const glm::vec3& newScale) {
+    scale = newScale;
 }
 
 Mesh Mesh::GenerateCube() {
@@ -139,13 +164,13 @@ Mesh Mesh::GenerateCube() {
     return Mesh(vertices, indices, 1);
 }
 
-Mesh Mesh::GeneratePlane(float textureRepeat) {
+Mesh Mesh::GeneratePlane() {
     std::vector<float> vertices = {
-        // Positions         // Texture Coords (repeated) // Normals
-        -0.5f, 0.0f, -0.5f,   0.0f, 0.0f,                 0.0f, 1.0f, 0.0f, // left back
-         0.5f, 0.0f, -0.5f,   textureRepeat, 0.0f,        0.0f, 1.0f, 0.0f, // right back
-        -0.5f, 0.0f,  0.5f,   0.0f, textureRepeat,        0.0f, 1.0f, 0.0f, // left front
-         0.5f, 0.0f,  0.5f,   textureRepeat, textureRepeat,0.0f, 1.0f, 0.0f  // right front
+        // Positions         // Texture Coords // Normals
+        -0.5f, 0.0f, -0.5f,   0.0f, 0.0f,    0.0f, 1.0f, 0.0f, // 0. left back
+         0.5f, 0.0f, -0.5f,   1.0f, 0.0f,    0.0f, 1.0f, 0.0f, // 1. right back
+        -0.5f, 0.0f,  0.5f,   0.0f, 1.0f,    0.0f, 1.0f, 0.0f, // 2. left front
+         0.5f, 0.0f,  0.5f,   1.0f, 1.0f,    0.0f, 1.0f, 0.0f  // 3. right front
     };
 
     std::vector<unsigned int> indices = {
@@ -172,51 +197,4 @@ Mesh Mesh::GenerateQuad() {
     };
 
     return Mesh(vertices, indices, 0);
-}
-
-void Mesh::Draw(Shader& shader) {
-    glm::mat4 model = GetModelMatrix();
-    shader.setMat4("model", model);
-
-    // Bind Textures (only sets the diffuse texture atm)
-    for (int i = 0; i < textures.size(); i++) {
-        glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit
-        shader.setInt("diffuseTexture", 0);
-        glBindTexture(GL_TEXTURE_2D, textures[i].ID); // Bind the texture
-    }
-
-    // Draw Mesh
-    vao->Bind();
-    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
-    vao->Unbind();
-}
-
-void Mesh::AddTexture(Texture* texture) {
-    textures.push_back(*texture);
-}
-
-const glm::mat4& Mesh::GetModelMatrix() const {
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, position);
-    model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    model = glm::scale(model, scale);
-    return model;
-}
-
-glm::vec3 Mesh::GetPosition() {
-    return position;
-}
-
-void Mesh::SetPosition(const glm::vec3& newPosition) {
-    position = newPosition;
-}
-
-void Mesh::SetRotation(const glm::vec3& newRotation) {
-    rotation = newRotation;
-}
-
-void Mesh::SetScale(const glm::vec3& newScale) {
-    scale = newScale;
 }

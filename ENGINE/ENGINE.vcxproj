@@ -135,23 +135,12 @@
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
-    <ClCompile Include="Source\ElementBuffer.cpp" />
-    <ClCompile Include="Source\FrameBuffer.cpp" />
     <ClCompile Include="Source\Light.cpp" />
     <ClCompile Include="Source\Main.cpp" />
-    <ClCompile Include="Source\MainRenderPass.cpp" />
+    <ClCompile Include="Compile\stb.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
-    <ClCompile Include="Source\Noise.cpp" />
-    <ClCompile Include="Source\PostProcessPass.cpp" />
-    <ClCompile Include="Source\RenderBuffer.cpp" />
-    <ClCompile Include="Source\Renderer.cpp" />
-    <ClCompile Include="Source\ResourceManager.cpp" />
-    <ClCompile Include="Source\ShadowMapPass.cpp" />
-    <ClCompile Include="Source\stb.cpp" />
-    <ClCompile Include="Source\VertexArray.cpp" />
-    <ClCompile Include="Source\VertexBuffer.cpp" />
     <ClCompile Include="Source\Window.cpp" />
-    <ClCompile Include="ThirdParty\glad\glad.c" />
+    <ClCompile Include="Compile\glad.c" />
     <ClCompile Include="ThirdParty\imgui\imgui.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp" />
@@ -161,25 +150,11 @@
     <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Resources\Shaders\Shaders.vert" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Camera.h" />
-    <ClInclude Include="Source\ElementBuffer.h" />
-    <ClInclude Include="Source\FrameBuffer.h" />
     <ClInclude Include="Source\IncludeGL.h" />
     <ClInclude Include="Source\Light.h" />
-    <ClInclude Include="Source\MainRenderPass.h" />
     <ClInclude Include="Source\Mesh.h" />
-    <ClInclude Include="Source\Noise.h" />
-    <ClInclude Include="Source\PostProcessPass.h" />
-    <ClInclude Include="Source\RenderBuffer.h" />
-    <ClInclude Include="Source\Renderer.h" />
-    <ClInclude Include="Source\RenderPass.h" />
-    <ClInclude Include="Source\ShadowMapPass.h" />
-    <ClInclude Include="Source\RenderPipeline.h" />
-    <ClInclude Include="Source\ResourceManager.h" />
-    <ClInclude Include="Source\VertexArray.h" />
-    <ClInclude Include="Source\VertexBuffer.h" />
     <ClInclude Include="Source\Window.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />
     <ClInclude Include="ThirdParty\glad\khrplatform.h" />
@@ -196,37 +171,14 @@
     <ClInclude Include="ThirdParty\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shaders\Color.frag" />
-    <None Include="Resources\Shaders\Color.vert" />
-    <None Include="Resources\Shaders\BasicLighting.frag" />
-    <None Include="Resources\Shaders\BasicLighting.vert" />
-    <None Include="Resources\Shaders\DebugQuadDepth.frag" />
-    <None Include="Resources\Shaders\DebugQuadDepth.vert" />
-    <None Include="Resources\Shaders\FramebufferScreen.frag" />
-    <None Include="Resources\Shaders\FramebufferScreen.vert" />
-    <None Include="Resources\Shaders\Grayscale.frag" />
-    <None Include="Resources\Shaders\Grayscale.vert" />
-    <None Include="Resources\Shaders\Default.frag" />
-    <None Include="Resources\Shaders\Default.vert" />
-    <None Include="Resources\Shaders\LightCasters.frag" />
-    <None Include="Resources\Shaders\LightCasters.vert" />
-    <None Include="Resources\Shaders\LightingMap.frag" />
-    <None Include="Resources\Shaders\LightingMap.vert" />
-    <None Include="Resources\Shaders\Shaders.frag" />
-    <None Include="Resources\Shaders\ShadowMapping.frag" />
-    <None Include="Resources\Shaders\ShadowMapping.vert" />
-    <None Include="Resources\Shaders\ShadowMappingDepth.frag" />
-    <None Include="Resources\Shaders\ShadowMappingDepth.vert" />
-    <None Include="Resources\Shaders\Skybox.frag" />
-    <None Include="Resources\Shaders\Skybox.vert" />
-    <None Include="Resources\Shaders\Texture.frag" />
-    <None Include="Resources\Shaders\Texture.vert" />
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="Resources\Textures\brickwall.jpg" />
     <Image Include="Resources\Textures\container.png" />
     <Image Include="Resources\Textures\container_specular.png" />
     <Image Include="Resources\Textures\wood.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Shaders\Default.frag" />
+    <None Include="Resources\Shaders\Default.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

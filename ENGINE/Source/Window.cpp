@@ -5,6 +5,7 @@
 Window::Window(int& success, WindowSettings settings) {
 	success = 1;
 
+	// Initialzie SDL
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		std::cout << "SDL error on initialization: " << SDL_GetError() << "\n";
 		return;
@@ -45,7 +46,6 @@ Window::Window(int& success, WindowSettings settings) {
 		return;
 	}
 }
-
 
 Window::~Window() {
 	std::cout << "Window Destroyed\n";
