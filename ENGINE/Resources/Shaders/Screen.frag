@@ -93,4 +93,28 @@ float kernel[9] = float[](
     2.0 / 16, 4.0 / 16, 2.0 / 16,
     1.0 / 16, 2.0 / 16, 1.0 / 16  
 );
+
+DRUNK
+#version 330 core
+out vec4 FragColor;
+
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform float time; // Uniform to control the effect over time
+
+void main()
+{
+    // Wavy effect
+    float wave = sin(time + TexCoords.x * 10.0) * 0.005; 
+    vec2 wavyTexCoords = TexCoords + vec2(wave, wave);
+
+    // Duplicate vision
+    vec3 color = texture(screenTexture, wavyTexCoords).rgb;
+    color += texture(screenTexture, wavyTexCoords + vec2(0.01, 0.01)).rgb;
+    color += texture(screenTexture, wavyTexCoords - vec2(0.01, 0.01)).rgb;
+    color /= 3.0; // Average the color to prevent over-brightening
+
+    FragColor = vec4(color, 1.0);
+}
 */

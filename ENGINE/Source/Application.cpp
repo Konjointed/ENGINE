@@ -2,6 +2,8 @@
 TODO:
 - Make a scene class that will (maybe) hold the camera and lighting stuff
 - Add imgui panels for controlling the scene, lighting, camera, etc
+- Create a lgoger (maybe)
+- Move console panel code in GUI class to its own class
 */
 
 #include <iostream>
@@ -17,6 +19,11 @@ TODO:
 #include "Mesh.h"
 #include "Texture.h"
 #include "Buffers.h"
+#include "Scene.h"
+
+// Static stuff for scene class
+Camera* Scene::camera = nullptr;
+bool Scene::wireframe = false;
 
 Application::Application() : window(nullptr), quit(false) {}
 Application::~Application() {}
@@ -36,8 +43,10 @@ bool Application::Init() {
 	if (!success) return false;
 
 	gui = new GUI(*window);
-
 	camera = new Camera;
+
+	// Set the scene variables
+	Scene::camera = camera;
 
 	return true;
 }
@@ -95,8 +104,6 @@ int Application::Run() {
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
 	//  || Main Loop
 	int lastFrameTime = 0;
 	while (!quit) {
@@ -105,11 +112,15 @@ int Application::Run() {
 		lastFrameTime = currentTime;
 
 		PollEvents();
-
+	
 		// || Update
 		camera->Update(deltaTime);
 
 		// || Render
+		if (Scene::wireframe) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+
 		glm::mat4 view = camera->GetViewMatrix();
 		glm::mat4 projection = camera->GetProjectionMatrix();
 
@@ -121,7 +132,7 @@ int Application::Run() {
 
 		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 		glEnable(GL_DEPTH_TEST);
-		//glDepthFunc(GL_LESS);
+		glDepthFunc(GL_LESS);
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -191,6 +202,10 @@ int Application::Run() {
 		skybox.Draw();
 		glDepthFunc(GL_LESS);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		if (Scene::wireframe) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
 
 		// Post processing pass
 		glDisable(GL_DEPTH_TEST);

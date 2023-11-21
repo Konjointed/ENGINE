@@ -1,6 +1,7 @@
 #include "GUI.h"
 
 #include "Window.h"
+#include "Scene.h"
 
 GUI::GUI(Window& window) {
 	IMGUI_CHECKVERSION();
@@ -27,13 +28,13 @@ void GUI::Draw() {
 	ImGui::NewFrame();
 
 	static bool showDemoWindow = false;
-	//static bool showSceneControls = false;
+	static bool showSceneControls = false;
 	static bool showConsole = false;
 
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("View")) {
 			ImGui::MenuItem("ImGui Demo", NULL, &showDemoWindow);
-			//ImGui::MenuItem("Scene Controls", NULL, &showSceneControls);
+			ImGui::MenuItem("Scene Controls", NULL, &showSceneControls);
 			ImGui::MenuItem("Console", NULL, &showConsole);
 			ImGui::EndMenu();
 		}
@@ -50,6 +51,12 @@ void GUI::Draw() {
 		ImGui::End();
 	}
 
+	if (showSceneControls) {
+		ImGui::Begin("Scene Controls", &showSceneControls);
+		DrawSceneControls();
+		ImGui::End();
+	}
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -58,7 +65,15 @@ void GUI::AddLog(const std::string& log) {
 	output.push_back(log);
 }
 
+void GUI::DrawSceneControls() {
+	ImGui::InputFloat3("Camera Position", &(Scene::camera->GetPosition()[0]));
+	ImGui::SliderFloat("Camera Speed", &Scene::camera->movementSpeed, 0.0f, 1000.0f);
+	ImGui::Checkbox("Wireframe Mode", &Scene::wireframe);
+}
+
 void GUI::DrawConsole() {
+	ImGui::InputText("Filter", filterBuf, IM_ARRAYSIZE(filterBuf));
+
 	if (ImGui::Button("Clear")) {
 		output.clear();
 	}
@@ -74,19 +89,21 @@ void GUI::DrawConsole() {
 	// Console output
 	ImGui::BeginChild("ScrollingRegion", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), false, ImGuiWindowFlags_HorizontalScrollbar);
 	for (const auto& line : output) {
-		ImVec4 color;
-		if (line.find("[Error]") != std::string::npos) {
-			color = ImVec4(1.0f, 0.2f, 0.2f, 1.0f); // Red color for errors
+		if (IsLineVisible(line)) {
+			ImVec4 color;
+			if (line.find("[Error]") != std::string::npos) {
+				color = ImVec4(1.0f, 0.2f, 0.2f, 1.0f); // Red color for errors
+			}
+			else if (line.find("[Warning]") != std::string::npos) {
+				color = ImVec4(1.0f, 1.0f, 0.4f, 1.0f); // Yellow color for warnings
+			}
+			else {
+				color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // White color for regular messages
+			}
+			ImGui::PushStyleColor(ImGuiCol_Text, color);
+			ImGui::TextUnformatted(line.c_str());
+			ImGui::PopStyleColor();
 		}
-		else if (line.find("[Warning]") != std::string::npos) {
-			color = ImVec4(1.0f, 1.0f, 0.4f, 1.0f); // Yellow color for warnings
-		}
-		else {
-			color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // White color for regular messages
-		}
-		ImGui::PushStyleColor(ImGuiCol_Text, color);
-		ImGui::TextUnformatted(line.c_str());
-		ImGui::PopStyleColor();
 	}
 	ImGui::EndChild();
 
@@ -103,4 +120,11 @@ void GUI::DrawConsole() {
 
 void GUI::ExecuteCommand(const std::string& command) {
 	AddLog("Executing command: " + command);
+}
+
+bool GUI::IsLineVisible(const std::string& line) {
+	if (filterBuf[0] == '\0') {
+		return true;
+	}
+	return line.find(filterBuf) != std::string::npos;
 }

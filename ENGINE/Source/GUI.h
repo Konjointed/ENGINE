@@ -19,10 +19,14 @@ public:
 
 	void AddLog(const std::string& log);
 private:
+	void DrawSceneControls();
+
 	void DrawConsole();
 	void ExecuteCommand(const std::string& command);
+	bool IsLineVisible(const std::string& line);
 
 	char inputBuf[256] = "";
+	char filterBuf[256] = "";
 	std::vector<std::string> output;
 };
 

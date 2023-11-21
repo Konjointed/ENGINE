@@ -69,7 +69,7 @@ void Camera::Update(float deltaTime) {
     up = glm::normalize(glm::cross(right, front));
 }
 
-glm::vec3 Camera::GetPosition() {
+glm::vec3& Camera::GetPosition() {
     return position;
 }
 

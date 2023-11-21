@@ -14,8 +14,10 @@ public:
 	void ProcessKeyboard(float deltaTime);
 	void ProcessMouseMovement(float xoffset, float yoffset);
 	void Update(float deltaTime);
-	glm::vec3 GetPosition();
+	glm::vec3& GetPosition();
 	glm::vec3 GetFront();
+
+	float movementSpeed = 30.0f;
 private:
 	float fov = 45.0f;
 	float aspectRatio = static_cast<float>(1280) / 720;
@@ -31,7 +33,7 @@ private:
 	float yaw;
 	float pitch;
 
-	float movementSpeed = 30.0f;
+	//float movementSpeed = 30.0f;
 	float mouseSensitivity = 0.1f;
 	bool firstMouse = true;
 	float lastX, lastY;
