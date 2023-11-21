@@ -1,3 +1,9 @@
+/*
+TODO:
+- Make a scene class that will (maybe) hold the camera and lighting stuff
+- Add imgui panels for controlling the scene, lighting, camera, etc
+*/
+
 #include <iostream>
 
 #include <glm/ext/matrix_clip_space.hpp>
@@ -5,6 +11,7 @@
 
 #include "Application.h"
 #include "IncludeGL.h"
+#include "GUI.h"
 #include "Window.h"
 #include "Camera.h"
 #include "Mesh.h"
@@ -27,6 +34,8 @@ bool Application::Init() {
 	int success;
 	window = new Window(success);
 	if (!success) return false;
+
+	gui = new GUI(*window);
 
 	camera = new Camera;
 
@@ -66,57 +75,24 @@ int Application::Run() {
 
 	Mesh screenQuad = Mesh::GenerateQuad();
 
-	unsigned int framebuffer;
-	glGenFramebuffers(1, &framebuffer);
+	unsigned int framebuffer = FrameBuffer::CreateFrameBuffer();
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	// create a color attachment texture
-	unsigned int textureColorbuffer;
-	glGenTextures(1, &textureColorbuffer);
-	glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1280, 720, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	unsigned int textureColorbuffer = FrameBuffer::CreateTextureAttachment(1280, 720);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
-	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-	unsigned int rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1280, 720); // use a single renderbuffer object for both a depth AND stencil buffer.
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+
+	unsigned int rbo = FrameBuffer::CreateRenderBufferAttachment(1280, 720);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/*
 	unsigned int depthMapFBO = FrameBuffer::CreateFrameBuffer();
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 
 	unsigned int depthMap = FrameBuffer::CreateDepthTextureAttachment(1024, 1024);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	*/
-	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-	unsigned int depthMapFBO;
-	glGenFramebuffers(1, &depthMapFBO);
-	// create depth texture
-	unsigned int depthMap;
-	glGenTextures(1, &depthMap);
-	glBindTexture(GL_TEXTURE_2D, depthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-	// attach depth texture as FBO's depth buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -230,6 +206,8 @@ int Application::Run() {
 		glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
 		screenQuad.Draw();
 
+		gui->Draw();
+
 		window->SwapBuffers();
 	}
 
@@ -242,6 +220,8 @@ void Application::PollEvents() {
 	static bool rightMouseButtonPressed = false;
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
+		ImGui_ImplSDL2_ProcessEvent(&event);
+
 		switch (event.type) {
 		case SDL_QUIT:
 			quit = true;
@@ -286,6 +266,7 @@ void Application::Update() {
 }
 
 void Application::Shutdown() {
+	delete gui;
 	delete window;
 	delete camera;
 }

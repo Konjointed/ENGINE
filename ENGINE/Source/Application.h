@@ -3,6 +3,7 @@
 
 #include <vector>
 
+class GUI;
 class Window;
 class Camera;
 
@@ -20,6 +21,7 @@ public:
 	void Update();
 private:
 	bool quit;
+	GUI* gui;
 	Window* window;
 	Camera* camera;
 };

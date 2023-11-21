@@ -57,3 +57,11 @@ Window::~Window() {
 void Window::SwapBuffers() {
 	SDL_GL_SwapWindow(window);
 }
+
+SDL_Window* Window::GetWindow() {
+	return window;
+}
+
+SDL_GLContext Window::GetContext() {
+	return glContext;
+}

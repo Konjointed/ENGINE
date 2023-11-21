@@ -11,7 +11,6 @@ void main()
     FragColor = vec4(col, 1.0);
 } 
 
-
 /*
 FLIP
 void main()
