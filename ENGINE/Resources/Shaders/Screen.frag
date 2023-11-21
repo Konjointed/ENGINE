@@ -5,14 +5,32 @@ in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
 
-// Default
 void main()
 {
     vec3 col = texture(screenTexture, TexCoords).rgb;
     FragColor = vec4(col, 1.0);
 } 
 
+
 /*
+FLIP
+void main()
+{
+    // Invert the y-coordinate
+    vec2 flippedTexCoords = vec2(TexCoords.x, 1.0 - TexCoords.y);
+
+    vec3 col = texture(screenTexture, flippedTexCoords).rgb;
+    FragColor = vec4(col, 1.0);
+} 
+
+DEFAULT 
+void main()
+{
+    vec3 col = texture(screenTexture, TexCoords).rgb;
+    FragColor = vec4(col, 1.0);
+} 
+
+
 INVERSION
 void main()
 {

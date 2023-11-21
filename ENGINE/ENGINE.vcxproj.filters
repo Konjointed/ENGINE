@@ -127,12 +127,18 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shaders\Default.vert" />
-    <None Include="Resources\Shaders\Default.frag" />
+    <None Include="Resources\Shaders\Basic.vert" />
+    <None Include="Resources\Shaders\Basic.frag" />
     <None Include="Resources\Shaders\Skybox.frag" />
     <None Include="Resources\Shaders\Skybox.vert" />
     <None Include="Resources\Shaders\Screen.frag" />
     <None Include="Resources\Shaders\Screen.vert" />
+    <None Include="Resources\Shaders\ShadowMappingDepth.vert" />
+    <None Include="Resources\Shaders\ShadowMappingDepth.frag" />
+    <None Include="Resources\Shaders\Default.vert" />
+    <None Include="Resources\Shaders\Default.frag" />
+    <None Include="Resources\Shaders\DebugQuad.vert" />
+    <None Include="Resources\Shaders\DebugQuad.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">
