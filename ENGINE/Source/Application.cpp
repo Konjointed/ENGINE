@@ -23,6 +23,7 @@ TODO:
 #include "Texture.h"
 #include "Buffers.h"
 #include "Scene.h"
+#include "PostProcessor.h"
 
 // Static stuff for scene class
 glm::vec3 Scene::lightPosition = { 80.0f, 500.0f, -77.0f };
@@ -81,7 +82,7 @@ int Application::Run() {
 	Animation idleAnimation("Resources/Animations/Idle.dae", &ourModel);
 	Animator animator(&idleAnimation);
 
-	Mesh screenQuad = Mesh::GenerateQuad();
+	PostProcessor postProcessor;
 
 	unsigned int framebuffer = FrameBuffer::CreateFrameBuffer();
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -129,17 +130,22 @@ int Application::Run() {
 		glm::mat4 lightView = glm::lookAt(Scene::lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 
 		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// Main Pass
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glViewport(0, 0, 1280, 720);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		ourShader.use();
 
 		ourShader.setMat4("projection", projection);
 		ourShader.setMat4("view", view);
-
 
 		auto transforms = animator.GetFinalBoneMatrices();
 		for (int i = 0; i < transforms.size(); ++i)
@@ -151,9 +157,25 @@ int Application::Run() {
 		ourShader.setMat4("model", model);
 		ourModel.Draw(ourShader);
 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 		if (Scene::wireframe) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
+
+		// Post processing pass
+		glDisable(GL_DEPTH_TEST);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		static float accumulatedTime = 0.0f;
+
+		accumulatedTime += deltaTime;
+		screenShader.use();
+		screenShader.setFloat("time", accumulatedTime);
+		screenShader.setInt("screenTexture", 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+		postProcessor.Draw();
 
 		gui->Draw();
 

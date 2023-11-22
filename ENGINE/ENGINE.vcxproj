@@ -144,6 +144,7 @@
     <ClCompile Include="Compile\stb.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\Model.cpp" />
+    <ClCompile Include="Source\PostProcessor.cpp" />
     <ClCompile Include="Source\Scene.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\Window.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="Source\IncludeGL.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\Model.h" />
+    <ClInclude Include="Source\PostProcessor.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\Texture.h" />
     <ClInclude Include="Source\Window.h" />
