@@ -133,13 +133,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Animation.cpp" />
+    <ClCompile Include="Source\Animator.cpp" />
     <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Bone.cpp" />
     <ClCompile Include="Source\Buffers.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\GUI.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Compile\stb.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
+    <ClCompile Include="Source\Model.cpp" />
     <ClCompile Include="Source\Scene.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\Window.cpp" />
@@ -153,12 +157,18 @@
     <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Animation.h" />
+    <ClInclude Include="Source\AnimationData.h" />
+    <ClInclude Include="Source\Animator.h" />
     <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\AssimpGLMHelpers.h" />
+    <ClInclude Include="Source\Bone.h" />
     <ClInclude Include="Source\Buffers.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\GUI.h" />
     <ClInclude Include="Source\IncludeGL.h" />
     <ClInclude Include="Source\Mesh.h" />
+    <ClInclude Include="Source\Model.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\Texture.h" />
     <ClInclude Include="Source\Window.h" />
@@ -183,6 +193,8 @@
     <Image Include="Resources\Textures\wood.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Shaders\AnimModel.frag" />
+    <None Include="Resources\Shaders\AnimModel.vert" />
     <None Include="Resources\Shaders\Basic.frag" />
     <None Include="Resources\Shaders\Basic.vert" />
     <None Include="Resources\Shaders\DebugQuad.frag" />

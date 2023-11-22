@@ -17,6 +17,9 @@ TODO:
 #include "Window.h"
 #include "Camera.h"
 #include "Mesh.h"
+#include "Model.h"
+#include "Animation.h"
+#include "Animator.h"
 #include "Texture.h"
 #include "Buffers.h"
 #include "Scene.h"
@@ -68,20 +71,15 @@ int Application::Run() {
 	Shader screenShader("Resources/Shaders/Screen.vert", "Resources/Shaders/Screen.frag");
 	Shader depthShader("Resources/Shaders/ShadowMappingDepth.vert", "Resources/Shaders/ShadowMappingDepth.frag");
 	Shader debugDepthQuad("Resources/Shaders/DebugQuad.vert", "Resources/Shaders/DebugQuad.frag");
+	Shader ourShader("Resources/Shaders/AnimModel.vert", "Resources/Shaders/AnimModel.frag");
 
 	unsigned int wood = Texture::FromFile("wood.png", "Resources/Textures");
 	unsigned int brick = Texture::FromFile("brickwall.jpg", "Resources/Textures");
 	unsigned int cubemapTexture = Texture::LoadCubemap(faces);
 
-	Mesh cube = Mesh::GenerateCube();
-	cube.SetPosition({ 0.0f, 5.0f, 0.0f });
-	cube.SetScale({ 5.0f, 5.0f, 5.0f });
-
-	Mesh plane = Mesh::GeneratePlane(); 
-	plane.SetPosition({ 0.0f, -50.0f, 0.0f });
-	plane.SetScale({ 50.0f, 1.0f, 50.0f });
-
-	Mesh skybox = Mesh::GenerateCube();
+	Model ourModel("Resources/Models/Maria/Maria J J Ong.dae", false);
+	Animation idleAnimation("Resources/Animations/Idle.dae", &ourModel);
+	Animator animator(&idleAnimation);
 
 	Mesh screenQuad = Mesh::GenerateQuad();
 
@@ -115,6 +113,7 @@ int Application::Run() {
 	
 		// || Update
 		camera->Update(deltaTime);
+		animator.UpdateAnimation(deltaTime);
 
 		// || Render
 		if (Scene::wireframe) {
@@ -136,89 +135,25 @@ int Application::Run() {
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Shadow Pass
-		depthShader.use();
-		depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);;
+		ourShader.use();
 
-		glViewport(0, 0, 1024, 1024);
-		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		// RENDER SCENE
+		ourShader.setMat4("projection", projection);
+		ourShader.setMat4("view", view);
+
+
+		auto transforms = animator.GetFinalBoneMatrices();
+		for (int i = 0; i < transforms.size(); ++i)
+			ourShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+
 		glm::mat4 model = glm::mat4(1.0f);
-		model = plane.GetModelMatrix();
-		depthShader.setMat4("model", model);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, wood);
-		plane.Draw();
-
-		model = cube.GetModelMatrix();
-		depthShader.setMat4("model", model);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, brick);
-		cube.Draw();
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		// Main Pass
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		glViewport(0, 0, 1280, 720);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//glm::mat4 model = glm::mat4(1.0f); // Moved to shadow pass
-		defaultShader.use();
-		defaultShader.setInt("diffuseTexture", 0);
-		defaultShader.setInt("shadowMap", 1);
-		defaultShader.setMat4("view", view);
-		defaultShader.setMat4("projection", projection);
-		defaultShader.setVec3("viewPos", camera->GetPosition());
-		defaultShader.setVec3("lightPos", Scene::lightPosition);
-		defaultShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-		model = plane.GetModelMatrix();
-		defaultShader.setMat4("model", model);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, wood);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, depthMap);
-		plane.Draw();
-
-		model = cube.GetModelMatrix();
-		defaultShader.setMat4("model", model);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, brick);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, depthMap);
-		cube.Draw();
-
-		// Skybox
-		glDepthFunc(GL_LEQUAL);
-		skyboxShader.use();
-		skyboxShader.setInt("skybox", 0);
-		view = glm::mat4(glm::mat3(camera->GetViewMatrix())); // remove translation from the view matrix
-		skyboxShader.setMat4("view", view);
-		skyboxShader.setMat4("projection", projection);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		skybox.Draw();
-		glDepthFunc(GL_LESS);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		model = glm::translate(model, glm::vec3(0.0f, -0.4f, 0.0f)); // translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(.5f, .5f, .5f));	// it's a bit too big for our scene, so scale it down
+		ourShader.setMat4("model", model);
+		ourModel.Draw(ourShader);
 
 		if (Scene::wireframe) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
-
-		// Post processing pass
-		glDisable(GL_DEPTH_TEST);
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		static float accumulatedTime = 0.0f;
-		accumulatedTime += deltaTime;
-		screenShader.use();
-		screenShader.setFloat("time", accumulatedTime);
-		screenShader.setInt("screenTexture", 0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-		screenQuad.Draw();
 
 		gui->Draw();
 
