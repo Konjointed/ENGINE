@@ -66,8 +66,9 @@ void GUI::AddLog(const std::string& log) {
 }
 
 void GUI::DrawSceneControls() {
+	ImGui::DragFloat3("Light Position", &Scene::lightPosition[0], 0.1f, -FLT_MAX, FLT_MAX, "%.3f");
 	ImGui::InputFloat3("Camera Position", &(Scene::camera->GetPosition()[0]));
-	ImGui::SliderFloat("Camera Speed", &Scene::camera->movementSpeed, 0.0f, 1000.0f);
+	ImGui::InputFloat("Camera Speed", &Scene::camera->movementSpeed);
 	ImGui::Checkbox("Wireframe Mode", &Scene::wireframe);
 }
 

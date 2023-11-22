@@ -22,6 +22,7 @@ TODO:
 #include "Scene.h"
 
 // Static stuff for scene class
+glm::vec3 Scene::lightPosition = { 80.0f, 500.0f, -77.0f };
 Camera* Scene::camera = nullptr;
 bool Scene::wireframe = false;
 
@@ -94,7 +95,6 @@ int Application::Run() {
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	unsigned int depthMapFBO = FrameBuffer::CreateFrameBuffer();
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -126,9 +126,8 @@ int Application::Run() {
 
 		float near_plane = -1000.0f, far_plane = 1000.0f;
 		float orthoSize = 50.0f;
-		glm::vec3 lightPosition(80.0f, 500.0f, -77.0f);
 		glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
-		glm::mat4 lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		glm::mat4 lightView = glm::lookAt(Scene::lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 
 		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 		glEnable(GL_DEPTH_TEST);
@@ -171,7 +170,7 @@ int Application::Run() {
 		defaultShader.setMat4("view", view);
 		defaultShader.setMat4("projection", projection);
 		defaultShader.setVec3("viewPos", camera->GetPosition());
-		defaultShader.setVec3("lightPos", lightPosition);
+		defaultShader.setVec3("lightPos", Scene::lightPosition);
 		defaultShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 		model = plane.GetModelMatrix();
