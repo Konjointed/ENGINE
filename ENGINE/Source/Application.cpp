@@ -23,14 +23,10 @@ TODO:
 #include "Animator.h"
 #include "Texture.h"
 #include "Buffers.h"
-#include "Scene.h"
+#include "SceneElements.h"
 #include "PostProcessor.h"
 #include "Skybox.h"
-
-// Static stuff for scene class
-glm::vec3 Scene::lightPosition = { 80.0f, 500.0f, -77.0f };
-Camera* Scene::camera = nullptr;
-bool Scene::wireframe = false;
+#include "DrawableObject.h"
 
 Application::Application() : window(nullptr), quit(false) {}
 Application::~Application() {}
@@ -53,13 +49,18 @@ bool Application::Init() {
 	gui = new GUI(*window);
 	camera = new Camera;
 
-	// Set the scene variables
-	Scene::camera = camera;
-
 	return true;
 }
 
 int Application::Run() {
+	// Setup the scene
+	SceneElements scene;
+	scene.lightPosition = { 80.0f, 500.0f, -77.0f };
+	scene.camera = camera;
+	scene.wireframe = false;
+
+	// Every object now has access to the scene (granted they inherit from DrawableObject)
+	DrawableObject::scene = &scene;
 
 	Shader basicShader("Resources/Shaders/Basic.vert", "Resources/Shaders/Basic.frag"); // simple texture
 	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
@@ -121,7 +122,7 @@ int Application::Run() {
 		animator.UpdateAnimation(deltaTime);
 
 		// || Render
-		if (Scene::wireframe) {
+		if (scene.wireframe) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
 
@@ -131,7 +132,7 @@ int Application::Run() {
 		float near_plane = -1000.0f, far_plane = 1000.0f;
 		float orthoSize = 50.0f;
 		glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
-		glm::mat4 lightView = glm::lookAt(Scene::lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		glm::mat4 lightView = glm::lookAt(scene.lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 
 		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
@@ -190,7 +191,7 @@ int Application::Run() {
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		if (Scene::wireframe) {
+		if (scene.wireframe) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 

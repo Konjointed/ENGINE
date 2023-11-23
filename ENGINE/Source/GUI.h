@@ -8,14 +8,16 @@
 #include <imgui/imgui_impl_sdl2.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include "DrawableObject.h"
+
 class Window;
 
-class GUI {
+class GUI : public DrawableObject {
 public:
 	GUI(Window& window);
 	~GUI();
 
-	void Draw();
+	void Draw() override;
 
 	void AddLog(const std::string& log);
 private:
