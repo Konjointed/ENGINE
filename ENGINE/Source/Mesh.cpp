@@ -65,12 +65,16 @@ Mesh::~Mesh() {
 }
 
 // Shader needed to set textures (I think?)
-void Mesh::Draw(Shader& shader) {
+void Mesh::Draw(Shader& shader, unsigned int shadowMap) {
     // bind appropriate textures
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
     unsigned int normalNr = 1;
     unsigned int heightNr = 1;
+
+    glActiveTexture(GL_TEXTURE0 + textures.size());
+    glBindTexture(GL_TEXTURE_2D, shadowMap);
+    shader.setInt("shadowMap", textures.size());
 
     for (unsigned int i = 0; i < textures.size(); i++)
     {
@@ -101,7 +105,7 @@ void Mesh::Draw(Shader& shader) {
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, 0); // not sure if this is needed
 }
 
 const glm::mat4& Mesh::GetModelMatrix() const {
