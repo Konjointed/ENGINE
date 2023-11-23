@@ -65,9 +65,12 @@ void GUI::AddLog(const std::string& log) {
 }
 
 void GUI::DrawSceneControls() {
+	ImGui::DragFloat("Near Plane", &scene->nearPlane, 0.1f, -FLT_MAX, FLT_MAX, "%.3f");
+	ImGui::DragFloat("Far Plane", &scene->farPlane, 0.1f, -FLT_MAX, FLT_MAX, "%.3f");
+	ImGui::DragFloat("Ortho Size", &scene->orthoSize, 0.1f, -FLT_MAX, FLT_MAX, "%.3f");
 	ImGui::DragFloat3("Light Position", &scene->lightPosition[0], 0.1f, -FLT_MAX, FLT_MAX, "%.3f");
 	ImGui::InputFloat3("Camera Position", &(scene->camera->GetPosition()[0]));
-	ImGui::InputFloat("Camera Speed", &scene->camera->movementSpeed);
+	ImGui::DragFloat("Camera Speed", &scene->camera->movementSpeed, 0.1f, -FLT_MAX, FLT_MAX, "%.3f");
 	ImGui::Checkbox("Wireframe Mode", &scene->wireframe);
 }
 

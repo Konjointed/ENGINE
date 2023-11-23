@@ -55,7 +55,7 @@ bool Application::Init() {
 int Application::Run() {
 	// Setup the scene
 	SceneElements scene;
-	scene.lightPosition = { 80.0f, 500.0f, -77.0f };
+	scene.lightPosition = { 80.0f, 900.0f, -77.0f };
 	scene.camera = camera;
 	scene.wireframe = false;
 
@@ -74,8 +74,8 @@ int Application::Run() {
 	unsigned int brick = Texture::FromFile("brickwall.jpg", "Resources/Textures");
 
 	Mesh plane = Mesh::GeneratePlane();
-	plane.SetPosition({ 0.0f, -30.0f, 0.0f });
-	plane.SetScale({ 50.0f, 1.0f, 50.0f });
+	plane.SetPosition({ 0.0f, -10.0f, 0.0f });
+	plane.SetScale({ 30.0f, 1.0f, 30.0f });
 
 	Mesh cube = Mesh::GenerateCube();
 	cube.SetPosition({ 0.0f, 5.0f, 0.0f });
@@ -103,7 +103,7 @@ int Application::Run() {
 	unsigned int depthMapFBO = FrameBuffer::CreateFrameBuffer();
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 
-	unsigned int depthMap = FrameBuffer::CreateDepthTextureAttachment(1024, 1024);
+	unsigned int depthMap = FrameBuffer::CreateDepthTextureAttachment(4096, 4096);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -130,11 +130,8 @@ int Application::Run() {
 		glm::mat4 view = scene.camera->GetViewMatrix();
 		glm::mat4 projection = scene.camera->GetProjectionMatrix();
 
-		float near_plane = -1000.0f, far_plane = 1000.0f;
-		float orthoSize = 50.0f;
-		glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
+		glm::mat4 lightProjection = glm::ortho(-scene.orthoSize, scene.orthoSize, -scene.orthoSize, scene.orthoSize, scene.nearPlane, scene.farPlane);
 		glm::mat4 lightView = glm::lookAt(scene.lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-
 		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 		glEnable(GL_DEPTH_TEST);
@@ -144,7 +141,7 @@ int Application::Run() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Shadow Pass
-		glViewport(0, 0, 1024, 1024);
+		glViewport(0, 0, 4096, 4096);
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -164,6 +161,10 @@ int Application::Run() {
 		plane.Draw(depthShader);
 
 		// Render model
+		auto boneTransforms = animator.GetFinalBoneMatrices();
+		for (int i = 0; i < boneTransforms.size(); ++i)
+			depthShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", boneTransforms[i]);
+
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, -0.4f, 0.0f)); // translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(.5f, .5f, .5f));	// it's a bit too big for our scene, so scale it down
@@ -231,6 +232,9 @@ int Application::Run() {
 		static float accumulatedTime = 0.0f;
 		accumulatedTime += deltaTime;
 		screenShader.use();
+		//screenShader.setFloat("near_plane", scene.nearPlane);
+		//screenShader.setFloat("far_plane", scene.farPlane);
+		//screenShader.setInt("depthMap", 0);
 		screenShader.setFloat("time", accumulatedTime);
 		screenShader.setInt("screenTexture", 0);
 		glActiveTexture(GL_TEXTURE0);

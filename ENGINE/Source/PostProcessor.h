@@ -10,10 +10,8 @@ public:
 private:
 	unsigned int vao;
 	unsigned int vbo;
-	unsigned int ebo;
 
 	std::vector<float> vertices;
-	std::vector<unsigned int> indices;
 };
 
 #endif
