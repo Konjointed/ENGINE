@@ -74,8 +74,8 @@ int Application::Run() {
 	unsigned int brick = Texture::FromFile("brickwall.jpg", "Resources/Textures");
 
 	Mesh plane = Mesh::GeneratePlane();
-	plane.SetPosition({ 0.0f, -1.0f, 0.0f });
-	plane.SetScale({ 5.0f, 1.0f, 5.0f });
+	plane.SetPosition({ 0.0f, -30.0f, 0.0f });
+	plane.SetScale({ 50.0f, 1.0f, 50.0f });
 
 	Mesh cube = Mesh::GenerateCube();
 	cube.SetPosition({ 0.0f, 5.0f, 0.0f });
@@ -163,6 +163,13 @@ int Application::Run() {
 		depthShader.setMat4("model", model);
 		plane.Draw(depthShader);
 
+		// Render model
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, -0.4f, 0.0f)); // translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(.5f, .5f, .5f));	// it's a bit too big for our scene, so scale it down
+		depthShader.setMat4("model", model);
+		ourModel.Draw(depthShader);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		// Main Pass
@@ -192,17 +199,17 @@ int Application::Run() {
 
 		ourShader.setMat4("projection", projection);
 		ourShader.setMat4("view", view);
+		ourShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 		auto transforms = animator.GetFinalBoneMatrices();
 		for (int i = 0; i < transforms.size(); ++i)
 			ourShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 
-		//glm::mat4 model = glm::mat4(1.0f);
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, -0.4f, 0.0f)); // translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(.5f, .5f, .5f));	// it's a bit too big for our scene, so scale it down
 		ourShader.setMat4("model", model);
-		ourModel.Draw(ourShader);
+		ourModel.Draw(ourShader, depthMap);
 
 		skyboxShader.use();
 		view = glm::mat4(glm::mat3(view)); // remove translation from the view matrix

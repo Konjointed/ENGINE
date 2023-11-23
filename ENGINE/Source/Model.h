@@ -27,7 +27,7 @@ public:
 	Model(const std::string& path, bool gamma);
 	~Model();
 
-	void Draw(Shader& shader);
+	void Draw(Shader& shader, unsigned int shadowMap = 0);
 
 	auto& GetBoneInfoMap() { return boneInfoMap; }
 	int& GetBoneCount() { return boneCounter; }

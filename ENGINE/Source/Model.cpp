@@ -30,9 +30,9 @@ Model::Model(const std::string& path, bool gamma = false)
 
 Model::~Model() {}
 
-void Model::Draw(Shader& shader) {
+void Model::Draw(Shader& shader, unsigned int shadowMap) {
 	for (unsigned int i = 0; i < this->meshes.size(); i++)
-		this->meshes[i].Draw(shader);
+		this->meshes[i].Draw(shader, shadowMap);
 }
 
 void Model::ProcessNode(aiNode* node, const aiScene* scene) {
