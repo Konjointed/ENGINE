@@ -40,6 +40,7 @@ public:
 	void SetScale(const glm::vec3& scale);
 
 	static Mesh GeneratePlane();
+	static Mesh GenerateCube();
 private:
 	unsigned int vao;
 	unsigned int vbo;

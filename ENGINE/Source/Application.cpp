@@ -1,4 +1,4 @@
-/*
+﻿/*
 TODO:
 - Make a scene class that will (maybe) hold the camera and lighting stuff
 - Add imgui panels for controlling the scene, lighting, camera, etc (DONE)
@@ -45,6 +45,7 @@ bool Application::Init() {
 	customSettings.vsync = true;
 	*/
 
+	// Made a window class and doing absolutely nothing with it 💀
 	int success;
 	window = new Window(success);
 	if (!success) return false;
@@ -74,6 +75,10 @@ int Application::Run() {
 	Mesh plane = Mesh::GeneratePlane();
 	plane.SetPosition({ 0.0f, -1.0f, 0.0f });
 	plane.SetScale({ 5.0f, 1.0f, 5.0f });
+
+	Mesh cube = Mesh::GenerateCube();
+	cube.SetPosition({ 0.0f, 5.0f, 0.0f });
+	cube.SetScale({ 5.0f, 5.0f, 5.0f });
 
 	PostProcessor postProcessor;
 	Skybox skybox;
@@ -158,6 +163,15 @@ int Application::Run() {
 		model = glm::scale(model, glm::vec3(.5f, .5f, .5f));	// it's a bit too big for our scene, so scale it down
 		ourShader.setMat4("model", model);
 		ourModel.Draw(ourShader);
+
+		// Render cube
+		basicShader.use();
+		basicShader.setInt("texture1", 0);
+		basicShader.setMat4("view", view);
+		basicShader.setMat4("projection", projection);
+		model = cube.GetModelMatrix();
+		basicShader.setMat4("model", model);
+		cube.Draw(basicShader);
 
 		// Render plane
 		basicShader.use();

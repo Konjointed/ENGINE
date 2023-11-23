@@ -101,6 +101,7 @@ void Mesh::Draw(Shader& shader) {
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 const glm::mat4& Mesh::GetModelMatrix() const {
@@ -130,27 +131,86 @@ void Mesh::SetScale(const glm::vec3& newScale) {
 }
 
 Mesh Mesh::GeneratePlane() {
-    // Vertices of a simple plane
+    // Position - Normals - Texture Coord
     std::vector<Vertex> vertices = {
-        // Positions        // Normals       // Texture Coords
         {{-0.5f, 0.0f,  0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}}, // Top-left
         {{ 0.5f, 0.0f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}}, // Top-right
         {{ 0.5f, 0.0f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}}, // Bottom-right
         {{-0.5f, 0.0f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}}  // Bottom-left
     };
 
-    // Indices for the plane (two triangles)
+    // 2 Triangles
     std::vector<unsigned int> indices = {
         0, 1, 2, // First Triangle
         2, 3, 0  // Second Triangle
     };
 
-    // No textures in this example, but you can add if necessary
     std::vector<Texture> textures;
     Texture woodTexture;
-    woodTexture.ID = Texture::FromFile("wood111.png", "Resources/Textures"); // Replace with actual path
+    woodTexture.ID = Texture::FromFile("wood.png", "Resources/Textures"); // Replace with actual path
     woodTexture.type = "texture_diffuse"; // Assuming it's a diffuse texture
     textures.push_back(woodTexture);
+
+    return Mesh(vertices, indices, textures);
+}
+
+Mesh Mesh::GenerateCube() {
+    // Vertices of a cube
+    std::vector<Vertex> vertices = {
+        // Front face
+        {{-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}}, // Bottom-left
+        {{ 0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}}, // Bottom-right
+        {{ 0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}}, // Top-right
+        {{-0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}}, // Top-left
+
+        // Back face
+        {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}}, // Bottom-right
+        {{ 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}}, // Bottom-left
+        {{ 0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}}, // Top-left
+        {{-0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}}, // Top-right
+
+        // Left face
+        {{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // Bottom-right
+        {{-0.5f, -0.5f,  0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, // Bottom-left
+        {{-0.5f,  0.5f,  0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // Top-left
+        {{-0.5f,  0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}, // Top-right
+
+        // Right face
+        {{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // Bottom-left
+        {{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, // Bottom-right
+        {{ 0.5f,  0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // Top-right
+        {{ 0.5f,  0.5f,  0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}, // Top-left
+
+        // Top face
+        {{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}}, // Bottom-left
+        {{-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}}, // Bottom-right
+        {{ 0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}}, // Top-right
+        {{ 0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}}, // Top-left
+
+        // Bottom face
+        {{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}}, // Top-left
+        {{-0.5f, -0.5f,  0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}}, // Bottom-left
+        {{ 0.5f, -0.5f,  0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}}, // Bottom-right
+        {{ 0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}}  // Top-right
+    };
+
+    // 12 triangles
+    std::vector<unsigned int> indices = {
+        // Front face
+        0, 1, 2, 2, 3, 0,
+        // Back face
+        4, 5, 6, 6, 7, 4,
+        // Left face
+        8, 9, 10, 10, 11, 8,
+        // Right face
+        12, 13, 14, 14, 15, 12,
+        // Top face
+        16, 17, 18, 18, 19, 16,
+        // Bottom face
+        20, 21, 22, 22, 23, 20
+    };
+
+    std::vector<Texture> textures;
 
     return Mesh(vertices, indices, textures);
 }
