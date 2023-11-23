@@ -146,6 +146,7 @@
     <ClCompile Include="Source\Model.cpp" />
     <ClCompile Include="Source\PostProcessor.cpp" />
     <ClCompile Include="Source\Scene.cpp" />
+    <ClCompile Include="Source\Skybox.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\Window.cpp" />
     <ClCompile Include="Compile\glad.c" />
@@ -172,6 +173,7 @@
     <ClInclude Include="Source\Model.h" />
     <ClInclude Include="Source\PostProcessor.h" />
     <ClInclude Include="Source\Scene.h" />
+    <ClInclude Include="Source\Skybox.h" />
     <ClInclude Include="Source\Texture.h" />
     <ClInclude Include="Source\Window.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />
@@ -192,6 +194,8 @@
     <Image Include="Resources\Textures\brickwall.jpg" />
     <Image Include="Resources\Textures\container.png" />
     <Image Include="Resources\Textures\container_specular.png" />
+    <Image Include="Resources\Textures\missing1.png" />
+    <Image Include="Resources\Textures\missing2.png" />
     <Image Include="Resources\Textures\wood.png" />
   </ItemGroup>
   <ItemGroup>

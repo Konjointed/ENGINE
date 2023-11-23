@@ -79,21 +79,22 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene) {
 			indices.push_back(face.mIndices[j]);
 	}
 
-	// Materials/Textures
 	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
+	// Load textures for different types 
 	std::vector<Texture> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 	std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 	std::vector<Texture> normalMaps = LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
 	std::vector<Texture> heightMaps = LoadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
 
-	// Check if the material has any textures
+	// Check to see if any were loaded
 	if (diffuseMaps.empty() && specularMaps.empty() && normalMaps.empty() && heightMaps.empty()) {
 		std::cout << "No materials were found for this mesh.\n";
 	}
 	else {
 		std::cout << "Materials were found for this mesh.\n";
 	}
+
 
 	textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 	textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
@@ -116,14 +117,14 @@ std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType 
 	std::vector<Texture> textures;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 	{
-		aiString str;
-		mat->GetTexture(type, i, &str);
-		printf("Loading material texture: %s\n", str.C_Str());
+		aiString path;
+		mat->GetTexture(type, i, &path);
+		printf("Loading material texture: %s\n", path.C_Str());
 		// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
 		bool skip = false;
 		for (unsigned int j = 0; j < this->textures.size(); j++)
 		{
-			if (std::strcmp(this->textures[j].path.data(), str.C_Str()) == 0)
+			if (std::strcmp(this->textures[j].path.data(), path.C_Str()) == 0)
 			{
 				textures.push_back(this->textures[j]);
 				skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
@@ -133,9 +134,9 @@ std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType 
 		if (!skip)
 		{   // if texture hasn't been loaded already, load it
 			Texture texture;
-			texture.ID = Texture::FromFile(str.C_Str(), this->directory);
+			texture.ID = Texture::FromFile(path.C_Str(), this->directory);
 			texture.type = typeName;
-			texture.path = str.C_Str();
+			texture.path = path.C_Str();
 			textures.push_back(texture);
 			this->textures.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
 		}

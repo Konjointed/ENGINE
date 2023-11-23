@@ -39,9 +39,7 @@ public:
 	void SetRotation(const glm::vec3& rotation);
 	void SetScale(const glm::vec3& scale);
 
-	static Mesh GenerateCube();
 	static Mesh GeneratePlane();
-	static Mesh GenerateQuad();
 private:
 	unsigned int vao;
 	unsigned int vbo;

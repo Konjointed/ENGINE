@@ -1,14 +1,15 @@
 /*
 TODO:
 - Make a scene class that will (maybe) hold the camera and lighting stuff
-- Add imgui panels for controlling the scene, lighting, camera, etc
-- Create a lgoger (maybe)
+- Add imgui panels for controlling the scene, lighting, camera, etc (DONE)
+- Create a logger (maybe) 
 - Move console panel code in GUI class to its own class
 */
 
 #include <iostream>
 
 #include <glm/ext/matrix_clip_space.hpp>
+#include <stb_image.h>
 #include <Shader.h>
 
 #include "Application.h"
@@ -24,6 +25,7 @@ TODO:
 #include "Buffers.h"
 #include "Scene.h"
 #include "PostProcessor.h"
+#include "Skybox.h"
 
 // Static stuff for scene class
 glm::vec3 Scene::lightPosition = { 80.0f, 500.0f, -77.0f };
@@ -57,14 +59,6 @@ bool Application::Init() {
 }
 
 int Application::Run() {
-	std::vector<std::string> faces {
-		"Resources/Textures/skybox/right.jpg",
-		"Resources/Textures/skybox/left.jpg",
-		"Resources/Textures/skybox/top.jpg",
-		"Resources/Textures/skybox/bottom.jpg",
-		"Resources/Textures/skybox/front.jpg",
-		"Resources/Textures/skybox/back.jpg",
-	};
 
 	Shader basicShader("Resources/Shaders/Basic.vert", "Resources/Shaders/Basic.frag"); // simple texture
 	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
@@ -76,13 +70,18 @@ int Application::Run() {
 
 	unsigned int wood = Texture::FromFile("wood.png", "Resources/Textures");
 	unsigned int brick = Texture::FromFile("brickwall.jpg", "Resources/Textures");
-	unsigned int cubemapTexture = Texture::LoadCubemap(faces);
 
+	Mesh plane = Mesh::GeneratePlane();
+	plane.SetPosition({ 0.0f, -1.0f, 0.0f });
+	plane.SetScale({ 5.0f, 1.0f, 5.0f });
+
+	PostProcessor postProcessor;
+	Skybox skybox;
+
+	stbi_set_flip_vertically_on_load(true);
 	Model ourModel("Resources/Models/Maria/Maria J J Ong.dae", false);
 	Animation idleAnimation("Resources/Animations/Idle.dae", &ourModel);
 	Animator animator(&idleAnimation);
-
-	PostProcessor postProcessor;
 
 	unsigned int framebuffer = FrameBuffer::CreateFrameBuffer();
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -142,6 +141,9 @@ int Application::Run() {
 		glViewport(0, 0, 1280, 720);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		glm::mat4 model = glm::mat4(1.0f);
+
+		// Render model
 		ourShader.use();
 
 		ourShader.setMat4("projection", projection);
@@ -151,11 +153,26 @@ int Application::Run() {
 		for (int i = 0; i < transforms.size(); ++i)
 			ourShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 
-		glm::mat4 model = glm::mat4(1.0f);
+		//glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, -0.4f, 0.0f)); // translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(.5f, .5f, .5f));	// it's a bit too big for our scene, so scale it down
 		ourShader.setMat4("model", model);
 		ourModel.Draw(ourShader);
+
+		// Render plane
+		basicShader.use();
+		basicShader.setInt("texture1", 0);
+		basicShader.setMat4("view", view);
+		basicShader.setMat4("projection", projection);
+		model = plane.GetModelMatrix();
+		basicShader.setMat4("model", model);
+		plane.Draw(basicShader);
+
+		skyboxShader.use();
+		view = glm::mat4(glm::mat3(camera->GetViewMatrix())); // remove translation from the view matrix
+		skyboxShader.setMat4("view", view);
+		skyboxShader.setMat4("projection", projection);
+		skybox.Draw();
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
