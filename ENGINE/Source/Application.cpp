@@ -55,7 +55,7 @@ bool Application::Init() {
 int Application::Run() {
 	// Setup the scene
 	SceneElements scene;
-	scene.lightPosition = { 80.0f, 900.0f, -77.0f };
+	scene.lightPosition = { 80.0f, 90.0f, -77.0f };
 	scene.camera = camera;
 	scene.wireframe = false;
 

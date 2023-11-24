@@ -6,8 +6,8 @@
 #include "Camera.h"
 
 struct SceneElements {
-	float nearPlane = -1000.0f, farPlane = 1000.0f;
-	float orthoSize = 100.0f;
+	float nearPlane = -300.0f, farPlane = 300.0f;
+	float orthoSize = 1.0f;
 	glm::vec3 lightPosition;
 	Camera* camera;
 	bool wireframe;
