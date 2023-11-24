@@ -17,7 +17,7 @@ class Shader;
 struct Vertex;
 struct BoneInfo;
 
-class Model {
+class Model : public DrawableObject {
 public:
 	std::vector<Texture> textures;
 	std::vector<Mesh> meshes;

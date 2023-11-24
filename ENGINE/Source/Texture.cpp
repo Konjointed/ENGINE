@@ -5,15 +5,12 @@
 #include "Texture.h"
 #include "IncludeGL.h"
 
-unsigned int Texture::FromFile(std::string path, std::string directory, bool gamma) {
-	std::string filename = std::string(path);
-	filename = directory + '/' + filename;
-
+Texture Texture::FromFile(std::string path, bool gamma) {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
 
 	int width, height, nrComponents;
-	unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+	unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
 
 	if (data)
 	{
@@ -42,7 +39,12 @@ unsigned int Texture::FromFile(std::string path, std::string directory, bool gam
 		stbi_image_free(data);
 	}
 
-	return textureID;
+	Texture texture;
+	texture.ID = textureID;
+	texture.type = "";
+	texture.path = "";
+
+	return texture;
 }
 
 unsigned int Texture::LoadCubemap(std::vector<std::string> faces) {
@@ -71,5 +73,10 @@ unsigned int Texture::LoadCubemap(std::vector<std::string> faces) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	return textureID;
+	Texture texture;
+	texture.ID = textureID;
+	texture.type = "";
+	texture.path = "";
+
+	return texture;
 }

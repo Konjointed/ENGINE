@@ -27,6 +27,7 @@ TODO:
 #include "PostProcessor.h"
 #include "Skybox.h"
 #include "DrawableObject.h"
+#include "AssetManager.h"
 
 Application::Application() : window(nullptr), quit(false) {}
 Application::~Application() {}
@@ -53,6 +54,20 @@ bool Application::Init() {
 }
 
 int Application::Run() {
+	// Load shaders
+	AssetManager::LoadShader("Resources/Shaders/Basic.vert", "Resources/Shaders/Basic.frag", "basic");
+	AssetManager::LoadShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag", "default");
+	AssetManager::LoadShader("Resources/Shaders/Skybox.vert", "Resources/Shaders/Skybox.frag", "skybox");
+	AssetManager::LoadShader("Resources/Shaders/Screen.vert", "Resources/Shaders/Screen.frag", "screen");
+	AssetManager::LoadShader("Resources/Shaders/ShadowMappingDepth.vert", "Resources/Shaders/ShadowMappingDepth.frag", "shadowmapdepth");
+	AssetManager::LoadShader("Resources/Shaders/DebugQuad.vert", "Resources/Shaders/DebugQuad.frag", "debugquad");
+	AssetManager::LoadShader("Resources/Shaders/AnimModel.vert", "Resources/Shaders/AnimModel.frag", "animmodel");
+	// Load textures
+	AssetManager::LoadTexture("Resources/Textures/wood.png", "wood");
+	AssetManager::LoadTexture("Resources/Textures/brickwall.jpg", "brick");
+	// Load models
+	AssetManager::LoadModel("Resources/Models/Maria/Maria J J Ong.dae", "playermodel");
+
 	// Setup the scene
 	Scene scene;
 	scene.lightPosition = { 80.0f, 90.0f, -77.0f };
@@ -61,17 +76,6 @@ int Application::Run() {
 
 	// Every object now has access to the scene (granted they inherit from DrawableObject)
 	DrawableObject::scene = &scene;
-
-	Shader basicShader("Resources/Shaders/Basic.vert", "Resources/Shaders/Basic.frag"); // simple texture
-	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
-	Shader skyboxShader("Resources/Shaders/Skybox.vert", "Resources/Shaders/Skybox.frag");
-	Shader screenShader("Resources/Shaders/Screen.vert", "Resources/Shaders/Screen.frag");
-	Shader depthShader("Resources/Shaders/ShadowMappingDepth.vert", "Resources/Shaders/ShadowMappingDepth.frag");
-	Shader debugDepthQuad("Resources/Shaders/DebugQuad.vert", "Resources/Shaders/DebugQuad.frag");
-	Shader ourShader("Resources/Shaders/AnimModel.vert", "Resources/Shaders/AnimModel.frag");
-
-	unsigned int wood = Texture::FromFile("wood.png", "Resources/Textures");
-	unsigned int brick = Texture::FromFile("brickwall.jpg", "Resources/Textures");
 
 	Mesh plane = Mesh::GeneratePlane();
 	plane.SetPosition({ 0.0f, -10.0f, 0.0f });
@@ -85,8 +89,8 @@ int Application::Run() {
 	Skybox skybox;
 
 	stbi_set_flip_vertically_on_load(true);
-	Model ourModel("Resources/Models/Maria/Maria J J Ong.dae", false);
-	Animation idleAnimation("Resources/Animations/Idle.dae", &ourModel);
+	Model playerModel = AssetManager::GetModel("playermode");
+	Animation idleAnimation("Resources/Animations/Idle.dae", &playerModel);
 	Animator animator(&idleAnimation);
 
 	unsigned int framebuffer = FrameBuffer::CreateFrameBuffer();
@@ -145,6 +149,7 @@ int Application::Run() {
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
+		Shader depthShader = AssetManager::GetShader("shadowmapdepth");
 		depthShader.use();
 		depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 		depthShader.setMat4("view", view);
@@ -169,7 +174,7 @@ int Application::Run() {
 		model = glm::translate(model, glm::vec3(0.0f, -0.4f, 0.0f)); // translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(.5f, .5f, .5f));	// it's a bit too big for our scene, so scale it down
 		depthShader.setMat4("model", model);
-		ourModel.Draw(depthShader);
+		playerModel.Draw(depthShader);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -178,6 +183,7 @@ int Application::Run() {
 		glViewport(0, 0, 1280, 720);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		Shader defaultShader = AssetManager::GetShader("default");
 		defaultShader.use();
 		defaultShader.setMat4("view", view);
 		defaultShader.setMat4("projection", projection);
@@ -196,22 +202,23 @@ int Application::Run() {
 		plane.Draw(defaultShader, depthMap);
 
 		// Render model
-		ourShader.use();
-
-		ourShader.setMat4("projection", projection);
-		ourShader.setMat4("view", view);
-		ourShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		Shader animModelShader = AssetManager::GetShader("animmodel");
+		animModelShader.use();
+		animModelShader.setMat4("projection", projection);
+		animModelShader.setMat4("view", view);
+		animModelShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 		auto transforms = animator.GetFinalBoneMatrices();
 		for (int i = 0; i < transforms.size(); ++i)
-			ourShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+			animModelShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, -0.4f, 0.0f)); // translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(.5f, .5f, .5f));	// it's a bit too big for our scene, so scale it down
-		ourShader.setMat4("model", model);
-		ourModel.Draw(ourShader, depthMap);
+		animModelShader.setMat4("model", model);
+		playerModel.Draw(animModelShader, depthMap);
 
+		Shader skyboxShader = AssetManager::GetShader("skybox");
 		skyboxShader.use();
 		view = glm::mat4(glm::mat3(view)); // remove translation from the view matrix
 		skyboxShader.setMat4("view", view);
@@ -231,6 +238,7 @@ int Application::Run() {
 
 		static float accumulatedTime = 0.0f;
 		accumulatedTime += deltaTime;
+		Shader screenShader = AssetManager::GetShader("screen");
 		screenShader.use();
 		//debugDepthQuad.setFloat("near_plane", scene.nearPlane);
 		//debugDepthQuad.setFloat("far_plane", scene.farPlane);

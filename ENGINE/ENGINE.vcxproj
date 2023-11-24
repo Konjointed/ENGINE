@@ -136,6 +136,7 @@
     <ClCompile Include="Source\Animation.cpp" />
     <ClCompile Include="Source\Animator.cpp" />
     <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\AssetManager.cpp" />
     <ClCompile Include="Source\Bone.cpp" />
     <ClCompile Include="Source\Buffers.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
@@ -146,6 +147,8 @@
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\Model.cpp" />
     <ClCompile Include="Source\PostProcessor.cpp" />
+    <ClCompile Include="Source\Renderer.cpp" />
+    <ClCompile Include="Source\Scene.cpp" />
     <ClCompile Include="Source\Skybox.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\Window.cpp" />
@@ -163,6 +166,7 @@
     <ClInclude Include="Source\AnimationData.h" />
     <ClInclude Include="Source\Animator.h" />
     <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\AssetManager.h" />
     <ClInclude Include="Source\AssimpGLMHelpers.h" />
     <ClInclude Include="Source\Bone.h" />
     <ClInclude Include="Source\Buffers.h" />
@@ -173,6 +177,8 @@
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\Model.h" />
     <ClInclude Include="Source\PostProcessor.h" />
+    <ClInclude Include="Source\Renderer.h" />
+    <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\SceneElements.h" />
     <ClInclude Include="Source\Skybox.h" />
     <ClInclude Include="Source\Texture.h" />

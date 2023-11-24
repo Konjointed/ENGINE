@@ -9,8 +9,8 @@ public:
 	std::string type;
 	std::string path;
 
-	static unsigned int FromFile(std::string path, std::string directory, bool gamma = false);
-	static unsigned int LoadCubemap(std::vector<std::string> faces);
+	static Texture FromFile(std::string path, bool gamma = false);
+	static Texture LoadCubemap(std::vector<std::string> faces);
 	// GenerateTexture2D(w, h)
 	// GenerateTexture3D(w, h, d)
 private:

@@ -150,10 +150,10 @@ Mesh Mesh::GeneratePlane() {
     };
 
     std::vector<Texture> textures;
-    Texture woodTexture;
-    woodTexture.ID = Texture::FromFile("wood.png", "Resources/Textures"); // Replace with actual path
-    woodTexture.type = "texture_diffuse"; // Assuming it's a diffuse texture
-    textures.push_back(woodTexture);
+    //Texture woodTexture;
+    //woodTexture.ID = Texture::FromFile("wood.png", "Resources/Textures"); // Replace with actual path
+    //woodTexture.type = "texture_diffuse"; // Assuming it's a diffuse texture
+    //textures.push_back(woodTexture);
 
     return Mesh(vertices, indices, textures);
 }

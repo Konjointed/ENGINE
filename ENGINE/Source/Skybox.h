@@ -3,14 +3,16 @@
 
 #include <vector>
 
+#include "DrawableObject.h"
+
 class Shader;
 
-class Skybox {
+class Skybox : public DrawableObject {
 public:
 	Skybox();
 	~Skybox();
 
-	void Draw();
+	void Draw() override;
 private:
 	unsigned int vao;
 	unsigned int vbo;
