@@ -1,3 +1,3 @@
 #include "DrawableObject.h"
 
-SceneElements* DrawableObject::scene = 0;
+Scene* DrawableObject::scene = 0;

@@ -1,14 +1,14 @@
 #ifndef DRAWABLE_OBJECT_H
 #define DRAWABLE_OBJECT_H
 
-#include "SceneElements.h"
+#include "Scene.h"
 
 class DrawableObject {
 public:
 	virtual void Draw() = 0;
 	virtual void Update() {}
 	virtual void SetGui() {}
-	static SceneElements* scene;
+	static Scene* scene;
 };
 
 #endif 

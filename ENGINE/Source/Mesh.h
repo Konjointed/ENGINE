@@ -25,12 +25,12 @@ struct Vertex {
 	float weights[MAX_BONE_INFLUENCE];
 };
 
-class Mesh {
+class Mesh : public DrawableObject {
 public:
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 	~Mesh();
 
-	void Draw(Shader& shader, unsigned int shadowMap = 0);
+	void Draw(Shader& shader, unsigned int shadowMap = 0) override;
 
 	const glm::mat4& GetModelMatrix() const;
 	glm::vec3 GetPosition();

@@ -23,7 +23,7 @@ TODO:
 #include "Animator.h"
 #include "Texture.h"
 #include "Buffers.h"
-#include "SceneElements.h"
+#include "Scene.h"
 #include "PostProcessor.h"
 #include "Skybox.h"
 #include "DrawableObject.h"
@@ -54,8 +54,8 @@ bool Application::Init() {
 
 int Application::Run() {
 	// Setup the scene
-	SceneElements scene;
-	scene.lightPosition = { 80.0f, 900.0f, -77.0f };
+	Scene scene;
+	scene.lightPosition = { 80.0f, 90.0f, -77.0f };
 	scene.camera = camera;
 	scene.wireframe = false;
 
@@ -103,7 +103,7 @@ int Application::Run() {
 	unsigned int depthMapFBO = FrameBuffer::CreateFrameBuffer();
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 
-	unsigned int depthMap = FrameBuffer::CreateDepthTextureAttachment(4096, 4096);
+	unsigned int depthMap = FrameBuffer::CreateDepthTextureAttachment(1024, 1024);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -141,7 +141,7 @@ int Application::Run() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Shadow Pass
-		glViewport(0, 0, 4096, 4096);
+		glViewport(0, 0, 1024, 1024);
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -232,9 +232,9 @@ int Application::Run() {
 		static float accumulatedTime = 0.0f;
 		accumulatedTime += deltaTime;
 		screenShader.use();
-		//screenShader.setFloat("near_plane", scene.nearPlane);
-		//screenShader.setFloat("far_plane", scene.farPlane);
-		//screenShader.setInt("depthMap", 0);
+		//debugDepthQuad.setFloat("near_plane", scene.nearPlane);
+		//debugDepthQuad.setFloat("far_plane", scene.farPlane);
+		//debugDepthQuad.setInt("depthMap", 0);
 		screenShader.setFloat("time", accumulatedTime);
 		screenShader.setInt("screenTexture", 0);
 		glActiveTexture(GL_TEXTURE0);
