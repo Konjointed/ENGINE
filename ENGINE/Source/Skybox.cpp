@@ -1,8 +1,11 @@
 #include <string>
 
+#include <Shader.h>
+
 #include "Skybox.h"
 #include "IncludeGL.h"
 #include "Texture.h"
+#include "ResourceManager.h"
 
 Skybox::Skybox() {
     vertices = {
@@ -62,28 +65,23 @@ Skybox::Skybox() {
     // Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
     glEnableVertexAttribArray(0);
-
-    std::vector<std::string> faces{
-    "Resources/Textures/skybox/right.jpg",
-    "Resources/Textures/skybox/left.jpg",
-    "Resources/Textures/skybox/top.jpg",
-    "Resources/Textures/skybox/bottom.jpg",
-    "Resources/Textures/skybox/front.jpg",
-    "Resources/Textures/skybox/back.jpg",
-    };
-    texture = Texture::LoadCubemap(faces);
 }
 
 Skybox::~Skybox() {
 
 }
 
-void Skybox::Draw() {
+void Skybox::Draw(glm::mat4 view, glm::mat4 projection) {
+    view = glm::mat4(glm::mat3(view)); // remove translation from the view matrix
+
+    ResourceManager::GetShader("skybox").Use();
+    ResourceManager::GetShader("skybox").SetMatrix4("view", view);
+    ResourceManager::GetShader("skybox").SetMatrix4("projection", projection);
+
     glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-    // skybox cube
     glBindVertexArray(vao);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, ResourceManager::GetTexture("skybox").id);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
     glDepthFunc(GL_LESS); // set depth function back to default

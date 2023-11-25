@@ -146,6 +146,8 @@
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\Model.cpp" />
     <ClCompile Include="Source\PostProcessor.cpp" />
+    <ClCompile Include="Source\Renderer.cpp" />
+    <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\Skybox.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\Window.cpp" />
@@ -157,6 +159,7 @@
     <ClCompile Include="ThirdParty\imgui\imgui_impl_sdl2.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="ThirdParty\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Animation.h" />
@@ -168,11 +171,14 @@
     <ClInclude Include="Source\Buffers.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\DrawableObject.h" />
+    <ClInclude Include="Source\GameObject.h" />
     <ClInclude Include="Source\GUI.h" />
     <ClInclude Include="Source\IncludeGL.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\Model.h" />
     <ClInclude Include="Source\PostProcessor.h" />
+    <ClInclude Include="Source\Renderer.h" />
+    <ClInclude Include="Source\ResourceManager.h" />
     <ClInclude Include="Source\SceneElements.h" />
     <ClInclude Include="Source\Skybox.h" />
     <ClInclude Include="Source\Texture.h" />

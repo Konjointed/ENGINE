@@ -16,6 +16,7 @@ TODO:
 #include "IncludeGL.h"
 #include "GUI.h"
 #include "Window.h"
+#include "Renderer.h"
 #include "Camera.h"
 #include "Mesh.h"
 #include "Model.h"
@@ -27,6 +28,8 @@ TODO:
 #include "PostProcessor.h"
 #include "Skybox.h"
 #include "DrawableObject.h"
+#include "GameObject.h"
+#include "ResourceManager.h"
 
 Application::Application() : window(nullptr), quit(false) {}
 Application::~Application() {}
@@ -47,199 +50,99 @@ bool Application::Init() {
 	if (!success) return false;
 
 	gui = new GUI(*window);
+	renderer = new Renderer;
 	camera = new Camera;
 
 	return true;
 }
 
 int Application::Run() {
-	// Setup the scene
-	SceneElements scene;
-	scene.lightPosition = { 80.0f, 90.0f, -77.0f };
-	scene.camera = camera;
-	scene.wireframe = false;
+	ResourceManager::LoadShader("Resources/Shaders/Skybox.vert", "Resources/Shaders/Skybox.frag", "", "skybox");
+	ResourceManager::LoadShader("Resources/Shaders/AnimModel.vert", "Resources/Shaders/AnimModel.frag", "", "model");
 
-	// Every object now has access to the scene (granted they inherit from DrawableObject)
-	DrawableObject::scene = &scene;
-
-	Shader basicShader("Resources/Shaders/Basic.vert", "Resources/Shaders/Basic.frag"); // simple texture
-	Shader defaultShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag");
-	Shader skyboxShader("Resources/Shaders/Skybox.vert", "Resources/Shaders/Skybox.frag");
-	Shader screenShader("Resources/Shaders/Screen.vert", "Resources/Shaders/Screen.frag");
-	Shader depthShader("Resources/Shaders/ShadowMappingDepth.vert", "Resources/Shaders/ShadowMappingDepth.frag");
-	Shader debugDepthQuad("Resources/Shaders/DebugQuad.vert", "Resources/Shaders/DebugQuad.frag");
-	Shader ourShader("Resources/Shaders/AnimModel.vert", "Resources/Shaders/AnimModel.frag");
-
-	unsigned int wood = Texture::FromFile("wood.png", "Resources/Textures");
-	unsigned int brick = Texture::FromFile("brickwall.jpg", "Resources/Textures");
-
-	Mesh plane = Mesh::GeneratePlane();
-	plane.SetPosition({ 0.0f, -10.0f, 0.0f });
-	plane.SetScale({ 30.0f, 1.0f, 30.0f });
-
-	Mesh cube = Mesh::GenerateCube();
-	cube.SetPosition({ 0.0f, 5.0f, 0.0f });
-	cube.SetScale({ 1.0f, 1.0f, 1.0f });
-
-	PostProcessor postProcessor;
-	Skybox skybox;
+	ResourceManager::LoadCubemap({
+		"Resources/Textures/skybox/right.jpg",
+		"Resources/Textures/skybox/left.jpg",
+		"Resources/Textures/skybox/top.jpg",
+		"Resources/Textures/skybox/bottom.jpg",
+		"Resources/Textures/skybox/front.jpg",
+		"Resources/Textures/skybox/back.jpg",
+		}, "skybox");
 
 	stbi_set_flip_vertically_on_load(true);
-	Model ourModel("Resources/Models/Maria/Maria J J Ong.dae", false);
-	Animation idleAnimation("Resources/Animations/Idle.dae", &ourModel);
+
+	glEnable(GL_DEPTH_TEST);
+
+	Skybox skybox;
+
+	Model playerModel = Model("Resources/Models/Maria/Maria J J Ong.dae", false);
+	GameObject playerObject(playerModel);
+	playerObject.transform.SetLocalPosition({ 10, 0, 0 });
+	const float scale = 0.75;
+	playerObject.transform.SetLocalScale({ scale, scale, scale });
+
+	{
+		GameObject* lastEntity = &playerObject;
+
+		for (unsigned int i = 0; i < 10; ++i)
+		{
+			lastEntity->AddChild(playerModel);
+			lastEntity = lastEntity->children.back().get();
+
+			//Set transform values
+			lastEntity->transform.SetLocalPosition({ 10, 0, 0 });
+			lastEntity->transform.SetLocalScale({ scale, scale, scale });
+		}
+	}
+	playerObject.UpdateSelfAndChild();
+
+
+	Animation idleAnimation("Resources/Animations/Idle.dae", &playerModel);
 	Animator animator(&idleAnimation);
 
-	unsigned int framebuffer = FrameBuffer::CreateFrameBuffer();
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-	unsigned int textureColorbuffer = FrameBuffer::CreateTextureAttachment(1280, 720);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
-
-	unsigned int rbo = FrameBuffer::CreateRenderBufferAttachment(1280, 720);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	unsigned int depthMapFBO = FrameBuffer::CreateFrameBuffer();
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-
-	unsigned int depthMap = FrameBuffer::CreateDepthTextureAttachment(4096, 4096);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	//  || Main Loop
-	int lastFrameTime = 0;
+	static int lastFrameTime = 0;
 	while (!quit) {
 		int currentTime = SDL_GetTicks();
 		float deltaTime = (currentTime - lastFrameTime) / 1000.0f;
 		lastFrameTime = currentTime;
 
+		// || Events
 		PollEvents();
 	
 		// || Update
-		scene.camera->Update(deltaTime);
-		animator.UpdateAnimation(deltaTime);
+		camera->Update(deltaTime);
 
 		// || Render
-		if (scene.wireframe) {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		}
-
-		glm::mat4 model = glm::mat4(1.0f);
-		glm::mat4 view = scene.camera->GetViewMatrix();
-		glm::mat4 projection = scene.camera->GetProjectionMatrix();
-
-		glm::mat4 lightProjection = glm::ortho(-scene.orthoSize, scene.orthoSize, -scene.orthoSize, scene.orthoSize, scene.nearPlane, scene.farPlane);
-		glm::mat4 lightView = glm::lookAt(scene.lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
-
+		// Reset
+		//glDepthFunc(GL_LESS); // For skybox
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Shadow Pass
-		glViewport(0, 0, 4096, 4096);
-		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-		glClear(GL_DEPTH_BUFFER_BIT);
+		ResourceManager::GetShader("model").Use();
 
-		depthShader.use();
-		depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		depthShader.setMat4("view", view);
-		depthShader.setMat4("projection", projection);
-
-		// Render cube
-		model = cube.GetModelMatrix();
-		depthShader.setMat4("model", model);
-		cube.Draw(depthShader);
-
-		// Render plane
-		model = plane.GetModelMatrix();
-		depthShader.setMat4("model", model);
-		plane.Draw(depthShader);
-
-		// Render model
-		auto boneTransforms = animator.GetFinalBoneMatrices();
-		for (int i = 0; i < boneTransforms.size(); ++i)
-			depthShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", boneTransforms[i]);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -0.4f, 0.0f)); // translate it down so it's at the center of the scene
-		model = glm::scale(model, glm::vec3(.5f, .5f, .5f));	// it's a bit too big for our scene, so scale it down
-		depthShader.setMat4("model", model);
-		ourModel.Draw(depthShader);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		// Main Pass
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		glViewport(0, 0, 1280, 720);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		defaultShader.use();
-		defaultShader.setMat4("view", view);
-		defaultShader.setMat4("projection", projection);
-		defaultShader.setVec3("viewPos", scene.camera->GetPosition());
-		defaultShader.setVec3("lightPos", scene.lightPosition);
-		defaultShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-		// Render cube
-		model = cube.GetModelMatrix();
-		defaultShader.setMat4("model", model);
-		cube.Draw(defaultShader, depthMap);
-
-		// Render plane
-		model = plane.GetModelMatrix();
-		defaultShader.setMat4("model", model);
-		plane.Draw(defaultShader, depthMap);
-
-		// Render model
-		ourShader.use();
-
-		ourShader.setMat4("projection", projection);
-		ourShader.setMat4("view", view);
-		ourShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		glm::mat4 view = camera->GetViewMatrix();
+		glm::mat4 projection = camera->GetProjectionMatrix();
+		ResourceManager::GetShader("model").SetMatrix4("projection", projection);
+		ResourceManager::GetShader("model").SetMatrix4("view", view);
 
 		auto transforms = animator.GetFinalBoneMatrices();
-		for (int i = 0; i < transforms.size(); ++i)
-			ourShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -0.4f, 0.0f)); // translate it down so it's at the center of the scene
-		model = glm::scale(model, glm::vec3(.5f, .5f, .5f));	// it's a bit too big for our scene, so scale it down
-		ourShader.setMat4("model", model);
-		ourModel.Draw(ourShader, depthMap);
-
-		skyboxShader.use();
-		view = glm::mat4(glm::mat3(view)); // remove translation from the view matrix
-		skyboxShader.setMat4("view", view);
-		skyboxShader.setMat4("projection", projection);
-		skybox.Draw();
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		if (scene.wireframe) {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		for (int i = 0; i < transforms.size(); ++i) {
+			std::string name = "finalBonesMatrices[" + std::to_string(i) + "]";
+			ResourceManager::GetShader("model").SetMatrix4(name.c_str(), transforms[i]);
 		}
 
-		// Post processing pass
-		glDisable(GL_DEPTH_TEST);
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		// Draw scene graph
+		GameObject* lastObject = &playerObject;
+		while (lastObject->children.size()) {
+			ResourceManager::GetShader("model").SetMatrix4("model", lastObject->transform.GetModelMatrix());
+			lastObject->model->Draw(ResourceManager::GetShader("model"));
+			lastObject = lastObject->children.back().get();
+		}
+		//playerObject.transform.setLocalRotation({ 0.f, playerObject.transform.getLocalRotation().y + 20 * deltaTime, 0.f });
+		playerObject.UpdateSelfAndChild();
 
-		static float accumulatedTime = 0.0f;
-		accumulatedTime += deltaTime;
-		screenShader.use();
-		//screenShader.setFloat("near_plane", scene.nearPlane);
-		//screenShader.setFloat("far_plane", scene.farPlane);
-		//screenShader.setInt("depthMap", 0);
-		screenShader.setFloat("time", accumulatedTime);
-		screenShader.setInt("screenTexture", 0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-		postProcessor.Draw();
+		skybox.Draw(view, projection);
 
 		gui->Draw();
 
@@ -251,6 +154,10 @@ int Application::Run() {
 	return 1;
 }
 
+/* TODO:
+* - Create a EventHandler/EventManager class with a HandleEvent method
+* - This method will pass the event to it and then stuff will happen from their
+*/
 void Application::PollEvents() {
 	static bool rightMouseButtonPressed = false;
 	SDL_Event event;

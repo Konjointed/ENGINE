@@ -5,14 +5,13 @@
 #include "Model.h"
 #include "Mesh.h"
 #include "Texture.h"
-#include "AnimationData.h"
 #include "AssimpGLMHelpers.h"
 
-// Starts the loading processs
-Model::Model(const std::string& path, bool gamma = false) 
-	: gammaCorrection(gamma), position(0.0f), rotation(0.0f), scale(1.0f) {
-	Assimp::Importer importer;
+Model::Model() {}
 
+Model::Model(const std::string& path, bool gamma = false) : gammaCorrection(gamma)  {
+	// Read file via ASSIMP
+	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, 
 											aiProcess_Triangulate | 
 											aiProcess_GenSmoothNormals | 
@@ -28,9 +27,11 @@ Model::Model(const std::string& path, bool gamma = false)
 	ProcessNode(scene->mRootNode, scene);
 }
 
-Model::~Model() {}
+Model::~Model() {
+	std::cout << "Model destroyed\n";
+}
 
-void Model::Draw(Shader& shader, unsigned int shadowMap) {
+void Model::Draw(Shader shader, unsigned int shadowMap) {
 	for (unsigned int i = 0; i < this->meshes.size(); i++)
 		this->meshes[i].Draw(shader, shadowMap);
 }
@@ -133,8 +134,9 @@ std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType 
 		}
 		if (!skip)
 		{   // if texture hasn't been loaded already, load it
-			Texture texture;
-			texture.ID = Texture::FromFile(path.C_Str(), this->directory);
+			std::string filename = this->directory + "/" + path.C_Str();
+			Texture texture = Texture::FromFile(filename, false);
+			//texture.id = Texture::FromFile(filename, false);
 			texture.type = typeName;
 			texture.path = path.C_Str();
 			textures.push_back(texture);

@@ -17,7 +17,7 @@ public:
 	glm::vec3& GetPosition();
 	glm::vec3 GetFront();
 
-	float movementSpeed = 1.0f;
+	float movementSpeed = 100.0f;
 private:
 	float fov = 45.0f;
 	float aspectRatio = static_cast<float>(1280) / 720;

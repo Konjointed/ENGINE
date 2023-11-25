@@ -5,6 +5,7 @@
 
 class GUI;
 class Window;
+class Renderer;
 class Camera;
 
 class Application {
@@ -23,6 +24,7 @@ private:
 	bool quit;
 	GUI* gui;
 	Window* window;
+	Renderer* renderer;
 	Camera* camera;
 };
 

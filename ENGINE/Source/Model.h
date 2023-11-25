@@ -11,11 +11,14 @@
 #include <assimp/postprocess.h>
 #include <glm/mat4x4.hpp>
 
+#include "Mesh.h"
+#include "AnimationData.h"
+
 class Texture;
-class Mesh;
+//class Mesh;
 class Shader;
 struct Vertex;
-struct BoneInfo;
+//struct BoneInfo;
 
 class Model {
 public:
@@ -24,25 +27,15 @@ public:
 	std::string directory;
 	bool gammaCorrection;
 
+	Model(); // TEMP UNTIL ADDED TO RESOURCEMANAGER
 	Model(const std::string& path, bool gamma);
 	~Model();
 
-	void Draw(Shader& shader, unsigned int shadowMap = 0);
+	void Draw(Shader shader, unsigned int shadowMap = 0);
 
 	auto& GetBoneInfoMap() { return boneInfoMap; }
 	int& GetBoneCount() { return boneCounter; }
-	/*
-	glm::mat4 GetModelMatrix() const;
-
-	void SetPosition(const glm::vec3& pos);
-	void SetRotation(const glm::vec3& rot);
-	void SetScale(const glm::vec3& scl);
-	*/
 private:
-	glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
-
 	std::map<std::string, BoneInfo> boneInfoMap;
 	int boneCounter = 0;
 

@@ -25,22 +25,20 @@ struct Vertex {
 	float weights[MAX_BONE_INFLUENCE];
 };
 
+/*
+struct Texture {
+	unsigned int id;
+	std::string type;
+	std::string path;
+};
+*/
+
 class Mesh {
 public:
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 	~Mesh();
 
 	void Draw(Shader& shader, unsigned int shadowMap = 0);
-
-	const glm::mat4& GetModelMatrix() const;
-	glm::vec3 GetPosition();
-
-	void SetPosition(const glm::vec3& position);
-	void SetRotation(const glm::vec3& rotation);
-	void SetScale(const glm::vec3& scale);
-
-	static Mesh GeneratePlane();
-	static Mesh GenerateCube();
 private:
 	unsigned int vao;
 	unsigned int vbo;
@@ -49,8 +47,4 @@ private:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
-
-	glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
 };

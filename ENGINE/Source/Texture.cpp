@@ -5,15 +5,12 @@
 #include "Texture.h"
 #include "IncludeGL.h"
 
-unsigned int Texture::FromFile(std::string path, std::string directory, bool gamma) {
-	std::string filename = std::string(path);
-	filename = directory + '/' + filename;
-
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
+Texture Texture::FromFile(std::string path, bool gamma) {
+	Texture texture;
+	glGenTextures(1, &texture.id);
 
 	int width, height, nrComponents;
-	unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+	unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
 
 	if (data)
 	{
@@ -25,7 +22,7 @@ unsigned int Texture::FromFile(std::string path, std::string directory, bool gam
 		else if (nrComponents == 4)
 			format = GL_RGBA;
 
-		glBindTexture(GL_TEXTURE_2D, textureID);
+		glBindTexture(GL_TEXTURE_2D, texture.id);
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -42,13 +39,13 @@ unsigned int Texture::FromFile(std::string path, std::string directory, bool gam
 		stbi_image_free(data);
 	}
 
-	return textureID;
+	return texture;
 }
 
-unsigned int Texture::LoadCubemap(std::vector<std::string> faces) {
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+Texture Texture::LoadCubemap(std::vector<std::string> faces) {
+	Texture texture;
+	glGenTextures(1, &texture.id);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture.id);
 
 	int width, height, nrChannels;
 	for (unsigned int i = 0; i < faces.size(); i++)
@@ -71,5 +68,5 @@ unsigned int Texture::LoadCubemap(std::vector<std::string> faces) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	return textureID;
+	return texture;
 }

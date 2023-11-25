@@ -6,11 +6,7 @@
 #include "Texture.h"
 #include "IncludeGL.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) :
-    position(0.0f, 0.0f, 0.0f),
-    rotation(0.0f, 0.0f, 0.0f),
-    scale(1.0f, 1.0f, 1.0f)
-{
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
     this->vertices = vertices;
     this->indices = indices;
     this->textures = textures;
@@ -74,7 +70,7 @@ void Mesh::Draw(Shader& shader, unsigned int shadowMap) {
 
     glActiveTexture(GL_TEXTURE0 + textures.size());
     glBindTexture(GL_TEXTURE_2D, shadowMap);
-    shader.setInt("shadowMap", textures.size());
+    shader.SetInteger("shadowMap", textures.size());
 
     for (unsigned int i = 0; i < textures.size(); i++)
     {
@@ -93,9 +89,9 @@ void Mesh::Draw(Shader& shader, unsigned int shadowMap) {
             number = std::to_string(heightNr++); // transfer unsigned int to string
 
         // now set the sampler to the correct texture unit
-        shader.setInt((name + number).c_str(), i);
+        shader.SetInteger((name + number).c_str(), i);
         // and finally bind the texture
-        glBindTexture(GL_TEXTURE_2D, textures[i].ID);
+        glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
 
     // draw mesh
@@ -108,32 +104,7 @@ void Mesh::Draw(Shader& shader, unsigned int shadowMap) {
     glBindTexture(GL_TEXTURE_2D, 0); // not sure if this is needed
 }
 
-const glm::mat4& Mesh::GetModelMatrix() const {
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, position);
-    model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    model = glm::scale(model, scale);
-    return model;
-}
-
-glm::vec3 Mesh::GetPosition() {
-    return position;
-}
-
-void Mesh::SetPosition(const glm::vec3& newPosition) {
-    position = newPosition;
-}
-
-void Mesh::SetRotation(const glm::vec3& newRotation) {
-    rotation = newRotation;
-}
-
-void Mesh::SetScale(const glm::vec3& newScale) {
-    scale = newScale;
-}
-
+/*
 Mesh Mesh::GeneratePlane() {
     // Position - Normals - Texture Coord
     std::vector<Vertex> vertices = {
@@ -218,3 +189,4 @@ Mesh Mesh::GenerateCube() {
 
     return Mesh(vertices, indices, textures);
 }
+*/
