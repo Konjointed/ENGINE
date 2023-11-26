@@ -63,7 +63,7 @@
     <ClCompile Include="Source\Buffers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GUI.cpp">
+    <ClCompile Include="Source\Editor\GUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Animation.cpp">
@@ -84,7 +84,31 @@
     <ClCompile Include="Source\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\DrawableObject.cpp">
+    <ClCompile Include="Source\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Scenegraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\SceneControls.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\ImguiWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Viewport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -149,7 +173,7 @@
     <ClInclude Include="Source\Buffers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GUI.h">
+    <ClInclude Include="Source\Editor\GUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\SceneElements.h">
@@ -179,7 +203,31 @@
     <ClInclude Include="Source\Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\DrawableObject.h">
+    <ClInclude Include="Source\GameObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\ImguiWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Console.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Scenegraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\SceneControls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Viewport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\LuaEnvironment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -198,6 +246,8 @@
     <None Include="Resources\Shaders\DebugQuad.frag" />
     <None Include="Resources\Shaders\AnimModel.vert" />
     <None Include="Resources\Shaders\AnimModel.frag" />
+    <None Include="Resources\Scripts\ILoveLua.lua" />
+    <None Include="Resources\Scripts\Module.lua" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">

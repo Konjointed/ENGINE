@@ -12,9 +12,12 @@ TODO:
 #include <stb_image.h>
 #include <Shader.h>
 
+#include "Editor/GUI.h"
+#include "Editor/Console.h"
+#include "Editor/Scenegraph.h"
+
 #include "Application.h"
 #include "IncludeGL.h"
-#include "GUI.h"
 #include "Window.h"
 #include "Renderer.h"
 #include "Camera.h"
@@ -27,9 +30,10 @@ TODO:
 #include "SceneElements.h"
 #include "PostProcessor.h"
 #include "Skybox.h"
-#include "DrawableObject.h"
+//#include "DrawableObject.h"
 #include "GameObject.h"
 #include "ResourceManager.h"
+#include "LuaEnvironment.h"
 
 Application::Application() : window(nullptr), quit(false) {}
 Application::~Application() {}
@@ -57,6 +61,20 @@ bool Application::Init() {
 }
 
 int Application::Run() {
+	LuaEnvironment luaenv;
+	luaenv.DoFile("Resources/Scripts/ILoveLua.lua");
+
+	unsigned int framebuffer = FrameBuffer::CreateFrameBuffer();
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+	unsigned int textureColorbuffer = FrameBuffer::CreateTextureAttachment(1280, 720);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+
+	unsigned int rbo = FrameBuffer::CreateRenderBufferAttachment(1280, 720);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	ResourceManager::LoadShader("Resources/Shaders/Skybox.vert", "Resources/Shaders/Skybox.frag", "", "skybox");
 	ResourceManager::LoadShader("Resources/Shaders/AnimModel.vert", "Resources/Shaders/AnimModel.frag", "", "model");
 
@@ -69,33 +87,32 @@ int Application::Run() {
 		"Resources/Textures/skybox/back.jpg",
 		}, "skybox");
 
+	Console console(*gui);
+	SceneGraph sceneGraph(*gui); 
+
 	stbi_set_flip_vertically_on_load(true);
 
 	glEnable(GL_DEPTH_TEST);
+
+	GameObject scenegraph; // root
+	scenegraph.name = "Root";
+
+	SceneElements scene(scenegraph);
+	scene.lightPosition = { 80.0f, 90.0f, -77.0f };
+	scene.camera = camera; 
+	scene.wireframe = false;
+	GameObject::scene = &scene;
 
 	Skybox skybox;
 
 	Model playerModel = Model("Resources/Models/Maria/Maria J J Ong.dae", false);
 	GameObject playerObject(playerModel);
+	playerObject.name = "Player";
 	playerObject.transform.SetLocalPosition({ 10, 0, 0 });
 	const float scale = 0.75;
 	playerObject.transform.SetLocalScale({ scale, scale, scale });
 
-	{
-		GameObject* lastEntity = &playerObject;
-
-		for (unsigned int i = 0; i < 10; ++i)
-		{
-			lastEntity->AddChild(playerModel);
-			lastEntity = lastEntity->children.back().get();
-
-			//Set transform values
-			lastEntity->transform.SetLocalPosition({ 10, 0, 0 });
-			lastEntity->transform.SetLocalScale({ scale, scale, scale });
-		}
-	}
-	playerObject.UpdateSelfAndChild();
-
+	scenegraph.AddChild(std::move(playerObject));
 
 	Animation idleAnimation("Resources/Animations/Idle.dae", &playerModel);
 	Animator animator(&idleAnimation);
@@ -109,11 +126,15 @@ int Application::Run() {
 
 		// || Events
 		PollEvents();
-	
+
 		// || Update
 		camera->Update(deltaTime);
 
 		// || Render
+		if (scene.wireframe) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+
 		// Reset
 		//glDepthFunc(GL_LESS); // For skybox
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -133,18 +154,16 @@ int Application::Run() {
 		}
 
 		// Draw scene graph
-		GameObject* lastObject = &playerObject;
-		while (lastObject->children.size()) {
-			ResourceManager::GetShader("model").SetMatrix4("model", lastObject->transform.GetModelMatrix());
-			lastObject->model->Draw(ResourceManager::GetShader("model"));
-			lastObject = lastObject->children.back().get();
-		}
-		//playerObject.transform.setLocalRotation({ 0.f, playerObject.transform.getLocalRotation().y + 20 * deltaTime, 0.f });
-		playerObject.UpdateSelfAndChild();
+		scenegraph.UpdateSelfAndChild();
+		scenegraph.DrawSelfAndChild(ResourceManager::GetShader("model"));
 
 		skybox.Draw(view, projection);
 
-		gui->Draw();
+		if (scene.wireframe) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+
+		gui->DrawWindows();
 
 		window->SwapBuffers();
 	}

@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>.\Bin</OutDir>
-    <IncludePath>D:\Github\ENGINE\ENGINE\ThirdParty\SDL2;D:\Github\ENGINE\ENGINE\ThirdParty;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Github\ENGINE\ENGINE\ThirdParty\lua;D:\Github\ENGINE\ENGINE\ThirdParty\SDL2;D:\Github\ENGINE\ENGINE\ThirdParty;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Github\ENGINE\ENGINE\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -113,7 +113,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;sdl2main.lib;sdl2.lib;sdl2_image.lib;sdl2_ttf.lib;freetype.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;sdl2main.lib;sdl2.lib;sdl2_image.lib;sdl2_ttf.lib;freetype.lib;assimp-vc143-mtd.lib;lua54.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,8 +139,13 @@
     <ClCompile Include="Source\Bone.cpp" />
     <ClCompile Include="Source\Buffers.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
-    <ClCompile Include="Source\DrawableObject.cpp" />
-    <ClCompile Include="Source\GUI.cpp" />
+    <ClCompile Include="Source\Editor\Console.cpp" />
+    <ClCompile Include="Source\Editor\ImguiWindow.cpp" />
+    <ClCompile Include="Source\Editor\SceneControls.cpp" />
+    <ClCompile Include="Source\Editor\Scenegraph.cpp" />
+    <ClCompile Include="Source\Editor\Viewport.cpp" />
+    <ClCompile Include="Source\GameObject.cpp" />
+    <ClCompile Include="Source\Editor\GUI.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Compile\stb.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
@@ -170,10 +175,15 @@
     <ClInclude Include="Source\Bone.h" />
     <ClInclude Include="Source\Buffers.h" />
     <ClInclude Include="Source\Camera.h" />
-    <ClInclude Include="Source\DrawableObject.h" />
+    <ClInclude Include="Source\Editor\Console.h" />
+    <ClInclude Include="Source\Editor\ImguiWindow.h" />
+    <ClInclude Include="Source\Editor\SceneControls.h" />
+    <ClInclude Include="Source\Editor\Scenegraph.h" />
+    <ClInclude Include="Source\Editor\Viewport.h" />
     <ClInclude Include="Source\GameObject.h" />
-    <ClInclude Include="Source\GUI.h" />
+    <ClInclude Include="Source\Editor\GUI.h" />
     <ClInclude Include="Source\IncludeGL.h" />
+    <ClInclude Include="Source\LuaEnvironment.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\Model.h" />
     <ClInclude Include="Source\PostProcessor.h" />
@@ -206,6 +216,8 @@
     <Image Include="Resources\Textures\wood.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Scripts\ILoveLua.lua" />
+    <None Include="Resources\Scripts\Module.lua" />
     <None Include="Resources\Shaders\AnimModel.frag" />
     <None Include="Resources\Shaders\AnimModel.vert" />
     <None Include="Resources\Shaders\Basic.frag" />

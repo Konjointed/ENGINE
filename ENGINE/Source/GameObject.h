@@ -8,7 +8,13 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-class Model;
+#include <Shader.h>
+
+#include "Model.h"
+
+class SceneElements;
+
+//class Model;
 
 class Transform {
 public:
@@ -75,6 +81,8 @@ protected:
 
 class  GameObject {
 public:
+	static SceneElements* scene;
+
 	// Scene graph
 	std::list<std::unique_ptr<GameObject>> children;
 	GameObject* parent = nullptr;
@@ -83,14 +91,33 @@ public:
 	Transform transform;
 
 	Model* model = nullptr;
+	std::string name;
 
-	GameObject(Model& model) : model(&model) {}
+	GameObject() : name("Unnamed GameObject") {}
+	GameObject(Model& model) : model(&model), name("Unnamed GameObject") {}
 
 	template<typename... TArgs>
 	void AddChild(TArgs&... args) {
 		children.emplace_back(std::make_unique<GameObject>(args...));
 		children.back()->parent = this;
 	}
+
+	// Add an existing gameobject
+	// scenegraph.AddChild(std::move(playerObject));
+	void AddChild(GameObject child) {
+		children.emplace_back(std::make_unique<GameObject>(std::move(child)));
+		children.back()->parent = this;
+	}
+
+	/*
+	void SetName(const std::string& newName) {
+		name = newName;
+	}
+
+	const std::string& GetName() const {
+		return name;
+	}
+	*/
 
 	void UpdateSelfAndChild() {
 		if (transform.IsDirty()) {
@@ -117,7 +144,21 @@ public:
 		}
 	}
 
-	void DrawSelfAndChild() {}
+	void DrawSelfAndChild(Shader shader) {
+		// If this GameObject has a model, draw it
+		if (model != nullptr) {
+			// Set the transformation matrix for this object
+			shader.SetMatrix4("model", transform.GetModelMatrix());
+
+			// Draw the model
+			model->Draw(shader);
+		}
+
+		// Draw all children
+		for (auto&& child : children) {
+			child->DrawSelfAndChild(shader);
+		}
+	}
 private:
 };
 
