@@ -12,9 +12,7 @@ TODO:
 #include <stb_image.h>
 #include <Shader.h>
 
-#include "Editor/GUI.h"
-#include "Editor/Console.h"
-#include "Editor/Scenegraph.h"
+#include "Editor/Editor.h"
 
 #include "Application.h"
 #include "IncludeGL.h"
@@ -53,7 +51,7 @@ bool Application::Init() {
 	window = new Window(success);
 	if (!success) return false;
 
-	gui = new GUI(*window);
+	editor = new Editor(*window);
 	renderer = new Renderer;
 	camera = new Camera;
 
@@ -61,6 +59,7 @@ bool Application::Init() {
 }
 
 int Application::Run() {
+	//====================TEMPORARY=================
 	LuaEnvironment luaenv;
 	luaenv.DoFile("Resources/Scripts/ILoveLua.lua");
 
@@ -74,6 +73,7 @@ int Application::Run() {
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//==============================================
 
 	ResourceManager::LoadShader("Resources/Shaders/Skybox.vert", "Resources/Shaders/Skybox.frag", "", "skybox");
 	ResourceManager::LoadShader("Resources/Shaders/AnimModel.vert", "Resources/Shaders/AnimModel.frag", "", "model");
@@ -86,9 +86,6 @@ int Application::Run() {
 		"Resources/Textures/skybox/front.jpg",
 		"Resources/Textures/skybox/back.jpg",
 		}, "skybox");
-
-	Console console(*gui);
-	SceneGraph sceneGraph(*gui); 
 
 	stbi_set_flip_vertically_on_load(true);
 
@@ -135,9 +132,14 @@ int Application::Run() {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
 
-		// Reset
+		// OpenGL Reset
 		//glDepthFunc(GL_LESS); // For skybox
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Render
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glViewport(0, 0, 1280, 720);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		ResourceManager::GetShader("model").Use();
@@ -163,7 +165,10 @@ int Application::Run() {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 
-		gui->DrawWindows();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
+		// NOTE: TEMPORARY PASSING THIS TO THE EDITOR UNTIL I FIND A BETETR IMPLEMENTATION
+		editor->Draw(textureColorbuffer);
 
 		window->SwapBuffers();
 	}
@@ -218,16 +223,8 @@ void Application::PollEvents() {
 	}
 }
 
-void Application::Render() {
-
-}
-
-void Application::Update() {
-
-}
-
 void Application::Shutdown() {
-	delete gui;
+	delete editor;
 	delete window;
 	delete camera;
 }

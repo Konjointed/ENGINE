@@ -4,15 +4,12 @@
 #include <string>
 #include <vector>
 
-#include "ImguiWindow.h"
-#include "GUI.h"
-
-class Console : public ImguiWindow {
+class Console {
 public:
-	Console(GUI& gui);
+	Console();
 	~Console();
 
-	void Draw() override;
+	void Draw();
 	void AddLog(const std::string& log);
 private:
 	char inputBuf[256] = "";

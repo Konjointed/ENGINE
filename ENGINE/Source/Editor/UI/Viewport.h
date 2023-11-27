@@ -1,3 +1,17 @@
+#ifndef VIEWPORT_H
+#define VIEWPORT_H
+
+class Viewport {
+public:
+	Viewport();
+	~Viewport();
+
+	void Draw(unsigned int textureColorBuffer);
+private:
+};
+
+#endif 
+
 /*
 	class Viewport : public Panel {
 	public:

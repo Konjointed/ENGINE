@@ -1,46 +1,42 @@
-#include "GUI.h"
-
+#include "Editor.h"
 #include "../Window.h"
 #include "ImguiWindow.h"
 
-GUI::GUI(Window& window) {
+Editor::Editor(Window& window) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	io = &ImGui::GetIO();
-	io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-	io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
-	io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplSDL2_InitForOpenGL(window.GetWindow(), window.GetContext());
 	ImGui_ImplOpenGL3_Init();
 }
 
-GUI::~GUI() {
+Editor::~Editor() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 }
 
-void GUI::DrawWindows() {
+void Editor::Draw(unsigned int textureColorBuffer) {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 
 	ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
-	for (ImguiWindow* window : imguiWindows) {
-		if (window->IsVisible()) {
-			window->Draw();
-		}
-	}
+	editorUI.Draw(textureColorBuffer);
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	// Update and Render additional Platform Windows
-	if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
 		SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
 		SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
@@ -48,15 +44,6 @@ void GUI::DrawWindows() {
 		ImGui::RenderPlatformWindowsDefault();
 		SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
 	}
-}
-
-void GUI::RegisterWindow(ImguiWindow* window) {
-	imguiWindows.emplace_back(window);
-}
-
-void GUI::UnregisterWindow(ImguiWindow* window) {
-	auto it = std::remove(imguiWindows.begin(), imguiWindows.end(), window);
-	imguiWindows.erase(it, imguiWindows.end());
 }
 
 /*

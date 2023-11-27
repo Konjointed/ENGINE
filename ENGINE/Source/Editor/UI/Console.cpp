@@ -1,6 +1,7 @@
 #include "Console.h"
+#include "../Editor.h"
 
-Console::Console(GUI& gui) : ImguiWindow(gui) {}
+Console::Console() {}
 Console::~Console() {}
 
 void Console::Draw() {

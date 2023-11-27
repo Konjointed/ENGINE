@@ -3,7 +3,7 @@
 
 #include <vector>
 
-class GUI;
+class Editor;
 class Window;
 class Renderer;
 class Camera;
@@ -18,11 +18,11 @@ public:
 	void Shutdown();
 
 	void PollEvents();
-	void Render();
-	void Update();
+	//void Render();
+	//void Update();
 private:
 	bool quit;
-	GUI* gui;
+	Editor* editor;
 	Window* window;
 	Renderer* renderer;
 	Camera* camera;

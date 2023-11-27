@@ -63,7 +63,7 @@
     <ClCompile Include="Source\Buffers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Editor\GUI.cpp">
+    <ClCompile Include="Source\Editor\Editor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Animation.cpp">
@@ -96,19 +96,22 @@
     <ClCompile Include="Source\GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Editor\Console.cpp">
+    <ClCompile Include="Source\Editor\UI\Console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Editor\Scenegraph.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Editor\SceneControls.cpp">
+    <ClCompile Include="Source\Editor\UI\SceneGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Editor\ImguiWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Editor\Viewport.cpp">
+    <ClCompile Include="Source\Editor\UI\Viewport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\UI\EditorUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\UI\Properties.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -173,7 +176,7 @@
     <ClInclude Include="Source\Buffers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Editor\GUI.h">
+    <ClInclude Include="Source\Editor\Editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\SceneElements.h">
@@ -215,19 +218,22 @@
     <ClInclude Include="Source\Editor\ImguiWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Editor\Console.h">
+    <ClInclude Include="Source\Editor\UI\Console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Editor\Scenegraph.h">
+    <ClInclude Include="Source\Editor\UI\SceneGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Editor\SceneControls.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\Viewport.h">
+    <ClInclude Include="Source\Editor\UI\Viewport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\LuaEnvironment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\UI\EditorUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\UI\Properties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

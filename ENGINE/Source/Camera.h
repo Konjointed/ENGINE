@@ -3,6 +3,8 @@
 #include <SDL2/SDL_events.h>
 #include <glm/ext/matrix_transform.hpp>
 
+#include "GameObject.h"
+
 class Camera {
 public:
 	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = 45.0f, float pitch = 0.0f);
