@@ -109,11 +109,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;sdl2main.lib;sdl2.lib;sdl2_image.lib;sdl2_ttf.lib;freetype.lib;assimp-vc143-mtd.lib;lua54.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;sdl2main.lib;sdl2.lib;sdl2_image.lib;sdl2_ttf.lib;freetype.lib;assimp-vc143-mtd.lib;lua54.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -133,31 +134,49 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Animation.cpp" />
-    <ClCompile Include="Source\Animator.cpp" />
-    <ClCompile Include="Source\Application.cpp" />
-    <ClCompile Include="Source\Bone.cpp" />
-    <ClCompile Include="Source\Buffers.cpp" />
-    <ClCompile Include="Source\Camera.cpp" />
-    <ClCompile Include="Source\Editor\UI\Console.cpp" />
-    <ClCompile Include="Source\Editor\ImguiWindow.cpp" />
-    <ClCompile Include="Source\Editor\UI\EditorUI.cpp" />
-    <ClCompile Include="Source\Editor\UI\Properties.cpp" />
-    <ClCompile Include="Source\Editor\UI\SceneGraph.cpp" />
-    <ClCompile Include="Source\Editor\UI\Viewport.cpp" />
-    <ClCompile Include="Source\GameObject.cpp" />
-    <ClCompile Include="Source\Editor\Editor.cpp" />
-    <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Src\Animation.cpp" />
+    <ClCompile Include="Src\Animator.cpp" />
+    <ClCompile Include="Src\Application.cpp" />
+    <ClCompile Include="Src\Bone.cpp" />
+    <ClCompile Include="Src\Buffers.cpp" />
+    <ClCompile Include="Src\Camera.cpp" />
+    <ClCompile Include="Src\DiscordRichPresence.cpp" />
+    <ClCompile Include="Src\Editor\UI\Console.cpp" />
+    <ClCompile Include="Src\Editor\ImguiWindow.cpp" />
+    <ClCompile Include="Src\Editor\UI\EditorUI.cpp" />
+    <ClCompile Include="Src\Editor\UI\Properties.cpp" />
+    <ClCompile Include="Src\Editor\UI\ResourceBrowser.cpp" />
+    <ClCompile Include="Src\Editor\UI\SceneGraph.cpp" />
+    <ClCompile Include="Src\Editor\UI\TextEdit.cpp" />
+    <ClCompile Include="Src\Editor\UI\Viewport.cpp" />
+    <ClCompile Include="Src\GameObject.cpp" />
+    <ClCompile Include="Src\Editor\Editor.cpp" />
+    <ClCompile Include="Src\Main.cpp" />
     <ClCompile Include="Compile\stb.cpp" />
-    <ClCompile Include="Source\Mesh.cpp" />
-    <ClCompile Include="Source\Model.cpp" />
-    <ClCompile Include="Source\PostProcessor.cpp" />
-    <ClCompile Include="Source\Renderer.cpp" />
-    <ClCompile Include="Source\ResourceManager.cpp" />
-    <ClCompile Include="Source\Skybox.cpp" />
-    <ClCompile Include="Source\Texture.cpp" />
-    <ClCompile Include="Source\Window.cpp" />
+    <ClCompile Include="Src\Mesh.cpp" />
+    <ClCompile Include="Src\Model.cpp" />
+    <ClCompile Include="Src\PostProcessor.cpp" />
+    <ClCompile Include="Src\Renderer.cpp" />
+    <ClCompile Include="Src\ResourceManager.cpp" />
+    <ClCompile Include="Src\Skybox.cpp" />
+    <ClCompile Include="Src\Texture.cpp" />
+    <ClCompile Include="Src\Window.cpp" />
     <ClCompile Include="Compile\glad.c" />
+    <ClCompile Include="ThirdParty\discord\achievement_manager.cpp" />
+    <ClCompile Include="ThirdParty\discord\activity_manager.cpp" />
+    <ClCompile Include="ThirdParty\discord\application_manager.cpp" />
+    <ClCompile Include="ThirdParty\discord\core.cpp" />
+    <ClCompile Include="ThirdParty\discord\image_manager.cpp" />
+    <ClCompile Include="ThirdParty\discord\lobby_manager.cpp" />
+    <ClCompile Include="ThirdParty\discord\network_manager.cpp" />
+    <ClCompile Include="ThirdParty\discord\overlay_manager.cpp" />
+    <ClCompile Include="ThirdParty\discord\relationship_manager.cpp" />
+    <ClCompile Include="ThirdParty\discord\storage_manager.cpp" />
+    <ClCompile Include="ThirdParty\discord\store_manager.cpp" />
+    <ClCompile Include="ThirdParty\discord\types.cpp" />
+    <ClCompile Include="ThirdParty\discord\user_manager.cpp" />
+    <ClCompile Include="ThirdParty\discord\voice_manager.cpp" />
+    <ClCompile Include="ThirdParty\ImGuiColorTextEdit\TextEditor.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp" />
@@ -168,35 +187,57 @@
     <ClCompile Include="ThirdParty\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Animation.h" />
-    <ClInclude Include="Source\AnimationData.h" />
-    <ClInclude Include="Source\Animator.h" />
-    <ClInclude Include="Source\Application.h" />
-    <ClInclude Include="Source\AssimpGLMHelpers.h" />
-    <ClInclude Include="Source\Bone.h" />
-    <ClInclude Include="Source\Buffers.h" />
-    <ClInclude Include="Source\Camera.h" />
-    <ClInclude Include="Source\Editor\UI\Console.h" />
-    <ClInclude Include="Source\Editor\ImguiWindow.h" />
-    <ClInclude Include="Source\Editor\UI\EditorUI.h" />
-    <ClInclude Include="Source\Editor\UI\Properties.h" />
-    <ClInclude Include="Source\Editor\UI\SceneGraph.h" />
-    <ClInclude Include="Source\Editor\UI\Viewport.h" />
-    <ClInclude Include="Source\GameObject.h" />
-    <ClInclude Include="Source\Editor\Editor.h" />
-    <ClInclude Include="Source\IncludeGL.h" />
-    <ClInclude Include="Source\LuaEnvironment.h" />
-    <ClInclude Include="Source\Mesh.h" />
-    <ClInclude Include="Source\Model.h" />
-    <ClInclude Include="Source\PostProcessor.h" />
-    <ClInclude Include="Source\Renderer.h" />
-    <ClInclude Include="Source\ResourceManager.h" />
-    <ClInclude Include="Source\SceneElements.h" />
-    <ClInclude Include="Source\Skybox.h" />
-    <ClInclude Include="Source\Texture.h" />
-    <ClInclude Include="Source\Window.h" />
+    <ClInclude Include="Src\Animation.h" />
+    <ClInclude Include="Src\AnimationData.h" />
+    <ClInclude Include="Src\Animator.h" />
+    <ClInclude Include="Src\Application.h" />
+    <ClInclude Include="Src\AssimpGLMHelpers.h" />
+    <ClInclude Include="Src\Bone.h" />
+    <ClInclude Include="Src\Buffers.h" />
+    <ClInclude Include="Src\Camera.h" />
+    <ClInclude Include="Src\DiscordRichPresence.h" />
+    <ClInclude Include="Src\Editor\Command.h" />
+    <ClInclude Include="Src\Editor\UI\Console.h" />
+    <ClInclude Include="Src\Editor\ImguiWindow.h" />
+    <ClInclude Include="Src\Editor\UI\EditorUI.h" />
+    <ClInclude Include="Src\Editor\UI\Properties.h" />
+    <ClInclude Include="Src\Editor\UI\ResourceBrowser.h" />
+    <ClInclude Include="Src\Editor\UI\SceneGraph.h" />
+    <ClInclude Include="Src\Editor\UI\TextEdit.h" />
+    <ClInclude Include="Src\Editor\UI\Viewport.h" />
+    <ClInclude Include="Src\GameObject.h" />
+    <ClInclude Include="Src\Editor\Editor.h" />
+    <ClInclude Include="Src\IncludeGL.h" />
+    <ClInclude Include="Src\LuaEnvironment.h" />
+    <ClInclude Include="Src\Mesh.h" />
+    <ClInclude Include="Src\Model.h" />
+    <ClInclude Include="Src\PostProcessor.h" />
+    <ClInclude Include="Src\Renderer.h" />
+    <ClInclude Include="Src\ResourceManager.h" />
+    <ClInclude Include="Src\SceneElements.h" />
+    <ClInclude Include="Src\Skybox.h" />
+    <ClInclude Include="Src\Texture.h" />
+    <ClInclude Include="Src\Window.h" />
+    <ClInclude Include="ThirdParty\discord\achievement_manager.h" />
+    <ClInclude Include="ThirdParty\discord\activity_manager.h" />
+    <ClInclude Include="ThirdParty\discord\application_manager.h" />
+    <ClInclude Include="ThirdParty\discord\core.h" />
+    <ClInclude Include="ThirdParty\discord\discord.h" />
+    <ClInclude Include="ThirdParty\discord\event.h" />
+    <ClInclude Include="ThirdParty\discord\ffi.h" />
+    <ClInclude Include="ThirdParty\discord\image_manager.h" />
+    <ClInclude Include="ThirdParty\discord\lobby_manager.h" />
+    <ClInclude Include="ThirdParty\discord\network_manager.h" />
+    <ClInclude Include="ThirdParty\discord\overlay_manager.h" />
+    <ClInclude Include="ThirdParty\discord\relationship_manager.h" />
+    <ClInclude Include="ThirdParty\discord\storage_manager.h" />
+    <ClInclude Include="ThirdParty\discord\store_manager.h" />
+    <ClInclude Include="ThirdParty\discord\types.h" />
+    <ClInclude Include="ThirdParty\discord\user_manager.h" />
+    <ClInclude Include="ThirdParty\discord\voice_manager.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />
     <ClInclude Include="ThirdParty\glad\khrplatform.h" />
+    <ClInclude Include="ThirdParty\ImGuiColorTextEdit\TextEditor.h" />
     <ClInclude Include="ThirdParty\imgui\imconfig.h" />
     <ClInclude Include="ThirdParty\imgui\imgui.h" />
     <ClInclude Include="ThirdParty\imgui\imgui_impl_opengl3.h" />
@@ -237,6 +278,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="CmakeLists.txt" />
+    <Text Include="Src\CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

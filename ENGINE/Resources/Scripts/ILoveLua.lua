@@ -1,3 +1,4 @@
+local myModule = require("Resources/Scripts/Module")
 local mytable = {1,2,3,4,5,6}
 
 local function add(x, y) 
@@ -12,4 +13,6 @@ end
 
 print(add(5,5))
 printtable()
+myModule.doTask()
+
 

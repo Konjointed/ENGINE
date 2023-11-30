@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../Source/IncludeGL.h"
+#include "../Src/IncludeGL.h"
 
 Shader& Shader::Use()
 {
