@@ -5,11 +5,9 @@
 #include "IncludeGL.h"
 #include "ResourceManager.h"
 #include "Buffers.h"
-#include "GameObject.h"
 #include "Window.h"
-#include "Skybox.h"
-#include "Animator.h"
-#include "Camera.h"
+#include "Scene.h"
+#include "GameObject.h"
 
 Renderer::Renderer(Window& window) {
 	framebuffer = FrameBuffer::CreateFrameBuffer();
@@ -26,7 +24,7 @@ Renderer::Renderer(Window& window) {
 
 Renderer::~Renderer() {}
 
-void Renderer::Render(Window& window, Camera& camera, Animator& animator, Skybox& skybox, GameObject& scenegraph) {
+void Renderer::Render(Window& window, Scene& scene) {
 	/*
 	if (scene.wireframe) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -42,22 +40,24 @@ void Renderer::Render(Window& window, Camera& camera, Animator& animator, Skybox
 
 	ResourceManager::GetShader("model").Use();
 
-	glm::mat4 view = camera.GetViewMatrix();
-	glm::mat4 projection = camera.GetProjectionMatrix();
+	glm::mat4 view = scene.camera->GetViewMatrix();
+	glm::mat4 projection = scene.camera->GetProjectionMatrix();
 	ResourceManager::GetShader("model").SetMatrix4("projection", projection);
 	ResourceManager::GetShader("model").SetMatrix4("view", view);
 
-	auto transforms = animator.GetFinalBoneMatrices();
+	auto transforms = scene.animator->GetFinalBoneMatrices();
 	for (int i = 0; i < transforms.size(); ++i) {
 		std::string name = "finalBonesMatrices[" + std::to_string(i) + "]";
 		ResourceManager::GetShader("model").SetMatrix4(name.c_str(), transforms[i]);
 	}
 
 	// Draw scene graph
-	scenegraph.UpdateSelfAndChild();
-	scenegraph.DrawSelfAndChild(ResourceManager::GetShader("model"));
+	for (auto& object : scene.sceneObjects) {
+		object->UpdateSelfAndChild();
+		object->DrawSelfAndChild(ResourceManager::GetShader("model"));
+	}
 
-	skybox.Draw(view, projection);
+	//scene.skybox.Draw(view, projection);
 
 	/*
 	if (scene.wireframe) {

@@ -10,19 +10,21 @@
 
 #include "UI/EditorUI.h"
 #include "../LuaEnvironment.h"
+#include "../GameObject.h"
 
 class Window;
+struct Scene;
 
 class Editor {
 public:
 	EditorUI* editorUI = nullptr;
 	Window& window;
-	LuaEnvironment* luaenv = nullptr;
+	LuaEnvironment* luaenv = nullptr; // Note: move this back to application class
 
 	Editor(Window& window);
 	~Editor();
 
-	void Draw(unsigned int textureColorBuffer);
+	void Draw(unsigned int textureColorBuffer, Scene& scene);
 private:
 };
 

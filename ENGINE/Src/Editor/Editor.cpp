@@ -1,6 +1,7 @@
 #include "Editor.h"
+//#include "ImguiWindow.h"
 #include "../Window.h"
-#include "ImguiWindow.h"
+#include "../Scene.h"
 
 Editor::Editor(Window& window) : window(window) {
 	IMGUI_CHECKVERSION();
@@ -28,14 +29,14 @@ Editor::~Editor() {
 	delete luaenv;
 }
 
-void Editor::Draw(unsigned int textureColorBuffer) {
+void Editor::Draw(unsigned int textureColorBuffer, Scene& scene) {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 
 	ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
-	editorUI->Draw(textureColorBuffer, window, *luaenv);
+	editorUI->Draw(textureColorBuffer, window, *luaenv, scene);
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

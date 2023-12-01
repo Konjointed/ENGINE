@@ -1,19 +1,21 @@
 #include <iostream>
 
 #include "Scenegraph.h"
-#include "../../GameObject.h"
-#include "../../SceneElements.h"
 #include "../Editor.h"
+#include "../../GameObject.h"
+#include "../../Scene.h"
 
 SceneGraph::SceneGraph() {}
 
 SceneGraph::~SceneGraph() {}
 
-void SceneGraph::Draw() {
+void SceneGraph::Draw(Scene& scene) {
 	if (ImGui::Begin("Scene Graph")) {
 		ImGui::InputText("Search", searchQuery, IM_ARRAYSIZE(searchQuery));
 
-		DisplaySceneGraph(GameObject::scene->scenegraph);
+		for (auto& object : scene.sceneObjects) {
+			DisplaySceneGraph(*object);
+		}
 
 		// Right-click on blank space
 		if (ImGui::IsMouseClicked(1) && ImGui::IsWindowHovered()) {

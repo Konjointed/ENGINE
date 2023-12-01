@@ -10,7 +10,7 @@ class Camera : public GameObject {
 public:
 	float movementSpeed = 1.0f;
 
-	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = 45.0f, float pitch = 0.0f);
+	Camera(glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = 45.0f, float pitch = 0.0f);
 	~Camera();
 
 	void UpdateSelfAndChild() override;
@@ -22,7 +22,6 @@ public:
 
 	glm::mat4 GetViewMatrix();
 	glm::mat4 GetProjectionMatrix();
-	glm::vec3& GetPosition();
 	glm::vec3 GetFront();
 private:
 	float fov = 45.0f;
@@ -30,7 +29,6 @@ private:
 	float nearPlane = 0.1f;
 	float farPlane = 10000.0f;
 
-	glm::vec3 position;
 	glm::vec3 front;
 	glm::vec3 up;
 	glm::vec3 right;

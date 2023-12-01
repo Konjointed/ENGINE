@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <algorithm> 
+#include <memory>
 
 #include <glm/ext/matrix_clip_space.hpp>
 #include <stb_image.h>
@@ -29,12 +30,12 @@
 #include "Animation.h"
 #include "Animator.h"
 #include "Texture.h"
-#include "SceneElements.h"
 #include "PostProcessor.h"
 #include "Skybox.h"
 #include "GameObject.h"
 #include "ResourceManager.h"
 #include "DiscordRichPresence.h"
+#include "Scene.h"
 
 Application::Application() : window(nullptr), quit(false) {}
 Application::~Application() {}
@@ -76,42 +77,12 @@ int Application::Run() {
 
 	glEnable(GL_DEPTH_TEST);
 
-	DiscordRichPresence drp;
+	DiscordRichPresence drp; 
 	Editor editor(*window);
 	Renderer renderer(*window);
-	Camera camera;
-	camera.name = "Camera";
 
-	//====================TEMPORARY=================
-	GameObject scenegraph; // root
-	scenegraph.name = "Root";
-
-	SceneElements scene(scenegraph);
-	scene.lightPosition = { 80.0f, 90.0f, -77.0f };
-	scene.camera = &camera; 
-	scene.wireframe = false;
-	GameObject::scene = &scene;
-
-	Model playerModel = Model("Resources/Models/Maria/Maria J J Ong.dae", false);
-	GameObject playerObject(playerModel);
-	playerObject.name = "Player";
-	//playerObject.transform.SetLocalPosition({ 10, 0, 0 });
-	//const float scale = 0.75;
-	//playerObject.transform.SetLocalScale({ scale, scale, scale });
-
-	Model planeModel = Model::GeneratePlane();
-	GameObject planeObject(planeModel);
-	planeObject.name = "Plane";
-
-	scenegraph.AddChild(std::move(planeObject));
-	scenegraph.AddChild(std::move(playerObject));
-	scenegraph.AddChild(std::move(camera));
-
-	Animation idleAnimation("Resources/Animations/Idle.dae", &playerModel);
-	Animator animator(&idleAnimation);
-
-	Skybox skybox;
-	//==============================================
+	Scene scene;
+	InitScene(&scene);
 
 	//  || Main Loop
 	bool rightMouseButtonPressed = false;
@@ -164,25 +135,24 @@ int Application::Run() {
 				break;
 			case SDL_MOUSEMOTION:
 				if (rightMouseButtonPressed) {
-					camera.ProcessMouseMovement(static_cast<float>(event.motion.xrel), static_cast<float>(event.motion.yrel));
+					scene.camera->ProcessMouseMovement(static_cast<float>(event.motion.xrel), static_cast<float>(event.motion.yrel));
 				}
 				break;
 			}
 		}
 
+		// || Update
 		while (accumulator >= dt) {
-			// || Update
 			drp.Update(); // discord rich presence
-			camera.Update(dt);
+			UpdateScene(&scene, dt);
 
 			accumulator -= dt;
 			t += dt;
 		}
 
 		// || Render
-		renderer.Render(*window, camera, animator, skybox, scenegraph);
-
-		editor.Draw(renderer.GetTextureColorBuffer());
+		renderer.Render(*window, scene);
+		editor.Draw(renderer.GetTextureColorBuffer(), scene);
 
 		window->SwapBuffers();
 	}

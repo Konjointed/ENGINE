@@ -3,14 +3,16 @@
 
 #include "Properties.h"
 #include "../Editor.h"
-#include "../../SceneElements.h"
 
 Properties::Properties() {}
 Properties::~Properties() {}
 
 void Properties::CameraProperties(Camera* camera) {
-    ImGui::InputFloat3("Camera Position", &(GameObject::scene->camera->GetPosition()[0]));
-    ImGui::DragFloat("Camera Speed", &GameObject::scene->camera->movementSpeed, 0.1f, -FLT_MAX, FLT_MAX, "%.3f");
+    Transform& transform = camera->transform;
+    glm::vec3 position = transform.GetLocalPosition();
+
+    ImGui::InputFloat3("Camera Position", &(position[0]));
+    ImGui::DragFloat("Camera Speed", &camera->movementSpeed, 0.1f, -FLT_MAX, FLT_MAX, "%.3f");
 }
 
 void Properties::ObjectProperties(GameObject* object) {

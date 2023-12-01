@@ -1,18 +1,17 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <vector>
+
 class Window;
-class Animator;
-class Skybox;
-class GameObject;
-class Camera;
+struct Scene;
 
 class Renderer {
 public:
 	Renderer(Window& window);
 	~Renderer();
 
-	void Render(Window& window, Camera& camera, Animator& animator, Skybox& skybox, GameObject& scenegraph);
+	void Render(Window& window, Scene& scene);
 	void Resize();
 
 	unsigned int GetTextureColorBuffer();

@@ -4,14 +4,13 @@
 
 #include <glm/ext/matrix_clip_space.hpp>
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) :
+Camera::Camera(glm::vec3 up, float yaw, float pitch) :
     front(glm::vec3(0.0f, 0.0f, -1.0f)),
     GameObject()
 {
     std::cout << "Constructing Camera\n";
     classID = CLASS_ID_CAMERA;
 
-    this->position = position;
     this->worldUp = up;
     this->yaw = yaw;
     this->pitch = pitch;
@@ -34,16 +33,24 @@ void Camera::ProcessKeyboard(float deltaTime) {
 
     float velocity = movementSpeed * deltaTime;
     if (state[SDL_SCANCODE_W]) {
+        glm::vec3 position = transform.GetLocalPosition();
         position += front * velocity;
+        transform.SetLocalPosition(position);
     }
     if (state[SDL_SCANCODE_S]) {
+        glm::vec3 position = transform.GetLocalPosition();
         position -= front * velocity;
+        transform.SetLocalPosition(position);
     }
     if (state[SDL_SCANCODE_A]) {
+        glm::vec3 position = transform.GetLocalPosition();
         position -= right * velocity;
+        transform.SetLocalPosition(position);
     }
     if (state[SDL_SCANCODE_D]) {
+        glm::vec3 position = transform.GetLocalPosition();
         position += right * velocity;
+        transform.SetLocalPosition(position);
     }
 }
 
@@ -79,15 +86,11 @@ void Camera::Update(float deltaTime) {
 }
 
 glm::mat4 Camera::GetViewMatrix() {
-    return glm::lookAt(position, position + front, up);
+    return glm::lookAt(transform.GetLocalPosition(), transform.GetLocalPosition() + front, up);
 }
 
 glm::mat4 Camera::GetProjectionMatrix() {
     return glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
-}
-
-glm::vec3& Camera::GetPosition() {
-    return position;
 }
 
 glm::vec3 Camera::GetFront() {

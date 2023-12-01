@@ -9,6 +9,8 @@
 #include "ResourceBrowser.h"
 
 class Window;
+class LuaEnvironment;
+struct Scene;
 
 class EditorUI {
 public:
@@ -22,7 +24,7 @@ public:
 	EditorUI();
 	~EditorUI();
 
-	void Draw(unsigned int textureColorBuffer, Window& window, LuaEnvironment& luaenv);
+	void Draw(unsigned int textureColorBuffer, Window& window, LuaEnvironment& luaenv, Scene& scene);
 private:
 };
 

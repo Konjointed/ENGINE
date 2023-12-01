@@ -13,15 +13,12 @@
 
 #include "Model.h"
 
-class SceneElements;
-
 //class Model;
 
 enum ClassID {
 	CLASS_ID_GAMEOBJECT,
 	CLASS_ID_CAMERA,    
 };
-
 
 class Transform {
 public:
@@ -86,10 +83,8 @@ protected:
 	}
 };
 
-class  GameObject {
+class  GameObject : public std::enable_shared_from_this<GameObject> {
 public:
-	static SceneElements* scene;
-
 	// Scene graph
 	std::list<std::unique_ptr<GameObject>> children;
 	GameObject* parent = nullptr;
@@ -99,34 +94,22 @@ public:
 
 	ClassID classID;
 	std::string name;
-	Model* model = nullptr;
+	std::shared_ptr<Model> model = nullptr;
 
-	GameObject() : classID(CLASS_ID_GAMEOBJECT), name("Unnamed GameObject") { std::cout << "Constructing GameObject\n"; }
-	GameObject(Model& model) : model(&model), classID(CLASS_ID_GAMEOBJECT), name("Unnamed GameObject") { std::cout << "Destructing GameObject\n"; }
-	//virtual ~GameObject() {}
+	GameObject() : classID(CLASS_ID_GAMEOBJECT), name("Unnamed GameObject") { 
+		std::cout << "Constructing GameObject\n"; 
+	}
+
+	GameObject(std::shared_ptr<Model> model)
+		: model(model), classID(CLASS_ID_GAMEOBJECT), name("Unnamed GameObject") {
+		std::cout << "Constructing GameObject\n";
+	}
 
 	template<typename... TArgs>
 	void AddChild(TArgs&... args) {
 		children.emplace_back(std::make_unique<GameObject>(args...));
 		children.back()->parent = this;
 	}
-
-	// Add an existing gameobject
-	// scenegraph.AddChild(std::move(playerObject));
-	void AddChild(GameObject child) {
-		children.emplace_back(std::make_unique<GameObject>(std::move(child)));
-		children.back()->parent = this;
-	}
-
-	/*
-	void SetName(const std::string& newName) {
-		name = newName;
-	}
-
-	const std::string& GetName() const {
-		return name;
-	}
-	*/
 
 	virtual void UpdateSelfAndChild() {
 		if (transform.IsDirty()) {
@@ -168,7 +151,6 @@ public:
 			child->DrawSelfAndChild(shader);
 		}
 	}
-private:
 };
 
 #endif 

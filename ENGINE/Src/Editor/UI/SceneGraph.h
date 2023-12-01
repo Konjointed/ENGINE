@@ -5,13 +5,14 @@
 #include <vector>
 
 class GameObject;
+struct Scene;
 
 class SceneGraph {
 public:
 	SceneGraph();
 	~SceneGraph();
 
-	void Draw();
+	void Draw(Scene& scene);
 	GameObject* GetSelectedObject();
 private:
 	char searchQuery[128] = "";

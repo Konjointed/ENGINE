@@ -158,6 +158,7 @@
     <ClCompile Include="Src\PostProcessor.cpp" />
     <ClCompile Include="Src\Renderer.cpp" />
     <ClCompile Include="Src\ResourceManager.cpp" />
+    <ClCompile Include="Src\Scene.cpp" />
     <ClCompile Include="Src\Skybox.cpp" />
     <ClCompile Include="Src\Texture.cpp" />
     <ClCompile Include="Src\Window.cpp" />
@@ -214,7 +215,7 @@
     <ClInclude Include="Src\PostProcessor.h" />
     <ClInclude Include="Src\Renderer.h" />
     <ClInclude Include="Src\ResourceManager.h" />
-    <ClInclude Include="Src\SceneElements.h" />
+    <ClInclude Include="Src\Scene.h" />
     <ClInclude Include="Src\Skybox.h" />
     <ClInclude Include="Src\Texture.h" />
     <ClInclude Include="Src\Window.h" />
