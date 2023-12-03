@@ -23,7 +23,6 @@ void InitScene(Scene* scene) {
 	scene->sceneObjects.push_back(std::move(planeObject));
 	//testObject->AddChild(std::move(planeObject));
 
-	/*
 	auto playerModel = std::make_shared<Model>("Resources/Models/Maria/Maria J J Ong.dae", false);
 	auto playerObject = std::make_shared<GameObject>(playerModel);
 	playerObject->type = SKINNEDMESH;
@@ -32,7 +31,6 @@ void InitScene(Scene* scene) {
 
 	scene->idleAnimation = new Animation("Resources/Animations/Idle.dae", playerModel.get());
 	scene->animator = new Animator(scene->idleAnimation);
-	*/
 
 	auto cameraObject = std::make_shared<Camera>();
 	cameraObject->type = NONE;

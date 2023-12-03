@@ -25,7 +25,7 @@ Renderer::Renderer(Window& window) {
 	shadowMapFramebuffer = FrameBuffer::CreateFrameBuffer();
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFramebuffer);
 
-	shadowMapTexture = FrameBuffer::CreateDepthTextureAttachment(1024, 1024);
+	shadowMapTexture = FrameBuffer::CreateDepthTextureAttachment(2048, 2048);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMapTexture, 0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -52,7 +52,7 @@ void Renderer::Render(Window& window, Scene& scene) {
 	ResourceManager::GetShader("shadow").SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFramebuffer);
-	glViewport(0, 0, 1024, 1024);
+	glViewport(0, 0, 2048, 2048);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	for (auto& object : scene.sceneObjects) {

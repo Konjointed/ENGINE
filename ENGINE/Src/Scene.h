@@ -18,10 +18,10 @@ struct Scene {
 	Animation* idleAnimation;
 	Animator* animator;
 
-	glm::vec3 lightPosition = { 80.0f, 500.0f, -77.0f };
-	float nearPlane = -1000.0f;
-	float farPlane = 1000.0f;
-	float orthoSize = 50.0f;
+	glm::vec3 lightPosition = { 500.0f, 5000.0f, 500.0f };
+	float nearPlane = 1.0f;
+	float farPlane = 10000.0f;
+	float orthoSize = 2200.0f;
 
 	bool wireframe = false;
 };
