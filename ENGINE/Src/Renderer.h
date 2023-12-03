@@ -2,8 +2,13 @@
 #define RENDERER_H
 
 #include <vector>
+#include <memory>
+
+#include <glm/mat4x4.hpp>
 
 class Window;
+class Shader;
+class GameObject;
 struct Scene;
 
 class Renderer {
@@ -19,6 +24,9 @@ private:
 	unsigned int framebuffer;
 	unsigned int textureColorBuffer;
 	unsigned int renderbuffer;
+
+	unsigned int shadowMapFramebuffer;
+	unsigned int shadowMapTexture;
 };
 
 #endif 

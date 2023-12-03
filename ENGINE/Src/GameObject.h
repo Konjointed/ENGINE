@@ -15,9 +15,13 @@
 
 //class Model;
 
-enum ClassID {
-	CLASS_ID_GAMEOBJECT,
-	CLASS_ID_CAMERA,    
+enum ObjectType {
+	NONE,
+	ROOT,
+	WORKSPACE,
+	LIGHTING,
+	STATICMESH,
+	SKINNEDMESH,    
 };
 
 class Transform {
@@ -92,23 +96,29 @@ public:
 	// Space information
 	Transform transform;
 
-	ClassID classID;
+	ObjectType type;
 	std::string name;
 	std::shared_ptr<Model> model = nullptr;
 
-	GameObject() : classID(CLASS_ID_GAMEOBJECT), name("Unnamed GameObject") { 
+	GameObject() : type(STATICMESH), name("Unnamed GameObject") {
 		std::cout << "Constructing GameObject\n"; 
 	}
 
 	GameObject(std::shared_ptr<Model> model)
-		: model(model), classID(CLASS_ID_GAMEOBJECT), name("Unnamed GameObject") {
+		: model(model), type(SKINNEDMESH), name("Unnamed GameObject") {
 		std::cout << "Constructing GameObject\n";
 	}
 
+	/*
 	template<typename... TArgs>
 	void AddChild(TArgs&... args) {
 		children.emplace_back(std::make_unique<GameObject>(args...));
 		children.back()->parent = this;
+	}
+	*/
+	void AddChild(std::unique_ptr<GameObject> child) {
+		child->parent = this;
+		children.push_back(std::move(child));
 	}
 
 	virtual void UpdateSelfAndChild() {
@@ -136,14 +146,14 @@ public:
 		}
 	}
 
-	virtual void DrawSelfAndChild(Shader shader) {
+	virtual void DrawSelfAndChild(Shader shader, unsigned int shadowMapTexture = 0) {
 		// If this GameObject has a model, draw it
 		if (model != nullptr) {
 			// Set the transformation matrix for this object
 			shader.SetMatrix4("model", transform.GetModelMatrix());
 
 			// Draw the model
-			model->Draw(shader);
+			model->Draw(shader, shadowMapTexture);
 		}
 
 		// Draw all children

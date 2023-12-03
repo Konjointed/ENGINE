@@ -9,8 +9,6 @@ Camera::Camera(glm::vec3 up, float yaw, float pitch) :
     GameObject()
 {
     std::cout << "Constructing Camera\n";
-    classID = CLASS_ID_CAMERA;
-
     this->worldUp = up;
     this->yaw = yaw;
     this->pitch = pitch;
@@ -24,8 +22,8 @@ void Camera::UpdateSelfAndChild() {
     GameObject::UpdateSelfAndChild(); 
 }
 
-void Camera::DrawSelfAndChild(Shader shader) {
-    GameObject::DrawSelfAndChild(shader); 
+void Camera::DrawSelfAndChild(Shader shader, unsigned int shadowMapTexture) {
+    GameObject::DrawSelfAndChild(shader, 0); 
 }
 
 void Camera::ProcessKeyboard(float deltaTime) {

@@ -32,9 +32,9 @@ Model::~Model() {
 	std::cout << "Model destroyed\n";
 }
 
-void Model::Draw(Shader shader, unsigned int shadowMap) {
+void Model::Draw(Shader shader, unsigned int shadowMapTexture) {
 	for (unsigned int i = 0; i < this->meshes.size(); i++)
-		this->meshes[i].Draw(shader, shadowMap);
+		this->meshes[i].Draw(shader, shadowMapTexture);
 }
 
 void Model::ProcessNode(aiNode* node, const aiScene* scene) {
@@ -208,7 +208,77 @@ Model Model::GeneratePlane() {
 	};
 
 	std::vector<Texture> textures;
-	textures.push_back(ResourceManager::GetTexture("wood"));
+
+	Texture texture = Texture::FromFile("Resources/Textures/wood.png", false);
+	texture.type = "texture_diffuse";
+	textures.push_back(texture);
+
+	Model newModel;
+	newModel.meshes.push_back(Mesh(vertices, indices, textures));
+
+	return newModel;
+}
+
+Model Model::GenerateCube() {
+	std::vector<Vertex> vertices = {
+		// Front face
+		{{-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}}, // Bottom-left
+		{{ 0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}}, // Bottom-right
+		{{ 0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}}, // Top-right
+		{{-0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}}, // Top-left
+
+		// Back face
+		{{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}}, // Bottom-right
+		{{ 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}}, // Bottom-left
+		{{ 0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}}, // Top-left
+		{{-0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}}, // Top-right
+
+		// Left face
+		{{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // Bottom-right
+		{{-0.5f, -0.5f,  0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, // Bottom-left
+		{{-0.5f,  0.5f,  0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // Top-left
+		{{-0.5f,  0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}, // Top-right
+
+		// Right face
+		{{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, // Bottom-left
+		{{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, // Bottom-right
+		{{ 0.5f,  0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // Top-right
+		{{ 0.5f,  0.5f,  0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}, // Top-left
+
+		// Top face
+		{{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}}, // Bottom-left
+		{{-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}}, // Bottom-right
+		{{ 0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}}, // Top-right
+		{{ 0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}}, // Top-left
+
+		// Bottom face
+		{{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}}, // Top-left
+		{{-0.5f, -0.5f,  0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}}, // Bottom-left
+		{{ 0.5f, -0.5f,  0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}}, // Bottom-right
+		{{ 0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}}  // Top-right
+	};
+
+
+	std::vector<unsigned int> indices = {
+		// Front face
+		0, 1, 2, 2, 3, 0,
+		// Back face
+		4, 5, 6, 6, 7, 4,
+		// Left face
+		8, 9, 10, 10, 11, 8,
+		// Right face
+		12, 13, 14, 14, 15, 12,
+		// Top face
+		16, 17, 18, 18, 19, 16,
+		// Bottom face
+		20, 21, 22, 22, 23, 20
+	};
+
+	std::vector<Texture> textures;
+
+	Texture texture = Texture::FromFile("Resources/Textures/wood.png", false);
+	texture.type = "texture_diffuse";
+	textures.push_back(texture);
 
 	Model newModel;
 	newModel.meshes.push_back(Mesh(vertices, indices, textures));

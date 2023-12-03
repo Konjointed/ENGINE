@@ -3,6 +3,7 @@
 
 #include "Properties.h"
 #include "../Editor.h"
+#include "../../Scene.h"
 
 Properties::Properties() {}
 Properties::~Properties() {}
@@ -11,7 +12,10 @@ void Properties::CameraProperties(Camera* camera) {
     Transform& transform = camera->transform;
     glm::vec3 position = transform.GetLocalPosition();
 
-    ImGui::InputFloat3("Camera Position", &(position[0]));
+    if (ImGui::InputFloat3("Camera Position", &position[0])) {
+        transform.SetLocalPosition(position);
+    }
+
     ImGui::DragFloat("Camera Speed", &camera->movementSpeed, 0.1f, -FLT_MAX, FLT_MAX, "%.3f");
 }
 
@@ -20,24 +24,24 @@ void Properties::ObjectProperties(GameObject* object) {
 
     // Display and edit position
     glm::vec3 position = transform.GetLocalPosition();
-    if (ImGui::InputFloat3("Position", &position[0])) {
+    if (ImGui::DragFloat3("Position", &position[0])) {
         transform.SetLocalPosition(position);
     }
 
     // Display and edit rotation
     glm::vec3 rotation = transform.GetLocalRotation();
-    if (ImGui::InputFloat3("Rotation", &rotation[0])) {
+    if (ImGui::DragFloat3("Rotation", &rotation[0])) {
         transform.SetLocalRotation(rotation);
     }
 
     // Display and edit scale
     glm::vec3 scale = transform.GetLocalScale();
-    if (ImGui::InputFloat3("Scale", &scale[0])) {
+    if (ImGui::DragFloat3("Scale", &scale[0])) {
         transform.SetLocalScale(scale);
     }
 }
 
-void Properties::Draw(GameObject* selectedObject) {
+void Properties::Draw(GameObject* selectedObject, Scene& scene) {
 	ImGui::Begin("Properties");
 	ImGui::InputText("Search", searchQuery, IM_ARRAYSIZE(searchQuery));
 
@@ -48,12 +52,21 @@ void Properties::Draw(GameObject* selectedObject) {
             selectedObject->name = name;
         }
 
-        if (selectedObject->classID == CLASS_ID_CAMERA) {
-            Camera* camera = static_cast<Camera*>(selectedObject);
+        Camera* camera = dynamic_cast<Camera*>(selectedObject);
+
+        if (camera) {
             CameraProperties(camera);
         }
+        else {
+            // I'M NOT PROUD OF THIS SOLUTION, BUT OTHER METHODS CONFLICTED WITH RENDERING :(
+            if (selectedObject->name == "Workspace") {
+                ImGui::Checkbox("Wireframe Mode", &scene.wireframe);
+                ImGui::DragFloat3("Light Position", &scene.lightPosition[0]);
+                ImGui::DragFloat("Near", &scene.nearPlane);
+                ImGui::DragFloat("Far", &scene.farPlane);
+                ImGui::DragFloat("Ortho Size", &scene.orthoSize);
+            }
 
-        if (selectedObject->classID == CLASS_ID_GAMEOBJECT) {
             ObjectProperties(selectedObject);
         }
 	}

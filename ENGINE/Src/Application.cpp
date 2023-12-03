@@ -60,6 +60,8 @@ int Application::Run() {
 	ResourceManager::LoadShader("Resources/Shaders/Skybox.vert", "Resources/Shaders/Skybox.frag", "", "skybox");
 	ResourceManager::LoadShader("Resources/Shaders/AnimModel.vert", "Resources/Shaders/AnimModel.frag", "", "model");
 	ResourceManager::LoadShader("Resources/Shaders/Default.vert", "Resources/Shaders/Default.frag", "", "default");
+	ResourceManager::LoadShader("Resources/Shaders/Scene.vert", "Resources/Shaders/Scene.frag", "", "scene");
+	ResourceManager::LoadShader("Resources/Shaders/Shadow.vert", "Resources/Shaders/Shadow.frag", "", "shadow");
 
 	ResourceManager::LoadTexture("Resources/Textures/wood.png", "wood");
 	ResourceManager::LoadTexture("Resources/Textures/brickwall.jpg", "brick");

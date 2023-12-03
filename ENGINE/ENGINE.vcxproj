@@ -270,8 +270,12 @@
     <None Include="Resources\Shaders\DebugQuad.vert" />
     <None Include="Resources\Shaders\Default.frag" />
     <None Include="Resources\Shaders\Default.vert" />
+    <None Include="Resources\Shaders\Scene.frag" />
+    <None Include="Resources\Shaders\Scene.vert" />
     <None Include="Resources\Shaders\Screen.frag" />
     <None Include="Resources\Shaders\Screen.vert" />
+    <None Include="Resources\Shaders\Shadow.frag" />
+    <None Include="Resources\Shaders\Shadow.vert" />
     <None Include="Resources\Shaders\ShadowMappingDepth.frag" />
     <None Include="Resources\Shaders\ShadowMappingDepth.vert" />
     <None Include="Resources\Shaders\Skybox.frag" />

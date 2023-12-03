@@ -4,6 +4,8 @@
 #include "../../GameObject.h"
 #include "../../Camera.h"
 
+struct Scene;
+
 class Properties {
 public:
 	Properties();
@@ -11,7 +13,7 @@ public:
 
 	void CameraProperties(Camera* camera);
 	void ObjectProperties(GameObject* object);
-	void Draw(GameObject* selectedObject);
+	void Draw(GameObject* selectedObject, Scene& scene);
 private:
 	char searchQuery[128] = "";
 };

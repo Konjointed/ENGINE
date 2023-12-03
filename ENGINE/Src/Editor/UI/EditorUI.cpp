@@ -19,7 +19,7 @@ void EditorUI::Draw(unsigned int textureColorBuffer, Window& window, LuaEnvironm
 	console.Draw();
 	scenegraph.Draw(scene);
 	viewport.Draw(textureColorBuffer, window);
-	properties.Draw(scenegraph.GetSelectedObject());
+	properties.Draw(scenegraph.GetSelectedObject(), scene);
 	textEdit.Draw(luaenv);
 	resourceBrowser.Draw(textEdit);
 }

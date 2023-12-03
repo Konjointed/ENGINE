@@ -14,7 +14,7 @@ public:
 	~Camera();
 
 	void UpdateSelfAndChild() override;
-	void DrawSelfAndChild(Shader shader) override;
+	void DrawSelfAndChild(Shader shader, unsigned int shadowMapTexture) override;
 
 	void ProcessKeyboard(float deltaTime);
 	void ProcessMouseMovement(float xoffset, float yoffset);

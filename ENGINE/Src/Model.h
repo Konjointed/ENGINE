@@ -31,12 +31,13 @@ public:
 	Model(const std::string& path, bool gamma);
 	~Model();
 
-	void Draw(Shader shader, unsigned int shadowMap = 0);
+	void Draw(Shader shader, unsigned int shadowMapTexture = 0);
 
 	auto& GetBoneInfoMap() { return boneInfoMap; }
 	int& GetBoneCount() { return boneCounter; }
 
 	static Model GeneratePlane();
+	static Model GenerateCube();
 private:
 	std::map<std::string, BoneInfo> boneInfoMap;
 	int boneCounter = 0;

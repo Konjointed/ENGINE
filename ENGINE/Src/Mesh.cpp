@@ -61,7 +61,7 @@ Mesh::~Mesh() {
 }
 
 // Shader needed to set textures (I think?)
-void Mesh::Draw(Shader& shader, unsigned int shadowMap) {
+void Mesh::Draw(Shader& shader, unsigned int shadowMapTexture) {
     // bind appropriate textures
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
@@ -69,28 +69,35 @@ void Mesh::Draw(Shader& shader, unsigned int shadowMap) {
     unsigned int heightNr = 1;
 
     glActiveTexture(GL_TEXTURE0 + textures.size());
-    glBindTexture(GL_TEXTURE_2D, shadowMap);
-    shader.SetInteger("shadowMap", textures.size());
+    glBindTexture(GL_TEXTURE_2D, shadowMapTexture);
+    shader.SetInteger("shadowMapTexture", textures.size());
 
     for (unsigned int i = 0; i < textures.size(); i++)
     {
-        glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
+        // std::cout << i << "\n"; // Output: 0
+
+        // active proper texture unit before binding
+        glActiveTexture(GL_TEXTURE0 + i);
 
         // retrieve texture number (the N in diffuse_textureN)
         std::string number;
         std::string name = textures[i].type;
+        //std::cout << name << "\n"; // Output: texture_diffuse
         if (name == "texture_diffuse")
             number = std::to_string(diffuseNr++);
         else if (name == "texture_specular")
-            number = std::to_string(specularNr++); // transfer unsigned int to string
+            number = std::to_string(specularNr++); 
         else if (name == "texture_normal")
-            number = std::to_string(normalNr++); // transfer unsigned int to string
+            number = std::to_string(normalNr++); 
         else if (name == "texture_height")
-            number = std::to_string(heightNr++); // transfer unsigned int to string
+            number = std::to_string(heightNr++); 
 
         // now set the sampler to the correct texture unit
+        //std::cout << name + number << "\n"; // Output: texture_diffuse1
         shader.SetInteger((name + number).c_str(), i);
+
         // and finally bind the texture
+        //std::cout << textures[i].id << "\n"; // Output: 0
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
 

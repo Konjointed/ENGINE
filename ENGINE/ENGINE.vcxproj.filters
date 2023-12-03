@@ -377,6 +377,10 @@
     <None Include="Resources\Shaders\AnimModel.frag" />
     <None Include="Resources\Scripts\ILoveLua.lua" />
     <None Include="Resources\Scripts\Module.lua" />
+    <None Include="Resources\Shaders\Scene.vert" />
+    <None Include="Resources\Shaders\Scene.frag" />
+    <None Include="Resources\Shaders\Shadow.vert" />
+    <None Include="Resources\Shaders\Shadow.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">

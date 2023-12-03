@@ -47,8 +47,14 @@ void SceneGraph::DisplaySceneGraph(GameObject& object) {
 	}
 
 	if (node_open) {
+		/*
+		if (object.children.empty()) {
+			std::cout << "HAS NO CHILDREN\n";
+		}
+		*/
+
 		// Recursively display children
-		for (auto&& child : object.children) {
+		for (auto&& child : object.children) { 
 			DisplaySceneGraph(*child);
 		}
 		ImGui::TreePop();
