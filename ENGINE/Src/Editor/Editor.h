@@ -9,7 +9,6 @@
 #include <imgui/imgui_impl_opengl3.h>
 
 #include "UI/EditorUI.h"
-#include "../LuaEnvironment.h"
 #include "../GameObject.h"
 
 class Window;
@@ -19,7 +18,6 @@ class Editor {
 public:
 	EditorUI* editorUI = nullptr;
 	Window& window;
-	LuaEnvironment* luaenv = nullptr; // Note: move this back to application class
 
 	Editor(Window& window);
 	~Editor();

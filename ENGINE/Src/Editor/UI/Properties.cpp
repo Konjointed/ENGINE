@@ -17,6 +17,8 @@ void Properties::CameraProperties(Camera* camera) {
     }
 
     ImGui::DragFloat("Camera Speed", &camera->movementSpeed, 0.1f, -FLT_MAX, FLT_MAX, "%.3f");
+    ImGui::DragFloat("Far Plane", &camera->farPlane, 0.1f, -FLT_MAX, FLT_MAX, "%.3f");
+    ImGui::DragFloat("FOV", &camera->fov, 0.1f, -FLT_MAX, FLT_MAX, "%.3f");
 }
 
 void Properties::ObjectProperties(GameObject* object) {
@@ -61,10 +63,11 @@ void Properties::Draw(GameObject* selectedObject, Scene& scene) {
             // I'M NOT PROUD OF THIS SOLUTION, BUT OTHER METHODS CONFLICTED WITH RENDERING :(
             if (selectedObject->name == "Workspace") {
                 ImGui::Checkbox("Wireframe Mode", &scene.wireframe);
-                ImGui::DragFloat3("Light Position", &scene.lightPosition[0]);
-                ImGui::DragFloat("Near", &scene.nearPlane);
-                ImGui::DragFloat("Far", &scene.farPlane);
-                ImGui::DragFloat("Ortho Size", &scene.orthoSize);
+                //ImGui::DragFloat3("Light Position", &scene.lightPosition[0]);
+                //ImGui::DragFloat("Near", &scene.nearPlane);
+                //ImGui::DragFloat("Far", &scene.farPlane);
+                //ImGui::DragFloat("Ortho Size", &scene.orthoSize);
+                ImGui::DragFloat3("Light Direction", &scene.lightDirection[0]);
             }
 
             ObjectProperties(selectedObject);

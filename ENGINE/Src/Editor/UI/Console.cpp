@@ -11,6 +11,7 @@ void Console::Draw() {
 	if (ImGui::Button("Clear")) {
 		output.clear();
 	}
+	/*
 	ImGui::SameLine();
 	if (ImGui::Button("Add Error")) {
 		AddLog("[Error] error message");
@@ -19,6 +20,7 @@ void Console::Draw() {
 	if (ImGui::Button("Add Warning")) {
 		AddLog("[Warning]  warning message");
 	}
+	*/
 
 	// Console output
 	ImGui::BeginChild("ScrollingRegion", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), false, ImGuiWindowFlags_HorizontalScrollbar);

@@ -10,16 +10,25 @@ TextEdit::TextEdit() {
 }
 
 void TextEdit::Draw(LuaEnvironment& luaenv) {
-    for (auto& pair : editors) {
-        const std::string& editorPath = pair.first;
-        TextEditor& editor = *pair.second;
+    for (auto it = editors.begin(); it != editors.end(); ) {
+        const std::string& editorPath = it->first;
+        TextEditor& editor = *it->second;
 
-        // Begin a new window for each editor
-        ImGui::Begin(editorPath.c_str());
+        // Begin a new window with a menu bar for each editor
+        bool isOpen = true;
+        ImGui::Begin(editorPath.c_str(), &isOpen);
 
         ImGui::PushFont(font);
         editor.Render("TextEditor");
         ImGui::PopFont();
+
+        // Menu bar with close button
+        if (ImGui::BeginMenuBar()) {
+            if (ImGui::MenuItem("Close")) {
+                isOpen = false;  // Mark as not open
+            }
+            ImGui::EndMenuBar();
+        }
 
         // Context menu for each editor
         if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
@@ -42,6 +51,13 @@ void TextEdit::Draw(LuaEnvironment& luaenv) {
         }
 
         ImGui::End();
+
+        if (!isOpen) {
+            it = editors.erase(it);
+        }
+        else {
+            ++it;
+        }
     }
 }
 

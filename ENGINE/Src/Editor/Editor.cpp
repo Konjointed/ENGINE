@@ -17,7 +17,6 @@ Editor::Editor(Window& window) : window(window) {
 	ImGui_ImplOpenGL3_Init();
 
 	editorUI = new EditorUI;
-	luaenv = new LuaEnvironment;
 }
 
 Editor::~Editor() {
@@ -26,7 +25,6 @@ Editor::~Editor() {
 	ImGui::DestroyContext();
 
 	delete editorUI;
-	delete luaenv;
 }
 
 void Editor::Draw(unsigned int textureColorBuffer, Scene& scene) {
@@ -36,7 +34,7 @@ void Editor::Draw(unsigned int textureColorBuffer, Scene& scene) {
 
 	ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
-	editorUI->Draw(textureColorBuffer, window, *luaenv, scene);
+	editorUI->Draw(textureColorBuffer, window, scene);
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

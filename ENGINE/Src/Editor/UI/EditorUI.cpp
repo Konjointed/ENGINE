@@ -2,10 +2,15 @@
 #include "../Editor.h"
 #include "../../Scene.h"
 
-EditorUI::EditorUI() {}
-EditorUI::~EditorUI() {}
+EditorUI::EditorUI() {
+	luaenv = new LuaEnvironment(console);
+}
 
-void EditorUI::Draw(unsigned int textureColorBuffer, Window& window, LuaEnvironment& luaenv, Scene& scene) {
+EditorUI::~EditorUI() {
+	delete luaenv;
+}
+
+void EditorUI::Draw(unsigned int textureColorBuffer, Window& window, Scene& scene) {
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("View")) {
 			ImGui::MenuItem("Test 1");
@@ -20,6 +25,6 @@ void EditorUI::Draw(unsigned int textureColorBuffer, Window& window, LuaEnvironm
 	scenegraph.Draw(scene);
 	viewport.Draw(textureColorBuffer, window);
 	properties.Draw(scenegraph.GetSelectedObject(), scene);
-	textEdit.Draw(luaenv);
+	textEdit.Draw(*luaenv);
 	resourceBrowser.Draw(textEdit);
 }

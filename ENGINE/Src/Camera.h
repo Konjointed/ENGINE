@@ -9,6 +9,10 @@
 class Camera : public GameObject {
 public:
 	float movementSpeed = 1.0f;
+	float nearPlane = 0.1f;
+	float farPlane = 500.0f;
+	float fov = 45.0f;
+	float aspectRatio = (float)Viewport::VIEWPORT_WIDTH / Viewport::VIEWPORT_HEIGHT;
 
 	Camera(glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = 45.0f, float pitch = 0.0f);
 	~Camera();
@@ -24,11 +28,6 @@ public:
 	glm::mat4 GetProjectionMatrix();
 	glm::vec3 GetFront();
 private:
-	float fov = 45.0f;
-	float aspectRatio = (float)Viewport::VIEWPORT_WIDTH / Viewport::VIEWPORT_HEIGHT;
-	float nearPlane = 0.1f;
-	float farPlane = 10000.0f;
-
 	glm::vec3 front;
 	glm::vec3 up;
 	glm::vec3 right;

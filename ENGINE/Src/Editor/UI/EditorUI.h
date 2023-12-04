@@ -7,6 +7,7 @@
 #include "Properties.h"
 #include "TextEdit.h"
 #include "ResourceBrowser.h"
+#include "../../LuaEnvironment.h"
 
 class Window;
 class LuaEnvironment;
@@ -21,10 +22,12 @@ public:
 	TextEdit textEdit;
 	ResourceBrowser resourceBrowser;
 
+	LuaEnvironment* luaenv = nullptr; // Note: move this back to application class
+
 	EditorUI();
 	~EditorUI();
 
-	void Draw(unsigned int textureColorBuffer, Window& window, LuaEnvironment& luaenv, Scene& scene);
+	void Draw(unsigned int textureColorBuffer, Window& window, Scene& scene);
 private:
 };
 

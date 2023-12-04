@@ -381,6 +381,9 @@
     <None Include="Resources\Shaders\Scene.frag" />
     <None Include="Resources\Shaders\Shadow.vert" />
     <None Include="Resources\Shaders\Shadow.frag" />
+    <None Include="Resources\Shaders\Shadow2.vert" />
+    <None Include="Resources\Shaders\Shadow2.frag" />
+    <None Include="Resources\Shaders\Shadow2.geom" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.png">

@@ -1,18 +1,9 @@
-local myModule = require("Resources/Scripts/Module")
-local mytable = {1,2,3,4,5,6}
+local testModule = require("Resources/Scripts/Test")
 
-local function add(x, y) 
-	return x + y
-end
+testModule.DoSomething()
 
-local function printtable()
-	for i,v in ipairs(mytable) do
-		print(i)
-	end
-end
 
-print(add(5,5))
-printtable()
-myModule.doTask()
+
+
 
 

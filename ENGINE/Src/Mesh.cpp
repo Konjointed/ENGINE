@@ -69,7 +69,7 @@ void Mesh::Draw(Shader& shader, unsigned int shadowMapTexture) {
     unsigned int heightNr = 1;
 
     glActiveTexture(GL_TEXTURE0 + textures.size());
-    glBindTexture(GL_TEXTURE_2D, shadowMapTexture);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, shadowMapTexture);
     shader.SetInteger("shadowMapTexture", textures.size());
 
     for (unsigned int i = 0; i < textures.size(); i++)

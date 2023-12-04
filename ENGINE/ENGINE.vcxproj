@@ -276,6 +276,9 @@
     <None Include="Resources\Shaders\Screen.vert" />
     <None Include="Resources\Shaders\Shadow.frag" />
     <None Include="Resources\Shaders\Shadow.vert" />
+    <None Include="Resources\Shaders\Shadow2.frag" />
+    <None Include="Resources\Shaders\Shadow2.geom" />
+    <None Include="Resources\Shaders\Shadow2.vert" />
     <None Include="Resources\Shaders\ShadowMappingDepth.frag" />
     <None Include="Resources\Shaders\ShadowMappingDepth.vert" />
     <None Include="Resources\Shaders\Skybox.frag" />
